@@ -67,6 +67,7 @@ public class ElementController {
 	private Map <String, Object> location; 
 	private Map <String, Object> elementAttribues;
 	
+	
 	// Get all elements 
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}",
 			method = RequestMethod.GET,
