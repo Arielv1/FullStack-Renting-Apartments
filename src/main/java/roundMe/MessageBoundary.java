@@ -1,4 +1,4 @@
-package demo;
+package roundMe;
 
 public class MessageBoundary {
 	private String message;
