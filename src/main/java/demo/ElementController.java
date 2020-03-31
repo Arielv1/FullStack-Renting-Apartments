@@ -39,16 +39,16 @@ public class ElementController {
 	
 	
 	// Get a specific Element 
-	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementID}",
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementID}",
 					method = RequestMethod.GET,		
 					produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary getElement(@PathVariable("managerDomain") String managerDomain,
-			  						  @PathVariable("managerEmail") String managerEmail,
+	public ElementBoundary getElement(@PathVariable("userDomain") String userDomain,
+			  						  @PathVariable("userEmail") String userEmail,
 			  						  @PathVariable("elementDomain") String elementDomain,
 			  						  @PathVariable("elementID") String elementID) {
 		Map <String, Object> elementDomainMapping = new HashMap <String, Object>();
-		elementDomainMapping.put("managerDomain", managerDomain);
-		elementDomainMapping.put("managerEmail", managerEmail);
+		elementDomainMapping.put("userDomain", userDomain);
+		elementDomainMapping.put("managerEmail", userEmail);
 		
 		Map <String, Object> managerDomainMapping = new HashMap <String, Object>();
 		managerDomainMapping.put("elementDomain", elementDomain);
@@ -58,31 +58,22 @@ public class ElementController {
 				Collections.singletonMap("email", "2020B.Ofir.Cohen"), Collections.singletonMap("lat", "00.00"), 
 				Collections.singletonMap("demoAttribute" , "demoValue"));
 	}
-	private Map <String, Object> elementId;
-	private String type;
-	private String name;
-	private boolean active;	
-	private Date createdTimeStamp;
-	private Map <String, Object> createdBy;
-	private Map <String, Object> location; 
-	private Map <String, Object> elementAttribues;
-	
 	
 	// Get all elements 
-	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}",
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}",
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary[] getManyMessages (@PathVariable("managerDomain") String managerDomain,
-											  @PathVariable("managerEmail") String managerEmail) {
+	public ElementBoundary[] getManyMessages (@PathVariable("userDomain") String userDomain,
+											  @PathVariable("userEmail") String userEmail) {
 		Map <String, Object> elementDomainMapping = new HashMap <String, Object>();
-		elementDomainMapping.put("managerDomain", managerDomain);
-		elementDomainMapping.put("managerEmail", managerEmail);
+		elementDomainMapping.put("userDomain", userDomain);
+		elementDomainMapping.put("userEmail", userEmail);
 		
 		return IntStream.range(0, 10) // Stream of integers
 					.mapToObj(i -> "message #" + i) // Stream of Strings
 					.map(msg -> new ElementBoundary(Collections.singletonMap("domain", "thisDomain"), "Apartment", "idk", false,
 													new Date(), elementDomainMapping, null, Collections.singletonMap("demoAttribute", "demoValue"))) // Stream of MessageBoundary
-					.collect(Collectors.toList()) // List of MessageBoundary
-					.toArray(new ElementBoundary[0]); // Array of MessageBoundary
+					.collect(Collectors.toList()) // List of ElementBoundary
+					.toArray(new ElementBoundary[0]); // Array of ElementBoundary
 	}
 }
