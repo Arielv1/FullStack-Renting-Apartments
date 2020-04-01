@@ -17,14 +17,14 @@ public class UserController {
 	@RequestMapping(path = "/acs/users/login/{userDomain}/{userEmail}",
 			method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserBoundary infoOnUser(@PathVariable("userDomain") String userDomain, @PathVariable("userEmail") String userEmail) {
+	public UserBoundary infoOnUser(@PathVariable("userDomain") String userDomain, @PathVariable("userEmail") String userEmail)  {
 		if (userDomain != null && !userDomain.trim().isEmpty()) {
 			Map<String, Object> userIdMapping = new HashMap<>();
 			userIdMapping.put("userDomain", userDomain);
 			userIdMapping.put("userEmail", userEmail);
 			return new UserBoundary(Collections.singletonMap("email", "2020B.Ofir.Cohen"), "demo user", "client", ";-)");
 		}else {
-			throw new NameNotFoundException("invalid name");
+			throw new RuntimeException("invalid name");
 		}
 	}
 
