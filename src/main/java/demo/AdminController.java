@@ -23,29 +23,27 @@ public class AdminController {
 	) {}
 
 	// Delete all elements in the system
-
 	@RequestMapping(path = "/acs/admin/elements/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
 	public void delete_AllElements(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {}
+	
 	// Delete all actions in the system
-
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
 	public void delete_AllActions(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {}
 
 	// Export all users
-
 	@RequestMapping (path = "/acs/admin/users/{adminDomain}/{adminEmail}",
 					 method = RequestMethod.GET,
 					 produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserBoundry[] exports_AllUsers (
+	public UserBoundary[] exports_AllUsers (
 	@PathVariable("adminDomain") String adminDomain,
 	 @PathVariable("adminEmail") String adminEmail){
 		return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
 				.mapToObj(i -> "User #" + (i+1))  //stream of strings
-				.map(msg -> new UserBoundry(Collections.singletonMap("2020b.ofir.cohen", "hamami2010@gmail.com"),msg,"user role",":)")) // stream of UserBoundary
+				.map(msg -> new UserBoundary(Collections.singletonMap("2020b.ofir.cohen", "hamami2010@gmail.com"),msg,"user role",":)")) // stream of UserBoundary
 				.collect(Collectors.toList()) // list of UserBoundary
-				.toArray(new UserBoundry[0]); //UserBoundary[]
+				.toArray(new UserBoundary[0]); //UserBoundary[]
 	}
 
 	// Export all actions
