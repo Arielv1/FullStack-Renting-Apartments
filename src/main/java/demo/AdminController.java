@@ -41,7 +41,7 @@ public class AdminController {
 	 @PathVariable("adminEmail") String adminEmail){
 		return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
 				.mapToObj(i -> "User #" + (i+1))  //stream of strings
-				.map(msg -> new UserBoundary(Collections.singletonMap("2020b.ofir.cohen", "hamami2010@gmail.com"),msg,"user role",":)")) // stream of UserBoundary
+				.map(msg -> new UserBoundary(Collections.singletonMap("domain", "domain_value"),msg,"user role",":)")) // stream of UserBoundary
 				.collect(Collectors.toList()) // list of UserBoundary
 				.toArray(new UserBoundary[0]); //UserBoundary[]
 	}
@@ -55,7 +55,7 @@ public ActionBoundary[] exports_AllActions (
 	 @PathVariable("adminEmail") String adminEmail) {
 return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
 		.mapToObj(i -> "Action #" + (i+1))  //stream of strings
-		.map(msg -> new ActionBoundary(Collections.singletonMap("2020b.ofir.cohen", "971"),"actionType",Collections.singletonMap("domain", "54"),new Date(),Collections.singletonMap("invokedby:"+msg, "player@demo"),Collections.singletonMap("action", "information"))) // stream of ActionBoundary
+		.map(msg -> new ActionBoundary(Collections.singletonMap("domain", "domain_value"),"actionType",Collections.singletonMap("domain", "domain_value"),new Date(),Collections.singletonMap("invokedby:"+msg, "player@demo"),Collections.singletonMap("action", "information"))) // stream of ActionBoundary
 		.collect(Collectors.toList()) // list of ActionBoundary
 		.toArray(new ActionBoundary[0]); //ActionBoundary[]
 }

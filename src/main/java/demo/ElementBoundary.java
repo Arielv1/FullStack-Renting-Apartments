@@ -10,7 +10,10 @@ import java.util.*;
     "active": false,
     "createdTimeStamp": "2020-04-01T08:10:44.284+0000",
     "createdBy": {
-        "email": "2020B.Ofir.Cohen"
+    	"userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
     },
     "location": {
         "lat": "00.00"
