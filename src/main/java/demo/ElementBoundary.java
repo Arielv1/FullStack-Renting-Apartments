@@ -1,7 +1,24 @@
 package demo;
 
 import java.util.*;
-
+/*
+    "elementId": {
+        "ID": 1
+    },
+    "type": "demoType",
+    "name": "demoName",
+    "active": false,
+    "createdTimeStamp": "2020-04-01T08:10:44.284+0000",
+    "createdBy": {
+        "email": "2020B.Ofir.Cohen"
+    },
+    "location": {
+        "lat": "00.00"
+    },
+    "elementAttribues": {
+        "demoAttribute": "demoValue"
+    }
+ */
 public class ElementBoundary {
 	
 	private Map <String, Object> elementId;
