@@ -1,4 +1,4 @@
-package demo;
+package acs.rest.action;
 
 
 import org.springframework.http.MediaType;
@@ -14,6 +14,6 @@ public class ActionController {
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ActionBoundary invokeAnAction(@RequestBody ActionBoundary action) {
 		return new ActionBoundary(action.getActionId(), action.getType(), action.getElement(),
-				action.getCreatedTimeStamp(), action.getInvokedBy(), action.getActionAttributes());
+				action.getCreatedTimestamp(), action.getInvokedBy(), action.getActionAttributes());
 	}
 }

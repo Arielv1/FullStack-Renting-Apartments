@@ -1,4 +1,4 @@
-package demo;
+package acs.rest.action;
 
 import java.util.Date;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class ActionBoundary {
 	private Map <String, Object> actionId;
 	private String type;
 	private Map <String, Object> element;
-	private Date createdTimeStamp;
+	private Date createdTimestamp;
 	private Map <String, Object> invokedBy;
 	private Map <String, Object> actionAttributes;
 
@@ -43,13 +43,13 @@ public class ActionBoundary {
 
 	}
 
-	public ActionBoundary(Map <String, Object> actionId, String type, Map <String, Object> element, Date createdTimeStamp,
+	public ActionBoundary(Map <String, Object> actionId, String type, Map <String, Object> element, Date createdTimestamp,
 			Map <String, Object> invokedBy,Map <String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
 		this.type = type;
 		this.element = element;
-		this.createdTimeStamp = createdTimeStamp;
+		this.createdTimestamp = createdTimestamp;
 		this.invokedBy = invokedBy;
 		this.actionAttributes = actionAttributes;
 	}
@@ -78,12 +78,12 @@ public class ActionBoundary {
 		this.element = element;
 	}
 
-	public Date getCreatedTimeStamp() {
-		return createdTimeStamp;
+	public Date getCreatedTimestamp() {
+		return createdTimestamp;
 	}
 
-	public void setCreatedTimeStamp(Date createdTimeStamp) {
-		this.createdTimeStamp = createdTimeStamp;
+	public void setCreatedTimestamp(Date createdTimestamp) {
+		this.createdTimestamp = createdTimestamp;
 	}
 
 	public Map<String, Object> getInvokedBy() {
@@ -105,7 +105,7 @@ public class ActionBoundary {
 	@Override
 	public String toString() {
 		return "ActionBoundary [actionId=" + actionId + ", type=" + type + ", element=" + element
-				+ ", createdTimeStamp=" + createdTimeStamp + ", invokedBy=" + invokedBy + ", actionAttributes="
+				+ ", createdTimestamp=" + createdTimestamp + ", invokedBy=" + invokedBy + ", actionAttributes="
 				+ actionAttributes + "]";
 	}
 

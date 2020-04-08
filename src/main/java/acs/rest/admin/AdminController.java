@@ -1,4 +1,4 @@
-package demo;
+package acs.rest.admin;
 
 import java.util.Collections;
 import java.util.Date;
@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import acs.rest.action.ActionBoundary;
+import acs.rest.users.UserBoundary;
 
 //consumes =  type of input
 //produces =  type of output

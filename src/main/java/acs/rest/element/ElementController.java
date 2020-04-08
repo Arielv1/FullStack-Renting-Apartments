@@ -1,4 +1,4 @@
-package demo;
+package acs.rest.element;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -47,15 +47,15 @@ public class ElementController {
 			  						  @PathVariable("elementDomain") String elementDomain,
 			  						  @PathVariable("elementID") String elementID) {
 		Map <String, Object> elementDomainMapping = new HashMap <String, Object>();
-		elementDomainMapping.put("userDomain", userDomain);
-		elementDomainMapping.put("managerEmail", userEmail);
+		elementDomainMapping.put("elementDomain", elementDomain);
+		elementDomainMapping.put("elementID", elementID);
 		
-		Map <String, Object> managerDomainMapping = new HashMap <String, Object>();
-		managerDomainMapping.put("elementDomain", elementDomain);
-		managerDomainMapping.put("elementID", elementID);
+		Map <String, Object> userDomainMapping = new HashMap <String, Object>();
+		elementDomainMapping.put("userDomain", userDomain);
+		elementDomainMapping.put("userEmail", userEmail);
 		
 		return new ElementBoundary(Collections.singletonMap("ID", 1), "demoType", "demoName", false, new Date(), 
-				Collections.singletonMap("email", "2020B.Ofir.Cohen"), Collections.singletonMap("lat", "00.00"), 
+				Collections.singletonMap("email", "2020B.Ofir.Cohen"), Collections.singletonMap("lat", 31.32), 
 				Collections.singletonMap("demoAttribute" , "demoValue"));
 	}
 	

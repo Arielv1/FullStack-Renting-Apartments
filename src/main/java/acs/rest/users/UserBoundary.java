@@ -1,4 +1,4 @@
-package demo;
+package acs.rest.users;
 
 import java.util.Map;
 

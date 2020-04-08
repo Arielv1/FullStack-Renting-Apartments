@@ -1,4 +1,4 @@
-package demo;
+package acs.rest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,6 +1,8 @@
-package demo;
+package acs.rest.admin;
 
 import java.util.Arrays;
+
+import acs.rest.users.UserBoundary;
 
 /*
 {

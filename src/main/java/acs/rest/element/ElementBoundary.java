@@ -1,4 +1,4 @@
-package demo;
+package acs.rest.element;
 
 import java.util.*;
 /*
@@ -8,7 +8,7 @@ import java.util.*;
     "type": "demoType",
     "name": "demoName",
     "active": false,
-    "createdTimeStamp": "2020-04-01T08:10:44.284+0000",
+    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
     "createdBy": {
     	"userid":{
     		"domain:"2020b.ofir.cohen",
@@ -28,9 +28,9 @@ public class ElementBoundary {
 	private String type;
 	private String name;
 	private boolean active;	
-	private Date createdTimeStamp;
+	private Date createdTimestamp;
 	private Map <String, Object> createdBy;
-	private Map <String, Object> location; 
+	private Map <String, Double> location; 
 	private Map <String, Object> elementAttribues;
 	
 	
@@ -38,14 +38,14 @@ public class ElementBoundary {
 	}
 
 	public ElementBoundary(Map<String, Object> elementId, String type, String name, boolean active,
-			Date createdTimeStamp, Map<String, Object> createdBy, Map<String, Object> location,
+			Date createdTimestamp, Map<String, Object> createdBy, Map<String, Double> location,
 			Map<String, Object> elementAttribues) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
 		this.name = name;
 		this.active = active;
-		this.createdTimeStamp = createdTimeStamp;
+		this.createdTimestamp = createdTimestamp;
 		this.createdBy = createdBy;
 		this.location = location;
 		this.elementAttribues = elementAttribues;
@@ -83,12 +83,12 @@ public class ElementBoundary {
 		this.active = active;
 	}
 
-	public Date getCreatedTimeStamp() {
-		return createdTimeStamp;
+	public Date getCreatedTimestamp() {
+		return createdTimestamp;
 	}
 
-	public void setCreatedTimeStamp(Date createdTimeStamp) {
-		this.createdTimeStamp = createdTimeStamp;
+	public void setCreatedTimestamp(Date createdTimestamp) {
+		this.createdTimestamp = createdTimestamp;
 	}
 
 	public Map<String, Object> getCreatedBy() {
@@ -99,11 +99,11 @@ public class ElementBoundary {
 		this.createdBy = createdBy;
 	}
 
-	public Map<String, Object> getLocation() {
+	public Map<String, Double> getLocation() {
 		return location;
 	}
 
-	public void setLocation(Map<String, Object> location) {
+	public void setLocation(Map<String, Double> location) {
 		this.location = location;
 	}
 
@@ -118,7 +118,7 @@ public class ElementBoundary {
 	@Override
 	public String toString() {
 		return "ElementBoundary [elementId=" + elementId + ", type=" + type + ", name=" + name + ", active=" + active
-				+ ", createdTimeStamp=" + createdTimeStamp + ", createdBy=" + createdBy + ", location=" + location
+				+ ", createdTimestamp=" + createdTimestamp + ", createdBy=" + createdBy + ", location=" + location
 				+ ", elementAttribues=" + elementAttribues + "]";
 	}
 	
