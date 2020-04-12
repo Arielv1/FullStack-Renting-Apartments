@@ -15,7 +15,7 @@ import java.util.Map;
  			"domain":"2020b.demo",
  			"id":"54"
  	},
- 	"createTypestamp":"2020-03-01T15:03:55.121+0000"
+ 	"createdTimestamp":"2020-03-01T15:03:55.121+0000"
  	"invokedBy":{
  		"userId":{
  			"domain":"2020b.demo",
@@ -23,8 +23,10 @@ import java.util.Map;
  		}
  	},
  	"actionAttributes":{
- 		
- 	
+ 		"key1":"can be set to any value you wish",
+ 		"key2":44.5,
+ 		"booleanValue":false,
+ 		"lastKey":"it can contain anything you wish"
  	}
  }
  */

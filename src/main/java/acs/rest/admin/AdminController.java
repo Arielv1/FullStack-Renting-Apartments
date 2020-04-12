@@ -1,7 +1,8 @@
 package acs.rest.admin;
 
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.*;
 
 import org.springframework.http.MediaType;
@@ -42,9 +43,13 @@ public class AdminController {
 	public UserBoundary[] exports_AllUsers (
 	@PathVariable("adminDomain") String adminDomain,
 	 @PathVariable("adminEmail") String adminEmail){
+		Map <String, Object> userId = new HashMap <String, Object>();
+		userId.put("domain", "2020b.ofir.cohen");
+		userId.put("email", "MichaelHamami@gmail.com");
 		return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
 				.mapToObj(i -> "User #" + (i+1))  //stream of strings
-				.map(msg -> new UserBoundary(Collections.singletonMap("domain", "domain_value"),msg,"user role",":)")) // stream of UserBoundary
+				.map(msg -> new UserBoundary(userId,"Demo User","PLAYER",";-)")
+						) // stream of UserBoundary
 				.collect(Collectors.toList()) // list of UserBoundary
 				.toArray(new UserBoundary[0]); //UserBoundary[]
 	}
@@ -56,9 +61,36 @@ public class AdminController {
 public ActionBoundary[] exports_AllActions (
 	@PathVariable("adminDomain") String adminDomain,
 	 @PathVariable("adminEmail") String adminEmail) {
+		Map <String, Object> actionId = new HashMap <String, Object>();
+		actionId.put("domain", "2020b.ofir.cohen");
+		actionId.put("id", "971");
+		
+		Map <String, Object> elementID = new HashMap <String, Object>();
+		elementID.put("domain", "2020b.ofir.cohen");
+		elementID.put("id", "54");
+		
+		Map <String, Object> element = new HashMap <String, Object>();
+		element.put("elementId", elementID);
+		
+		Map <String, Object> userID = new HashMap <String, Object>();
+		userID.put("domain", "2020b.ofir.cohen");
+		userID.put("email", "MichaelHamami@gmail.com");
+		
+		Map <String, Object> invokedBy = new HashMap <String, Object>();
+		invokedBy.put("userId", userID);
+		
+		Map <String, Object> actionAttributes = new HashMap <String, Object>();
+		actionAttributes.put("key1", "can be set to any value you wish");
+		actionAttributes.put("key2", 44.5);
+		actionAttributes.put("booleanValue", false);
+		actionAttributes.put("lastKey", "it can contain anything you wish");
+
+		
 return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
 		.mapToObj(i -> "Action #" + (i+1))  //stream of strings
-		.map(msg -> new ActionBoundary(Collections.singletonMap("domain", "domain_value"),"actionType",Collections.singletonMap("domain", "domain_value"),new Date(),Collections.singletonMap("invokedby:"+msg, "player@demo"),Collections.singletonMap("action", "information"))) // stream of ActionBoundary
+		.map(msg -> new ActionBoundary(
+				actionId,"actionType",element,new Date(),invokedBy,actionAttributes)
+				) // stream of ActionBoundary
 		.collect(Collectors.toList()) // list of ActionBoundary
 		.toArray(new ActionBoundary[0]); //ActionBoundary[]
 }

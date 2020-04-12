@@ -6,16 +6,14 @@ import java.util.Map;
  {
  	"userId": { 
  		"domain" : "2020.b@demo",
- 		"email" : "tomerarnon@gmail.com"
+ 		"email" : "tomerarnon@gma"il.com"
  	},
- 	"role" : "client",
+ 	"role" : "PLAYER",
  	"userName" : "demo user",
  	"avatar" : ";-)"
  } 
- 
  * 
  */
-
 
 public class UserBoundary {
 	private Map<String, Object> userId;
