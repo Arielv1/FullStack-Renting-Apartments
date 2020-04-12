@@ -51,8 +51,8 @@ public class ElementController {
 		elementDomainMapping.put("elementID", elementID);
 		
 		Map <String, Object> userDomainMapping = new HashMap <String, Object>();
-		elementDomainMapping.put("userDomain", userDomain);
-		elementDomainMapping.put("userEmail", userEmail);
+		userDomainMapping.put("userDomain", userDomain);
+		userDomainMapping.put("userEmail", userEmail);
 		
 		return new ElementBoundary(Collections.singletonMap("ID", 1), "demoType", "demoName", false, new Date(), 
 				Collections.singletonMap("email", "2020B.Ofir.Cohen"), Collections.singletonMap("lat", 31.32), 
