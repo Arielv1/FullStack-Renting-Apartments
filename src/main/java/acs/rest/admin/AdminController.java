@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import acs.data.UserRole;
 import acs.rest.action.ActionBoundary;
 import acs.rest.users.UserBoundary;
 
@@ -48,7 +49,7 @@ public class AdminController {
 		userId.put("email", "MichaelHamami@gmail.com");
 		return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
 				.mapToObj(i -> "User #" + (i+1))  //stream of strings
-				.map(msg -> new UserBoundary(userId,"Demo User","PLAYER",";-)")
+				.map(msg -> new UserBoundary(userId,"Demo User",UserRole.PLAYER,";-)")
 						) // stream of UserBoundary
 				.collect(Collectors.toList()) // list of UserBoundary
 				.toArray(new UserBoundary[0]); //UserBoundary[]

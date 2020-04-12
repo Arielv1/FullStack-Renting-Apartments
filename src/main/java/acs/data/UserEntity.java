@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class UserEntity {
 	private Map<String, Object> userId;
-	private String role; // check if it is need to change
+	private UserRole role; // check if it is need to change
 	private String username;
 	private String avatar;
 	
@@ -12,22 +12,32 @@ public class UserEntity {
 	public UserEntity() {
 	}
 	
+	
+	public UserEntity(Map<String, Object> userId, UserRole role, String username, String avatar) {
+		super();
+		this.userId = userId;
+		this.role = role;
+		this.username = username;
+		this.avatar = avatar;
+	}
+
+
 	public Map<String, Object> getUserId() {
 		return userId;
 	}
 	public void setUserId(Map<String, Object> userId) {
 		this.userId = userId;
 	}
-	public String getRole() {
+	public UserRole getRole() {
 		return role;
 	}
-	public void setRole(String role) {
+	public void setRole(UserRole role) {
 		this.role = role;
 	}
-	public String getUsername() {
+	public String getUserName() {
 		return username;
 	}
-	public void setUsername(String username) {
+	public void setUserName(String username) {
 		this.username = username;
 	}
 	public String getAvatar() {

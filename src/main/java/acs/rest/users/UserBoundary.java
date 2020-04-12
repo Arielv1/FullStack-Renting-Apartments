@@ -2,6 +2,8 @@ package acs.rest.users;
 
 import java.util.Map;
 
+import acs.data.UserRole;
+
 /*
  {
  	"userId": { 
@@ -19,13 +21,13 @@ public class UserBoundary {
 	private Map<String, Object> userId;
 	private String avatar;
 	private String userName;
-	private String role;
+	private UserRole role;
 
 	public UserBoundary() {
 
 	}
 
-	public UserBoundary(Map<String, Object> userId,  String userName, String role, String avatar) {
+	public UserBoundary(Map<String, Object> userId,  String userName, UserRole role, String avatar) {
 		super();
 		this.userId = userId;
 		this.userName = userName;
@@ -57,11 +59,11 @@ public class UserBoundary {
 		this.userName = userName;
 	}
 
-	public String getRole() {
+	public UserRole getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(UserRole role) {
 		this.role = role;
 	}
 
