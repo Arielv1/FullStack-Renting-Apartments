@@ -17,12 +17,10 @@ import acs.logic.user.UserServiceInterface;
 public class UserController {
 	private UserServiceInterface userService;
 
-	/*
 	@Autowired
 	public void setUserService(UserServiceInterface userService) {
 		this.userService = userService;
 	}
-	*/
 	
 
 	// login valid user and retrieve user details
