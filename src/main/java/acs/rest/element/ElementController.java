@@ -1,8 +1,13 @@
 package acs.rest.element;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,70 +15,89 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import acs.logic.element.ElementService;
+
 @RestController
-public class ElementController {
+public class ElementController {	
 	
-	// Create new Element
+	private ElementService elementService;
+	
+	@Autowired
+	public void setElementService(ElementService elementService) {
+		this.elementService = elementService;
+	}
+	
+		// Create (POST) new element
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}",
 			method = RequestMethod.POST,
 			produces = MediaType.APPLICATION_JSON_VALUE,
 			consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary createNewElement(@PathVariable("managerDomain") String managerDomain ,
-		     								@PathVariable("managerEmail") String managerEmail,
-		     								@RequestBody ElementBoundary eb) {
-		return new ElementBoundary(eb.getElementId(), eb.getType(), eb.getName(), eb.isActive(), new Date(), eb.getCreatedBy(),
-				eb.getLocation(), eb.getElementAttribues());
+		     					  @PathVariable("managerEmail") String managerEmail,
+		     					  @RequestBody ElementBoundary element) {
+		
+		//TODO - Temp elementId generator
+		Map<String, Object> elementId = new HashMap<String, Object>();
+		elementId.put("domain", "2020B.Ofir.Cohen");
+		elementId.put("id", UUID.randomUUID().toString());
+			
+		Map<String, Object> createdBy = new HashMap<String, Object>();
+		
+		Map<String, Object> managerDetails = new HashMap<String, Object>();
+		managerDetails.put("domain", managerDomain);
+		managerDetails.put("email", managerEmail);
+		
+		createdBy.put("UserId", managerDetails);
+		
+		element.setElementId(elementId);
+		element.setCreatedBy(createdBy);
+			
+		return this.elementService.create(managerDomain, managerEmail, element);
 	}
-	
-	//Update an Element
-	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementID}",
+		
+		//Update an Element
+	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}",
 			method = RequestMethod.PUT,			
 			consumes = MediaType.APPLICATION_JSON_VALUE)
 	public void updateElement(@PathVariable("managerDomain") String managerDomain ,
 		     				  @PathVariable("managerEmail") String managerEmail,
 		     				  @PathVariable("elementDomain") String elementDomain,
-		     				  @PathVariable("elementID") String elementID,
+		     				  @PathVariable("elementId") String elementId,
 		     				  @RequestBody ElementBoundary eb) {
-		System.err.println(eb);
+		eb = this.elementService.update(managerDomain, managerEmail, elementId, elementDomain, eb);
+		System.err.println("UPDATE - BACK TO CONTROLLER\n"+eb);
 	}
 	
-	
-	// Get a specific Element 
-	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementID}",
-					method = RequestMethod.GET,		
-					produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary getElement(@PathVariable("userDomain") String userDomain,
-			  						  @PathVariable("userEmail") String userEmail,
-			  						  @PathVariable("elementDomain") String elementDomain,
-			  						  @PathVariable("elementID") String elementID) {
-		Map <String, Object> elementDomainMapping = new HashMap <String, Object>();
-		elementDomainMapping.put("elementDomain", elementDomain);
-		elementDomainMapping.put("elementID", elementID);
-		
-		Map <String, Object> userDomainMapping = new HashMap <String, Object>();
-		userDomainMapping.put("userDomain", userDomain);
-		userDomainMapping.put("userEmail", userEmail);
-		
-		return new ElementBoundary(Collections.singletonMap("ID", 1), "demoType", "demoName", false, new Date(), 
-				Collections.singletonMap("email", "2020B.Ofir.Cohen"), Collections.singletonMap("lat", 31.32), 
-				Collections.singletonMap("demoAttribute" , "demoValue"));
-	}
-	
-	// Get all elements 
-	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}",
-			method = RequestMethod.GET,
+		// Get (GET) Specific element by elementId (key)
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}",
+			method = RequestMethod.GET,		
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary[] getManyMessages (@PathVariable("userDomain") String userDomain,
-											  @PathVariable("userEmail") String userEmail) {
-		Map <String, Object> elementDomainMapping = new HashMap <String, Object>();
-		elementDomainMapping.put("userDomain", userDomain);
-		elementDomainMapping.put("userEmail", userEmail);
-		
-		return IntStream.range(0, 10) // Stream of integers
-					.mapToObj(i -> "message #" + i) // Stream of Strings
-					.map(msg -> new ElementBoundary(Collections.singletonMap("domain", "thisDomain"), "Apartment", "idk", false,
-													new Date(), elementDomainMapping, null, Collections.singletonMap("demoAttribute", "demoValue"))) // Stream of MessageBoundary
-					.collect(Collectors.toList()) // List of ElementBoundary
-					.toArray(new ElementBoundary[0]); // Array of ElementBoundary
+	public ElementBoundary getSpecific(@PathVariable("userDomain") String userDomain,
+		  						  @PathVariable("userEmail") String userEmail,
+		  						  @PathVariable("elementDomain") String elementDomain,
+		  						  @PathVariable("elementId") String elementId) {
+		System.err.println("GET SPECIFIC RESULT\n"+this.elementService.getSpecific(userDomain, userEmail, elementDomain, elementId));
+		return this.elementService.getSpecific(userDomain, userEmail, elementDomain, elementId);
 	}
+		
+		//Get All (GET) elements
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}",
+			method = RequestMethod.GET,		
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] getAll(@PathVariable("userDomain") String userDomain,
+		  						  @PathVariable("userEmail") String userEmail) {
+	
+		return this.elementService.getAll(userDomain, userEmail).stream().
+				toArray(i -> new ElementBoundary[i]);
+		
+	}
+	
+	/*/ COPY THIS TO ADMIN CONTROLLER
+		// Delete (DELETE) all elements
+	@RequestMapping(path = "/acs/admin/elements/{adminDomain}/{adminEmail}",
+			method = RequestMethod.DELETE)
+	public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
+			 					  @PathVariable("adminEmail") String adminEmail) {
+		this.elementService.deleteAll(adminDomain, adminEmail);	
+	}*/
 }

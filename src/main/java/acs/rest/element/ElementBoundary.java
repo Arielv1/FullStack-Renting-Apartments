@@ -3,6 +3,7 @@ package acs.rest.element;
 import java.util.*;
 /*
     "elementId": {
+    	"domain" : "2020B.Ofir.Cohen"
         "ID": 1
     },
     "type": "demoType",
@@ -23,11 +24,10 @@ import java.util.*;
     }
  */
 public class ElementBoundary {
-	
 	private Map <String, Object> elementId;
 	private String type;
 	private String name;
-	private boolean active;	
+	private Boolean active;	
 	private Date createdTimestamp;
 	private Map <String, Object> createdBy;
 	private Map <String, Double> location; 
@@ -37,7 +37,7 @@ public class ElementBoundary {
 	public ElementBoundary() {	
 	}
 
-	public ElementBoundary(Map<String, Object> elementId, String type, String name, boolean active,
+	public ElementBoundary(Map<String, Object> elementId, String type, String name, Boolean active,
 			Date createdTimestamp, Map<String, Object> createdBy, Map<String, Double> location,
 			Map<String, Object> elementAttribues) {
 		super();
@@ -75,11 +75,11 @@ public class ElementBoundary {
 		this.name = name;
 	}
 
-	public boolean isActive() {
+	public Boolean getActive() {
 		return active;
 	}
 
-	public void setActive(boolean active) {
+	public void setActive(Boolean active) {
 		this.active = active;
 	}
 
@@ -115,12 +115,17 @@ public class ElementBoundary {
 		this.elementAttribues = elementAttribues;
 	}
 
+
+
 	@Override
 	public String toString() {
 		return "ElementBoundary [elementId=" + elementId + ", type=" + type + ", name=" + name + ", active=" + active
 				+ ", createdTimestamp=" + createdTimestamp + ", createdBy=" + createdBy + ", location=" + location
 				+ ", elementAttribues=" + elementAttribues + "]";
 	}
+
 	
+
+
 	
 }
