@@ -31,7 +31,6 @@ public class UserService implements UserServiceInterface {
 	public UserService(UserConvertor convert) {
 		this.convert = convert;
 	}
-	
 
 	@Value("${spring.application.name:ofir.cohen}")
 	public void setProjectName(String ProjectName) {
