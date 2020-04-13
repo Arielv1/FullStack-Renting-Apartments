@@ -11,7 +11,7 @@ public class ActionConverter {
 				entity.getActionId(),
 				entity.getType(),
 				entity.getElement(),
-				entity.getCreatedTimeStamp(),
+				entity.getCreatedTimestamp(),
 				entity.getInvokedBy(),
 				entity.getActionAttributes()
 				);
@@ -23,7 +23,7 @@ public class ActionConverter {
 		entity.setActionId(boundary.getActionId());
 		entity.setType(boundary.getType());
 		entity.setElement(boundary.getElement());
-		entity.setCreatedTimeStamp(boundary.getCreatedTimestamp());
+		entity.setCreatedTimestamp(boundary.getCreatedTimestamp());
 		entity.setInvokedBy(boundary.getInvokedBy());
 		entity.setActionAttributes(boundary.getActionAttributes());
 		return entity;
