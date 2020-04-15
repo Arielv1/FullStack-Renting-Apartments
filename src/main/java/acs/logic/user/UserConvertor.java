@@ -16,7 +16,7 @@ public class UserConvertor {
 	}
 	public UserEntity toEntity(UserBoundary boundray) {
 		UserEntity entity = new UserEntity(boundray.getUserId(), boundray.getRole() ,boundray.getUserName()
-				, boundray.getAvatar());
+				,boundray.getAvatar());
 		return entity;
 		
 	}
