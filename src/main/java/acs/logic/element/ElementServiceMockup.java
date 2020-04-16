@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ import acs.data.*;
 import acs.rest.element.ElementBoundary;
 
 @Service
-public class ElementServiceMockup implements ElementService{
+public class ElementServiceMockup implements ElementService {
 	
 	private String projectName;
 	
@@ -46,7 +47,7 @@ public class ElementServiceMockup implements ElementService{
 	@PostConstruct
 	public void init() {
 		// initialize object after injection
-		System.err.println("project nawme: " + this.projectName);
+		System.err.println("Project : " + this.projectName + " initialized ElementServiceMockup");
 		
 		// make sure that this is actually the proper Map for this application
 		this.database = Collections.synchronizedMap(new HashMap<>()); 
@@ -55,21 +56,56 @@ public class ElementServiceMockup implements ElementService{
 	@Override
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary element) {
 		
-		Object keyParts[] = element.getElementId().values().toArray();
-		String key = (String)keyParts[0]+"!"+(String)keyParts[1];
+		/* Create elementId attribute:
+		 *  "elementId": {
+    			"domain" : "2020B.Ofir.Cohen"
+        		"ID": 1
+    		}
+		 */
+		Map<String, Object> elementId = new HashMap<String, Object>();
+		elementId.put("domain", this.projectName);
+		elementId.put("id", UUID.randomUUID().toString());
+			
+		/* Crate createdBy attribute:
+		 * "createdBy": {
+    			"userid":{
+    				"domain:"2020b.ofir.cohen",
+        			"email": "ofir.cohen@gmail.com"
+        		}
+    		} 
+		 */
+		Map<String, Object> createdBy = new HashMap<String, Object>();
+				
+		Map<String, Object> managerDetails = new HashMap<String, Object>();
+		managerDetails.put("domain", managerDomain);
+		managerDetails.put("email", managerEmail);
+				
+		createdBy.put("UserId", managerDetails);
+				
+		element.setElementId(elementId);
+		element.setCreatedBy(createdBy);
 		
-		this.database.put(key , this.converter.boundaryToEntity(element));	
+		
+		/*
+		 * Create key attribute to identify the element : key = id + "!" + domain
+		 */
+		
+		Object keyParts[] = element.getElementId().values().toArray();
+		String key = (String)keyParts[0] + "!" + (String)keyParts[1];
+		
+		ElementEntity entity = this.converter.boundaryToEntity(element);
+		
+		entity.setElementId(elementId);
+		entity.setCreatedBy(createdBy);
+		
+		// TODO - remove 'key' element is turns out to be irrelevent
+		entity.setKey(key);
+		
+		this.database.put(key , entity);	
 		
 		System.err.println(this.database.size() + " " + key);
 		
-		return new ElementBoundary(element.getElementId(), 
-				element.getType(), 
-				element.getName(), 
-				element.getActive(), 
-				element.getCreatedTimestamp(), 
-				element.getCreatedBy(), 
-				element.getLocation(), 
-				element.getElementAttribues());
+		return this.converter.entityToBoundary(entity);
 	}
 
 	@Override
@@ -78,23 +114,22 @@ public class ElementServiceMockup implements ElementService{
 		
 		ElementEntity entity = this.database.get(elementId);
 		
-		if (entity == null)
-			return null;
+		if(entity == null) throw new RuntimeException("ElementEntity invalid ID");
 		
-		if(update.getType() != null) 	entity.setType(update.getType()); 
-		else entity.setType(" ");
+		if(update.getType() != null) entity.setType(update.getType()); 
+		else throw new RuntimeException("ElementEntity invalid type");
 		
 		if(update.getName() != null) 	entity.setName(update.getName()); 
-		else entity.setName(" ");
+		else throw new RuntimeException("ElementEntity invalid name");
 		
 		if (update.getActive() != null) entity.setActive(update.getActive());
 		else entity.setActive(false);
 		
-		entity.setCreatedTimestamp(update.getCreatedTimestamp());
-		
 		entity.setLocation(update.getLocation());
 		
 		entity.setElementAttribues(update.getElementAttribues());
+		
+		entity.setCreatedTimestamp(new Date());
 		
 		update = this.converter.entityToBoundary(entity);
 
@@ -104,26 +139,28 @@ public class ElementServiceMockup implements ElementService{
 	@Override
 	public List <ElementBoundary> getAll(String userDomain, String userEmail) {
 		
-		List <ElementBoundary> boudaries = new ArrayList <ElementBoundary>();
-		
-		List <ElementEntity> entities = new ArrayList <ElementEntity>(this.database.values());
-		
-		for (ElementEntity entity : entities) 
-			boudaries.add(this.converter.entityToBoundary(entity));
-	
-		return boudaries;
+		return this.database
+				.values() // Collection<ElementEntity>
+				.stream()  // Stream<ElementEntity>
+				.map(this.converter::entityToBoundary) // Convert to Stream<ElementBoundary>
+				.collect(Collectors.toList()); // List<ElementBoundary>
 	}
 
 	@Override
 	public ElementBoundary getSpecific(String userDomain, String userEmail, String elementDomain, String elementId) {
-		return this.converter.entityToBoundary(this.database.get(elementId));
+		
+		ElementBoundary boundary = this.converter.entityToBoundary(this.database.get(elementId));
+		
+		if(boundary == null) throw new RuntimeException("ElementEntity invalid ID");
+		else return boundary;
 	}
 	
 	
 	@Override
 	public void deleteAll(String adminDomain, String adminEmail) {
 		
-		// TODO - Check admin privileges
+		// TODO - check admin privileges
+		
 		this.database.clear();
 	}
 }

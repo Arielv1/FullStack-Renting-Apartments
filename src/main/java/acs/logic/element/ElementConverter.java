@@ -1,16 +1,17 @@
-package acs.data;
+package acs.logic.element;
 
 import java.util.*;
 
 import org.springframework.stereotype.Component;
 
+import acs.data.ElementEntity;
 import acs.rest.element.ElementBoundary;
 
 @Component
 public class ElementConverter {
 	
 	public ElementBoundary entityToBoundary (ElementEntity entity) {
-		if (entity == null)
+		if (entity == null) 
 			return null;
 		
 		return new ElementBoundary(
@@ -40,23 +41,22 @@ public class ElementConverter {
 		ElementEntity entity = new ElementEntity();
 		
 		if (boundary.getElementId() != null) {
-			
-			// Possible to combine in 1 line - need to edit implementaion of setElementId so call setKey
 			entity.setElementId(boundary.getElementId());	
+			
+			// TODO - remove 'key' element is turns out to be irrelevent
 			entity.setKey(boundary.getElementId());
 		}
 		
-		
 		if(boundary.getType() != null) 	entity.setType(boundary.getType()); 
-		else entity.setType(" ");
+		else throw new RuntimeException("ElementBoundary invalid type");
 		
 		if(boundary.getName() != null) 	entity.setName(boundary.getName()); 
-		else entity.setName(" ");
+		else throw new RuntimeException("ElementBoundary invalid name");
 		
 		if (boundary.getActive() != null) entity.setActive(boundary.getActive());
 		else entity.setActive(false);
 		
-		entity.setCreatedTimestamp(boundary.getCreatedTimestamp());
+		entity.setCreatedTimestamp(new Date());
 		
 		entity.setCreatedBy(boundary.getCreatedBy());
 		

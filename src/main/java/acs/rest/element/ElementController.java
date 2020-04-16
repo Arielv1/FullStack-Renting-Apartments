@@ -21,7 +21,7 @@ import acs.logic.element.ElementService;
 public class ElementController {	
 	
 	private ElementService elementService;
-	
+
 	@Autowired
 	public void setElementService(ElementService elementService) {
 		this.elementService = elementService;
@@ -36,22 +36,6 @@ public class ElementController {
 		     					  @PathVariable("managerEmail") String managerEmail,
 		     					  @RequestBody ElementBoundary element) {
 		
-		//TODO - Temp elementId generator
-		Map<String, Object> elementId = new HashMap<String, Object>();
-		elementId.put("domain", "2020B.Ofir.Cohen");
-		elementId.put("id", UUID.randomUUID().toString());
-			
-		Map<String, Object> createdBy = new HashMap<String, Object>();
-		
-		Map<String, Object> managerDetails = new HashMap<String, Object>();
-		managerDetails.put("domain", managerDomain);
-		managerDetails.put("email", managerEmail);
-		
-		createdBy.put("UserId", managerDetails);
-		
-		element.setElementId(elementId);
-		element.setCreatedBy(createdBy);
-			
 		return this.elementService.create(managerDomain, managerEmail, element);
 	}
 		
@@ -72,7 +56,7 @@ public class ElementController {
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}",
 			method = RequestMethod.GET,		
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary getSpecific(@PathVariable("userDomain") String userDomain,
+	public ElementBoundary getSpecificElement(@PathVariable("userDomain") String userDomain,
 		  						  @PathVariable("userEmail") String userEmail,
 		  						  @PathVariable("elementDomain") String elementDomain,
 		  						  @PathVariable("elementId") String elementId) {
@@ -84,11 +68,10 @@ public class ElementController {
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}",
 			method = RequestMethod.GET,		
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary[] getAll(@PathVariable("userDomain") String userDomain,
+	public ElementBoundary[] getAllElements(@PathVariable("userDomain") String userDomain,
 		  						  @PathVariable("userEmail") String userEmail) {
 	
-		return this.elementService.getAll(userDomain, userEmail).stream().
-				toArray(i -> new ElementBoundary[i]);
+		return this.elementService.getAll(userDomain, userEmail).stream().toArray(i -> new ElementBoundary[i]);
 		
 	}
 	
