@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
@@ -49,34 +50,60 @@ public class ActionServiceMockup implements ActionService {
 	@Override
 	public Object invokeAction(ActionBoundary action) {
 		
-		ActionEntity actionEntity = this.converter.toEntity(action);
-		
-		Map <String, Object> actionId = new HashMap<>();;
-		
 		String id = UUID.randomUUID().toString();
-		
-		actionId.put(id, actionEntity);
-		
-		actionEntity.setActionId(actionId);
-		
-		actionEntity.setCreatedTimestamp(new Date());
-		
-		this.database.put(id, actionEntity);
 
-		return this.converter.fromEntity(actionEntity);
+		ActionEntity entity = this.converter.toEntity(action);
+		Map <String, Object> invokedBy =  new HashMap<>();
+		Map <String, Object> actionId = new HashMap<>();
+		Map<String, Object> playaerDetails = new HashMap<String, Object>();
+
+
+		/* Create actionId attribute:
+		 *  "actionId": {
+    			"domain" : "2020B.Ofir.Cohen"
+        		"ID": 1
+    		}
+		 */
+		
+		actionId.put("domain", this.projectName);
+		actionId.put("id", id);
+			
+		/* Crate invokedBy attribute:
+		 * "invokedBy": {
+    			"userId":{
+    				"domain:"2020b.ofir.cohen",
+        			"email": "ofir.cohen@gmail.com"
+        		}
+    		} 
+		 */
+		
+		
+		//playaerDetails.put("domain", this.projectName);
+	//	playaerDetails.put("email", );
+				
+		invokedBy.put("UserId", playaerDetails);
+		
+		entity.setActionId(actionId);
+		
+		entity.setCreatedTimestamp(new Date());
+		
+		entity.setInvokedBy(invokedBy);
+	
+		this.database.put(id, entity);
+
+		return this.converter.fromEntity(entity);
 	
 	}
 
 	@Override
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail) {
-		List<ActionBoundary> allActionsBoundaries = new ArrayList <ActionBoundary>();
-		List<ActionEntity> allActionsEntities = new ArrayList <ActionEntity> (this.database.values());
-		
-		for (ActionEntity entity : allActionsEntities) 
-			allActionsBoundaries.add(this.converter.fromEntity(entity));
-	
-		return allActionsBoundaries;
+		return this.database
+				.values() //Collection<ActionEntity>
+				.stream()  //Stream<ActionEntity>
+				.map(this.converter::fromEntity) // Stream<ActionBoundary>
+				.collect(Collectors.toList()); // List<ActionBoundary>
 	}
+
 
 	@Override
 	public void deleteAllActions(String adminDomain, String adminEmail) {
