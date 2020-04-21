@@ -46,17 +46,13 @@ public class ActionServiceMockup implements ActionService {
 		this.database = Collections.synchronizedMap(new HashMap<>());
 	}
 	
-
 	@Override
 	public Object invokeAction(ActionBoundary action) {
 		
 		String id = UUID.randomUUID().toString();
 
 		ActionEntity entity = this.converter.toEntity(action);
-		Map <String, Object> invokedBy =  new HashMap<>();
 		Map <String, Object> actionId = new HashMap<>();
-		Map<String, Object> playaerDetails = new HashMap<String, Object>();
-
 
 		/* Create actionId attribute:
 		 *  "actionId": {
@@ -76,13 +72,7 @@ public class ActionServiceMockup implements ActionService {
         		}
     		} 
 		 */
-		
-		
-		//playaerDetails.put("domain", this.projectName);
-	//	playaerDetails.put("email", );
 				
-		invokedBy.put("UserId", playaerDetails);
-
 		entity.setActionId(actionId);
 		
 		entity.setCreatedTimestamp(new Date());

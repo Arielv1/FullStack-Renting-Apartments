@@ -15,7 +15,7 @@ import java.util.Map;
  			"domain":"2020b.demo",
  			"id":"54"
  	},
- 	"createdTimestamp":"2020-03-01T15:03:55.121+0000"
+ 	"createdTimestamp":"2020-03-01T15:03:55.121+0000",
  	"invokedBy":{
  		"userId":{
  			"domain":"2020b.demo",
