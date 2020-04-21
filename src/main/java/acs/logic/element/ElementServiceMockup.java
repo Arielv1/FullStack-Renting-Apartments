@@ -55,7 +55,6 @@ public class ElementServiceMockup implements ElementService {
 	
 	@Override
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary element) {
-		
 		/* Create elementId attribute:
 		 *  "elementId": {
     			"domain" : "2020B.Ofir.Cohen"
@@ -66,7 +65,7 @@ public class ElementServiceMockup implements ElementService {
 		elementId.put("domain", this.projectName);
 		elementId.put("id", UUID.randomUUID().toString());
 			
-		/* Crate createdBy attribute:
+		/* Create createdBy attribute:
 		 * "createdBy": {
     			"userid":{
     				"domain:"2020b.ofir.cohen",
@@ -81,7 +80,8 @@ public class ElementServiceMockup implements ElementService {
 		managerDetails.put("email", managerEmail);
 				
 		createdBy.put("UserId", managerDetails);
-				
+		
+		element.setKey(this.projectName);
 		element.setElementId(elementId);
 		element.setCreatedBy(createdBy);
 		
@@ -102,8 +102,6 @@ public class ElementServiceMockup implements ElementService {
 		entity.setKey(key);
 		
 		this.database.put(key , entity);	
-		
-		System.err.println(this.database.size() + " " + key);
 		
 		return this.converter.entityToBoundary(entity);
 	}

@@ -2,6 +2,7 @@ package acs.rest.element;
 
 import java.util.*;
 /*
+ * 	"key" : "2020b.ofir.cohen!123456" <------ might be temp , will possibly removed
     "elementId": {
     	"domain" : "2020B.Ofir.Cohen"
         "ID": 1
@@ -24,6 +25,7 @@ import java.util.*;
     }
  */
 public class ElementBoundary {
+	private String key;
 	private Map <String, Object> elementId;
 	private String type;
 	private String name;
@@ -37,10 +39,11 @@ public class ElementBoundary {
 	public ElementBoundary() {	
 	}
 
-	public ElementBoundary(Map<String, Object> elementId, String type, String name, Boolean active,
+	public ElementBoundary(String key, Map<String, Object> elementId, String type, String name, Boolean active,
 			Date createdTimestamp, Map<String, Object> createdBy, Map<String, Double> location,
 			Map<String, Object> elementAttribues) {
 		super();
+		this.key = key;
 		this.elementId = elementId;
 		this.type = type;
 		this.name = name;
@@ -50,7 +53,15 @@ public class ElementBoundary {
 		this.location = location;
 		this.elementAttribues = elementAttribues;
 	}
+	
+	public String getKey() {
+		return key;
+	}
 
+	public void setKey(String key) {
+		this.key = key;
+	}
+	
 	public Map<String, Object> getElementId() {
 		return elementId;
 	}
@@ -115,7 +126,7 @@ public class ElementBoundary {
 		this.elementAttribues = elementAttribues;
 	}
 
-
+	
 
 	@Override
 	public String toString() {
@@ -123,6 +134,8 @@ public class ElementBoundary {
 				+ ", createdTimestamp=" + createdTimestamp + ", createdBy=" + createdBy + ", location=" + location
 				+ ", elementAttribues=" + elementAttribues + "]";
 	}
+
+	
 
 	
 

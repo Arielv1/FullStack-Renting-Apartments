@@ -68,7 +68,7 @@ public class ActionServiceMockup implements ActionService {
 		actionId.put("domain", this.projectName);
 		actionId.put("id", id);
 			
-		/* Crate invokedBy attribute:
+		/* Create invokedBy attribute:
 		 * "invokedBy": {
     			"userId":{
     				"domain:"2020b.ofir.cohen",
@@ -82,15 +82,15 @@ public class ActionServiceMockup implements ActionService {
 	//	playaerDetails.put("email", );
 				
 		invokedBy.put("UserId", playaerDetails);
-		
+
 		entity.setActionId(actionId);
 		
 		entity.setCreatedTimestamp(new Date());
 		
-		entity.setInvokedBy(invokedBy);
+		entity.setInvokedBy(action.getInvokedBy());
 	
 		this.database.put(id, entity);
-
+		
 		return this.converter.fromEntity(entity);
 	
 	}

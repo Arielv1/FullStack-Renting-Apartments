@@ -40,6 +40,11 @@ public class ElementEntity {
 		this.key = key;
 	}
 	
+	public void setKey() {
+		Object keyParts[] = this.getElementId().values().toArray();
+		this.key = (String)keyParts[0] + "!" + (String)keyParts[1];
+	}
+	
 	public void setKey(Map<String , Object> elementId) {
 		
 		Object keyParts[] = elementId.values().toArray();

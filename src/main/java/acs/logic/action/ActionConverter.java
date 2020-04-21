@@ -32,6 +32,9 @@ public class ActionConverter {
 		} else {
 
 		}
+		
+		entity.setInvokedBy(boundary.getInvokedBy());
+		
 		entity.setActionAttributes(boundary.getActionAttributes());
 		return entity;
 	}

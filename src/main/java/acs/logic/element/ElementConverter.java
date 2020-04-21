@@ -14,7 +14,7 @@ public class ElementConverter {
 		if (entity == null) 
 			return null;
 		
-		return new ElementBoundary(
+		return new ElementBoundary(entity.getKey(),
 				entity.getElementId(),
 				entity.getType(),
 				entity.getName(),
@@ -40,12 +40,11 @@ public class ElementConverter {
 		
 		ElementEntity entity = new ElementEntity();
 		
-		if (boundary.getElementId() != null) {
-			entity.setElementId(boundary.getElementId());	
-			
-			// TODO - remove 'key' element is turns out to be irrelevent
-			entity.setKey(boundary.getElementId());
-		}
+		if (boundary.getElementId() != null) entity.setElementId(boundary.getElementId());	
+		
+		// TODO - remove 'key' element is turns out to be irrelevent
+		if (boundary.getKey() != null)	entity.setKey(boundary.getKey());
+		else entity.setKey();
 		
 		if(boundary.getType() != null) 	entity.setType(boundary.getType()); 
 		else throw new RuntimeException("ElementBoundary invalid type");
