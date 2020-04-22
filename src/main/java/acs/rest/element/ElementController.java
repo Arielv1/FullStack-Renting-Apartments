@@ -1,12 +1,5 @@
 package acs.rest.element;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +41,7 @@ public class ElementController {
 		     				  @PathVariable("elementDomain") String elementDomain,
 		     				  @PathVariable("elementId") String elementId,
 		     				  @RequestBody ElementBoundary eb) {
-		eb = this.elementService.update(managerDomain, managerEmail, elementId, elementDomain, eb);
+		eb = this.elementService.update(managerDomain, managerEmail, elementDomain, elementId, eb);
 		System.err.println("UPDATE - BACK TO CONTROLLER\n"+eb);
 	}
 	
@@ -60,8 +53,8 @@ public class ElementController {
 		  						  @PathVariable("userEmail") String userEmail,
 		  						  @PathVariable("elementDomain") String elementDomain,
 		  						  @PathVariable("elementId") String elementId) {
-		System.err.println("GET SPECIFIC RESULT\n"+this.elementService.getSpecific(userDomain, userEmail, elementDomain, elementId));
-		return this.elementService.getSpecific(userDomain, userEmail, elementDomain, elementId);
+		System.err.println("GET SPECIFIC RESULT\n"+this.elementService.getSpecificElement(userDomain, userEmail, elementDomain, elementId));
+		return this.elementService.getSpecificElement(userDomain, userEmail, elementDomain, elementId);
 	}
 		
 		//Get All (GET) elements

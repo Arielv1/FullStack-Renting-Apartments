@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class UserEntity {
 	private Map<String, Object> userId;
-	private UserRole role; // check if it is need to change
+	private UserRole role; 
 	private String username;
 	private String avatar;
 	

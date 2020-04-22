@@ -1,6 +1,6 @@
 package acs.logic.action;
 
-import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import acs.data.ActionEntity;
-import acs.data.ElementEntity;
 import acs.rest.action.ActionBoundary;
-import acs.rest.element.ElementBoundary;
+
 
 @Service
 public class ActionServiceMockup implements ActionService {
@@ -97,6 +96,7 @@ public class ActionServiceMockup implements ActionService {
 
 	@Override
 	public void deleteAllActions(String adminDomain, String adminEmail) {
+		// TODO - check admin privileges
 		this.database.clear();
 	}
 

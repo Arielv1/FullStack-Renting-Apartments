@@ -1,26 +1,20 @@
 package acs.logic.element;
 
-import java.util.ArrayList;
-import java.util.Collection;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+
 
 import acs.data.*;
 import acs.rest.element.ElementBoundary;
@@ -34,7 +28,7 @@ public class ElementServiceMockup implements ElementService {
 	
 	private ElementConverter converter;
 	
-	@Value("${spring.application.name:No_Project_Name}")
+	@Value("${spring.application.name:ofir.cohen}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
@@ -107,12 +101,12 @@ public class ElementServiceMockup implements ElementService {
 	}
 
 	@Override
-	public ElementBoundary update(String managerDomain, String managerEmail, String elementId, String elementDomain,
+	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 		
 		ElementEntity entity = this.database.get(elementId);
 		
-		if(entity == null) throw new RuntimeException("ElementEntity invalid ID");
+		if(entity == null) throw new RuntimeException("No element with the given ID");
 		
 		if(update.getType() != null) entity.setType(update.getType()); 
 		else throw new RuntimeException("ElementEntity invalid type");
@@ -126,8 +120,6 @@ public class ElementServiceMockup implements ElementService {
 		entity.setLocation(update.getLocation());
 		
 		entity.setElementAttribues(update.getElementAttribues());
-		
-		entity.setCreatedTimestamp(new Date());
 		
 		update = this.converter.entityToBoundary(entity);
 
@@ -145,17 +137,17 @@ public class ElementServiceMockup implements ElementService {
 	}
 
 	@Override
-	public ElementBoundary getSpecific(String userDomain, String userEmail, String elementDomain, String elementId) {
+	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain, String elementId) {
 		
 		ElementBoundary boundary = this.converter.entityToBoundary(this.database.get(elementId));
 		
-		if(boundary == null) throw new RuntimeException("ElementEntity invalid ID");
+		if(boundary == null) throw new RuntimeException("No element with the given ID");
 		else return boundary;
 	}
 	
 	
 	@Override
-	public void deleteAll(String adminDomain, String adminEmail) {
+	public void deleteAllElements(String adminDomain, String adminEmail) {
 		
 		// TODO - check admin privileges
 		

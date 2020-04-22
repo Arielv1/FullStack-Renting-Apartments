@@ -17,13 +17,12 @@ import acs.data.UserRole;
 import acs.rest.users.UserBoundary;
 
 @Service
-public class UserServiceMockup implements UserService{
+public class UserServiceMockup implements UserService {
 
 	private String ProjectName;
 	private Map<Object, UserEntity> dataBase;
 	private UserConvertor convert;
-	
-	
+
 	@Autowired
 	public UserServiceMockup(UserConvertor convert) {
 		this.convert = convert;
@@ -48,9 +47,13 @@ public class UserServiceMockup implements UserService{
 		if (entity != null) {
 			throw new RuntimeException("the User alreay exsite in the data base!!");
 		} else {
-			entity = convert.toEntity(user);
-			this.dataBase.put(user.getUserId(), entity);
-		return	convert.fromEntity(entity);
+			if (user.getRole() != null) {
+				entity = convert.toEntity(user);
+				this.dataBase.put(user.getUserId(), entity);
+				return convert.fromEntity(entity);
+			} else {
+				throw new RuntimeException("the role is not from UserRole type");
+			}
 		}
 
 	}
@@ -70,7 +73,7 @@ public class UserServiceMockup implements UserService{
 
 	}
 
-	//update user details in the data base
+	// update user details in the data base
 	@Override
 	public UserBoundary updateUser(String domain, String email, UserBoundary update) {
 		Map<String, Object> userId = new HashMap<>();
@@ -87,7 +90,6 @@ public class UserServiceMockup implements UserService{
 		}
 	}
 
-
 	// get all users from the data base
 	@Override
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
@@ -97,24 +99,24 @@ public class UserServiceMockup implements UserService{
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity.getRole().equals(UserRole.ADMIN)) {
 			return this.dataBase.values().stream().map(this.convert::fromEntity).collect(Collectors.toList());
-			} else {
+		} else {
 			throw new RuntimeException("admin details invalid");
 		}
 	}
-	
 
 	// delete all users from the data base
 	@Override
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
-		Map<String, Object> userId = new HashMap<>();
-		userId.put("domain", adminDomain);
-		userId.put("email", adminEmail);
-		UserEntity entity = this.dataBase.get(userId);
-		if (entity.getRole().equals(UserRole.ADMIN)) {
-			this.dataBase.clear();
-		} else {
-			throw new RuntimeException("admin details invalid");
-		}
+		/*
+		 * Map<String, Object> userId = new HashMap<>(); userId.put("domain",
+		 * adminDomain); userId.put("email", adminEmail); UserEntity entity =
+		 * this.dataBase.get(userId); if (entity.getRole().equals(UserRole.ADMIN)) {
+		 */
+		this.dataBase.clear();
+
+		// } else {
+		// throw new RuntimeException("admin details invalid");
+		// }
 
 	}
 
