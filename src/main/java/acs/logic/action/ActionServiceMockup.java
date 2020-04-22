@@ -50,7 +50,7 @@ public class ActionServiceMockup implements ActionService {
 		
 		String id = UUID.randomUUID().toString();
 
-		ActionEntity entity = this.converter.toEntity(action);
+		ActionEntity entity = this.converter.boundaryToEntity(action);
 		Map <String, Object> actionId = new HashMap<>();
 
 		/* Create actionId attribute:
@@ -80,7 +80,7 @@ public class ActionServiceMockup implements ActionService {
 	
 		this.database.put(id, entity);
 		
-		return this.converter.fromEntity(entity);
+		return this.converter.entityToBoundary(entity);
 	
 	}
 
@@ -89,7 +89,7 @@ public class ActionServiceMockup implements ActionService {
 		return this.database
 				.values() //Collection<ActionEntity>
 				.stream()  //Stream<ActionEntity>
-				.map(this.converter::fromEntity) // Stream<ActionBoundary>
+				.map(this.converter::entityToBoundary) // Stream<ActionBoundary>
 				.collect(Collectors.toList()); // List<ActionBoundary>
 	}
 
