@@ -42,7 +42,7 @@ public class ElementController {
 		     				  @PathVariable("elementId") String elementId,
 		     				  @RequestBody ElementBoundary eb) {
 		eb = this.elementService.update(managerDomain, managerEmail, elementDomain, elementId, eb);
-		System.err.println("UPDATE - BACK TO CONTROLLER\n"+eb);
+		System.err.println("After Update\n"+eb);
 	}
 	
 		// Get (GET) Specific element by elementId (key)
@@ -53,7 +53,6 @@ public class ElementController {
 		  						  @PathVariable("userEmail") String userEmail,
 		  						  @PathVariable("elementDomain") String elementDomain,
 		  						  @PathVariable("elementId") String elementId) {
-		System.err.println("GET SPECIFIC RESULT\n"+this.elementService.getSpecificElement(userDomain, userEmail, elementDomain, elementId));
 		return this.elementService.getSpecificElement(userDomain, userEmail, elementDomain, elementId);
 	}
 		
@@ -67,13 +66,4 @@ public class ElementController {
 		return this.elementService.getAll(userDomain, userEmail).stream().toArray(i -> new ElementBoundary[i]);
 		
 	}
-	
-	/*/ COPY THIS TO ADMIN CONTROLLER
-		// Delete (DELETE) all elements
-	@RequestMapping(path = "/acs/admin/elements/{adminDomain}/{adminEmail}",
-			method = RequestMethod.DELETE)
-	public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
-			 					  @PathVariable("adminEmail") String adminEmail) {
-		this.elementService.deleteAll(adminDomain, adminEmail);	
-	}*/
 }

@@ -54,6 +54,20 @@ public class ElementBoundary {
 		this.elementAttribues = elementAttribues;
 	}
 	
+	public ElementBoundary(Map<String, Object> elementId, String type, String name, Boolean active,
+			Date createdTimestamp, Map<String, Object> createdBy, Map<String, Double> location,
+			Map<String, Object> elementAttribues) {
+		super();	
+		this.elementId = elementId;
+		this.type = type;
+		this.name = name;
+		this.active = active;
+		this.createdTimestamp = createdTimestamp;
+		this.createdBy = createdBy;
+		this.location = location;
+		this.elementAttribues = elementAttribues;
+	}
+	
 	public String getKey() {
 		return key;
 	}
