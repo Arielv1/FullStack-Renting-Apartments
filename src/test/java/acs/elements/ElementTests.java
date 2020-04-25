@@ -6,7 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 
@@ -27,6 +31,11 @@ public class ElementTests {
 	private int port;
 	private RestTemplate restTemplate;
 	private String url;
+	
+	private final static String GET_ALL_URL = "/TestUserDomain/TestUserEmail/";
+	private final static String GET_URL = "/TestUserDomain/TestUserEmail/TestElementDomain/";
+	private final static String POST_URL = "/TestManagerDomain/TestManagerEmail";
+	private final static String DELETE_URL =  "/admin/TestAdminDomain/TestAdminEmail/";
 	
 	
 	@PostConstruct
@@ -51,6 +60,7 @@ public class ElementTests {
 		// WHEN -  POST /acs/elements to create new ElementBoundary with specific name
 		// THEN - Server creates new ElementBoundary with given name and gives 2xx message
 		
+		
 		ElementBoundary input = new ElementBoundary(null,
 													"Type", 
 													"testName", 
@@ -60,7 +70,7 @@ public class ElementTests {
 													null ,
 													null);
 		
-		ElementBoundary output = this.restTemplate.postForObject(this.url+"/managerDomain/managerEmail", input, ElementBoundary.class);
+		ElementBoundary output = this.restTemplate.postForObject(this.url + POST_URL , input, ElementBoundary.class);
 		
 		assertEquals(output.getName(), input.getName());
 	}
@@ -82,7 +92,7 @@ public class ElementTests {
 		
 		ElementBoundary newElementObject = 
 				  this.restTemplate
-					.postForObject(this.url + "/managerDomain/managerEmail", 
+					.postForObject(this.url + POST_URL, 
 							new ElementBoundary(null,
 									"Type", 
 									"Name", 
@@ -94,10 +104,48 @@ public class ElementTests {
 									ElementBoundary.class);
 		
 		
-		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url +"/userDomain/userEmail/elementDomain/" + newElementObject.getKey(),
+		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + newElementObject.getKey(),
 																ElementBoundary.class,
 																newElementObject.getElementAttribues());
 		
 		assertThat(resultElementObject.getElementAttribues().equals(newElementObject.getElementAttribues()));
+	}
+	
+	@Test
+	public void testCreate5ElementsCheckThatTheyWereAddedToDatabaseThenDeleteDatabaseAndCheckThatItIsEmptyAndNotNull() throws Exception{
+		// GIVEN - Database contains 5 Elements
+		// WHEN - Invoked GET to all Elements , the size of the database will be 5
+		// THEN - Delete the entire database , confirm it is not null , is empty and return 2xx message from server
+		
+		// Create 5 Elements for database
+		List <ElementBoundary> dbContent = IntStream.range(0, 5) //Stream <Integer> with size of 5 (0,1,2,3,4)
+				.mapToObj(n -> "Object #" + n) // Stream<Strings> to Stream <Objects>
+				.map(current -> 				// Initialize each object 
+				new ElementBoundary (null,
+									"Type", 
+									"Name", 
+									 true,
+									new Date(), 
+									null, 
+									null,
+									null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class))
+				.collect(Collectors.toList());
+		
+		// Confirm database size == 5
+		assertEquals(dbContent.size(), 5);
+		
+		// Delete all elements from database
+		this.restTemplate.delete(this.url + DELETE_URL);
+		
+		// Retrieve all elements from database
+		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_ALL_URL, ElementBoundary[].class);
+		
+		// Confirm that the database is empty yet is not null
+		assertThat(result).isNotNull().isEmpty();
+				
 	}
 }

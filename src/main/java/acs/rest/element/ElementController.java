@@ -66,4 +66,13 @@ public class ElementController {
 		return this.elementService.getAll(userDomain, userEmail).stream().toArray(i -> new ElementBoundary[i]);
 		
 	}
+	
+	 // DUMMY DELETE METHOD - COPY TO ADMINCONTROLLER OR DELETE IF NEEDED
+	 // Delete (DELETE) all elements
+		@RequestMapping(path = "/acs/elements/admin/{adminDomain}/{adminEmail}",
+				method = RequestMethod.DELETE)
+		public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
+				 					  @PathVariable("adminEmail") String adminEmail) {
+			this.elementService.deleteAllElements(adminDomain, adminEmail);	
+		}
 }
