@@ -35,7 +35,8 @@ public class ElementTests {
 	private final static String GET_ALL_URL = "/TestUserDomain/TestUserEmail/";
 	private final static String GET_URL = "/TestUserDomain/TestUserEmail/TestElementDomain/";
 	private final static String POST_URL = "/TestManagerDomain/TestManagerEmail";
-	private final static String DELETE_URL =  "/admin/TestAdminDomain/TestAdminEmail/";
+	private final static String UPDATE_URL = "/TestManagerDomain}/TestManagerEmail}/TestElementDomain/";
+	private final static String DELETE_ALL_URL =  "/admin/TestAdminDomain/TestAdminEmail/";
 	
 	
 	@PostConstruct
@@ -49,9 +50,15 @@ public class ElementTests {
 		this.port = port;
 	}
 	
+	@AfterEach
+	public void teardown() {
+		this.restTemplate.delete(this.url + DELETE_ALL_URL);
+	}
+	
 	@Test
 	public void testContext() {	
 	}
+	
 	
 	
 	@Test
@@ -139,7 +146,7 @@ public class ElementTests {
 		assertEquals(dbContent.size(), 5);
 		
 		// Delete all elements from database
-		this.restTemplate.delete(this.url + DELETE_URL);
+		this.restTemplate.delete(this.url + DELETE_ALL_URL);
 		
 		// Retrieve all elements from database
 		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_ALL_URL, ElementBoundary[].class);
@@ -147,5 +154,47 @@ public class ElementTests {
 		// Confirm that the database is empty yet is not null
 		assertThat(result).isNotNull().isEmpty();
 				
+	}
+	
+	@Test
+	public void idk () throws Exception {
+		// GIVEN - Server is up 
+		// WHEN - Database contains a single element
+		// THEN - Invoke UPDATE method in an attempt to change the elementId attribute , check that the new id 
+		// 			has not been updated in the database and server returns 2xx message
+		
+		// Creating new ElementBoundary and adding it to the database through POST
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"TypeTest4", 
+																					"NameTest4", 
+																					false,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class);
+		
+		// Creating the new elementId to update
+		Map <String, Object> newElementId = new HashMap <String, Object>();
+		
+		newElementId.put("domain", "verybaddomain@doesntwork.uk");
+		newElementId.put("ID", 2.3);
+		
+		element.setElementId(newElementId);
+			
+		//Invoke the UPDATE method
+		this.restTemplate.put(this.url + UPDATE_URL + element.getKey(),
+							  element ,
+							  newElementId);
+		
+		
+		// Retrieve the entire database content
+		ElementBoundary database[] = this.restTemplate.getForObject(this.url + GET_ALL_URL, ElementBoundary[].class);
+		
+		// Check that the databases' old key was kept 
+		assertThat(database[0].getElementId()).isNotEqualTo(element.getElementId());
+		
 	}
 }
