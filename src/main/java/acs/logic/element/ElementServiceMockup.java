@@ -75,11 +75,11 @@ public class ElementServiceMockup implements ElementService {
 				
 		createdBy.put("UserId", managerDetails);
 		
-		element.setKey(this.projectName);
+		//element.setKey(this.projectName);
 		element.setElementId(elementId);
 		element.setCreatedBy(createdBy);
 		
-		
+		System.err.println("In mockup\n" + element);
 		/*
 		 * Create key attribute to identify the element : key = id + "!" + domain
 		 */

@@ -153,7 +153,6 @@ public class ElementTests {
 		
 		// Confirm that the database is empty yet is not null
 		assertThat(result).isNotNull().isEmpty();
-				
 	}
 	
 	@Test
