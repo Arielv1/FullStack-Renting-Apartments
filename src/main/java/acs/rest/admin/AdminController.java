@@ -2,9 +2,11 @@ package acs.rest.admin;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.data.UserRole;
+import acs.logic.user.UserService;
 import acs.rest.action.ActionBoundary;
 import acs.rest.users.UserBoundary;
 
@@ -19,13 +22,20 @@ import acs.rest.users.UserBoundary;
 //produces =  type of output
 @RestController
 public class AdminController {
-	// Delete all users in the system
+	
+	private UserService userService;
 
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
+	// Delete all users in the system
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
 	public void delete_AllUsers(@PathVariable("adminDomain") String adminDomain,
-			@PathVariable("adminEmail") String adminEmail
-
-	) {}
+			@PathVariable("adminEmail") String adminEmail) {
+		this.userService.deleteAllUsers(adminDomain, adminEmail);
+	}
 
 	// Delete all elements in the system
 	@RequestMapping(path = "/acs/admin/elements/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
@@ -41,18 +51,10 @@ public class AdminController {
 	@RequestMapping (path = "/acs/admin/users/{adminDomain}/{adminEmail}",
 					 method = RequestMethod.GET,
 					 produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserBoundary[] exports_AllUsers (
+	public List<UserBoundary> exports_AllUsers (
 	@PathVariable("adminDomain") String adminDomain,
 	 @PathVariable("adminEmail") String adminEmail){
-		Map <String, Object> userId = new HashMap <String, Object>();
-		userId.put("domain", "2020b.ofir.cohen");
-		userId.put("email", "MichaelHamami@gmail.com");
-		return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
-				.mapToObj(i -> "User #" + (i+1))  //stream of strings
-				.map(msg -> new UserBoundary(userId,"Demo User",UserRole.PLAYER,";-)")
-						) // stream of UserBoundary
-				.collect(Collectors.toList()) // list of UserBoundary
-				.toArray(new UserBoundary[0]); //UserBoundary[]
+		return this.userService.getAllUsers(adminDomain, adminEmail);
 	}
 
 	// Export all actions

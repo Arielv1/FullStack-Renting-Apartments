@@ -15,9 +15,15 @@ public class UserConvertor {
 		
 	}
 	public UserEntity toEntity(UserBoundary boundray) {
+		UserEntity entity;
 		String[] nameInDataBase = boundray.getUserName().split(" ");
-		UserEntity entity = new UserEntity(boundray.getUserId(), boundray.getRole(),
+		if(nameInDataBase.length != 1) {
+			entity = new UserEntity(boundray.getUserId(), boundray.getRole(),
 				nameInDataBase[0] +" "+ nameInDataBase[1], boundray.getAvatar());
+		}else {
+			 entity = new UserEntity(boundray.getUserId(), boundray.getRole(),
+					nameInDataBase[0], boundray.getAvatar());
+		}
 
 		return entity;
 	}
