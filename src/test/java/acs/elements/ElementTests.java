@@ -22,7 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
-import acs.rest.element.ElementBoundary;
+import acs.rest.boundaries.ElementIdBoundary;
+import acs.rest.element.boundaries.ElementBoundary;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -55,10 +56,34 @@ public class ElementTests {
 		this.restTemplate.delete(this.url + DELETE_ALL_URL);
 	}
 	
-	@Test
+	
+	/*"elementId": {
+    	"domain" : "2020B.Ofir.Cohen"
+        "ID": 1
+    },
+    "type": "demoType",
+    "name": "demoName",
+    "active": false,
+    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
+    "createdBy": {
+    	"userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
+    },
+    "location": {
+        "lat": "00.00"
+    },
+    "elementAttribues": {
+        "demoAttribute": "demoValue"
+    }*/
+    public String getElementIdFromBoundary(ElementIdBoundary eib) {
+		return eib.getDomain() + "!" + eib.getId();
+	}
+    
+    @Test
 	public void testContext() {	
 	}
-	
 	
 	
 	@Test
@@ -81,7 +106,9 @@ public class ElementTests {
 		
 		assertEquals(output.getName(), input.getName());
 	}
-
+	
+	
+	
 	@Test
 	public void testGetSpecificElementWithSpecificAttributesInDatabaseAndValidateObjectReturnedByDatabase() throws Exception{
 		
@@ -111,7 +138,7 @@ public class ElementTests {
 									ElementBoundary.class);
 		
 		
-		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + newElementObject.getKey(),
+		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + newElementObject.getElementId() + "!" + newElementObject.get),
 																ElementBoundary.class,
 																newElementObject.getElementAttribues());
 		
@@ -156,7 +183,7 @@ public class ElementTests {
 	}
 	
 	@Test
-	public void idk () throws Exception {
+	public void testCreateNewElementAttemptToChangeItsIdAndVerifyThatTheDatabaseHadNotChangedTheId () throws Exception {
 		// GIVEN - Server is up 
 		// WHEN - Database contains a single element
 		// THEN - Invoke UPDATE method in an attempt to change the elementId attribute , check that the new id 
@@ -176,15 +203,13 @@ public class ElementTests {
 																ElementBoundary.class);
 		
 		// Creating the new elementId to update
-		Map <String, Object> newElementId = new HashMap <String, Object>();
+		ElementIdBoundary newElementId = new ElementIdBoundary("testDomain", "testId");
 		
-		newElementId.put("domain", "verybaddomain@doesntwork.uk");
-		newElementId.put("ID", 2.3);
-		
-		element.setElementId(newElementId);
+		String elementId = getElementIdFromBoundary(element.getElementId());
+		element.setElementId(new ElementIdBoundary("testdomain", "1"));
 			
 		//Invoke the UPDATE method
-		this.restTemplate.put(this.url + UPDATE_URL + element.getKey(),
+		this.restTemplate.put(this.url + UPDATE_URL + elementId,
 							  element ,
 							  newElementId);
 		
@@ -195,5 +220,30 @@ public class ElementTests {
 		// Check that the databases' old key was kept 
 		assertThat(database[0].getElementId()).isNotEqualTo(element.getElementId());
 		
+	}
+	
+	@Test
+	public void test1() throws Exception{
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+																	new ElementBoundary(null,
+																						"TypeTest4", 
+																						"NameTest4", 
+																						false,
+																						new Date(), 
+																						null, 
+																						null,
+																						null
+																						),
+																	ElementBoundary.class);
+		String newName = null;
+		element.setName(newName);
+		this.restTemplate.put(this.url + UPDATE_URL + getElementIdFromBoundary(element.getElementId()),
+				  element ,
+				  newName);
+		
+		ElementBoundary result = this.restTemplate.getForObject(this.url + GET_URL + getElementIdFromBoundary(element.getElementId()),
+																ElementBoundary.class, 
+																element.getName());
+		System.err.println("element\n" + element + "\nresult\n" + result);
 	}
 }

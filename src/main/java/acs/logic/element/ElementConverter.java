@@ -1,21 +1,36 @@
 package acs.logic.element;
 
 import java.util.*;
-
 import org.springframework.stereotype.Component;
-
 import acs.data.ElementEntity;
-import acs.rest.element.ElementBoundary;
+import acs.rest.element.boundaries.ElementBoundary;
 
 @Component
 public class ElementConverter {
-	
-	public ElementBoundary entityToBoundary (ElementEntity entity) {
-		if (entity == null) 
-			return null;
+	/*"key" : "2020b.ofir.cohen!123456" <------ might be temp , will possibly removed
+    "elementId": {
+    	"domain" : "2020B.Ofir.Cohen"
+        "ID": 1
+    },
+    "type": "demoType",
+    "name": "demoName",
+    "active": false,
+    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
+    "createdBy": {
+    	"userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
+    },
+    "location": {
+        "lat": "00.00"
+    },
+    "elementAttribues": {
+        "demoAttribute": "demoValue"
+    }*/
+	public ElementBoundary fromEntity (ElementEntity entity) {
 		
-		return new ElementBoundary(entity.getKey(),
-				entity.getElementId(),
+		return new ElementBoundary(entity.getElementId(),
 				entity.getType(),
 				entity.getName(),
 				entity.getActive(),
@@ -23,39 +38,42 @@ public class ElementConverter {
 				entity.getCreatedBy(),
 				entity.getLocation(),
 				entity.getElementAttribues());
-
 	}
 	
-	/*
-	Map <String, Object> elementId; --> Can be null
-	String type; --> Can't be null
-	String name; --> Can't be null
-	boolean active; --> Can't be null
-	Date createdTimestamp; --> Can be null
-	Map <String, Object> createdBy; --> Can be null
-	Map <String, Double> location; --> Can be null
-	Map <String, Object> elementAttribues; --> Can be null
-	*/
-	public ElementEntity boundaryToEntity (ElementBoundary boundary) {
-		
+	public ElementEntity toEntity (ElementBoundary boundary) {
 		ElementEntity entity = new ElementEntity();
+			
+		entity.setElementId(boundary.getElementId());
+				
+		if(boundary.getType() != null && boundary.getType().trim().length() != 0) {
+			entity.setType(boundary.getType());
+		} 
+		else {
+			throw new RuntimeException("Invalid ElementBoundary Type");
+		}
 		
-		if (boundary.getElementId() != null) entity.setElementId(boundary.getElementId());	
+		if(boundary.getName() != null && boundary.getName().trim().length() != 0) {
+			entity.setName(boundary.getName());
+		} 
+		else {
+			throw new RuntimeException("Invalid ElementBoundary Name");
+		}
 		
-		// TODO - remove 'key' element is turns out to be irrelevent
-		if (boundary.getKey() != null)	entity.setKey(boundary.getKey());
-		else entity.setKey();
+		if(boundary.getActive() != null) {
+			entity.setActive(boundary.getActive());
+		} 
+		else {
+			entity.setActive(true);
+		}
 		
-		if(boundary.getType() != null) 	entity.setType(boundary.getType()); 
-		else throw new RuntimeException("ElementBoundary invalid type");
+		if(boundary.getName() != null) {
+			entity.setName(boundary.getName());
+		}
+		else {
+			entity.setName(" ");
+		}
 		
-		if(boundary.getName() != null) 	entity.setName(boundary.getName()); 
-		else throw new RuntimeException("ElementBoundary invalid name");
-		
-		if (boundary.getActive() != null) entity.setActive(boundary.getActive());
-		else entity.setActive(false);
-		
-		entity.setCreatedTimestamp(new Date());
+		entity.setCreatedTimestamp(boundary.getCreatedTimestamp());
 		
 		entity.setCreatedBy(boundary.getCreatedBy());
 		

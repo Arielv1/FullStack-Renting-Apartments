@@ -1,7 +1,8 @@
 package acs.logic.element;
 
 import java.util.List;
-import acs.rest.element.ElementBoundary;
+
+import acs.rest.element.boundaries.ElementBoundary;
 
 
 public interface ElementService {

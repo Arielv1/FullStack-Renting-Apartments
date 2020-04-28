@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.data.UserRole;
+import acs.logic.element.ElementService;
 import acs.rest.action.ActionBoundary;
 import acs.rest.users.UserBoundary;
 
@@ -20,7 +21,7 @@ import acs.rest.users.UserBoundary;
 @RestController
 public class AdminController {
 	// Delete all users in the system
-
+	
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.DELETE)
 	public void delete_AllUsers(@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail
