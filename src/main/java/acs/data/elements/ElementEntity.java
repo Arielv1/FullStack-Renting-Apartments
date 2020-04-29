@@ -1,18 +1,23 @@
-package acs.data;
+package acs.data.elements;
 
 import java.util.*;
 
 import javax.persistence.Convert;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import acs.dal.MapToJSONConverter;
-import acs.rest.boundaries.ElementIdBoundary;
+import acs.data.ElementIdEntity;
 import acs.rest.element.*;
+import acs.rest.element.boundaries.CreatedByBoundary;
 /*
     "elementId": {
     	"domain" : "2020B.Ofir.Cohen"
@@ -35,27 +40,27 @@ import acs.rest.element.*;
         "demoAttribute": "demoValue"
     }
  */
-import acs.rest.element.boundaries.CreatedByBoundary;
 
-//@Entity
-//@Table(name = "ELEMENTS")
+
+
+@Entity 
+@Table(name = "ELEMENTS")
 public class ElementEntity {
-	private ElementIdBoundary elementId;
+	private ElementIdEntity elementId;
 	private String type;
 	private String name;
 	private boolean active;	
 	private Date createdTimestamp;
-	private CreatedByBoundary createdBy;
+	private CreatedByEntity createdBy;
 	private Map <String, Double> location; 
 	private Map <String, Object> elementAttribues;
-	
 	
 	public ElementEntity() {	
 	}
 
 
-	public ElementEntity(ElementIdBoundary elementId, String type, String name, boolean active, Date createdTimestamp,
-			CreatedByBoundary createdBy, Map<String, Double> location, Map<String, Object> elementAttribues) {
+	public ElementEntity(ElementIdEntity elementId, String type, String name, boolean active, Date createdTimestamp,
+			CreatedByEntity createdBy, Map<String, Double> location, Map<String, Object> elementAttribues) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -66,14 +71,15 @@ public class ElementEntity {
 		this.location = location;
 		this.elementAttribues = elementAttribues;
 	}
-
-	//@Id
-	public ElementIdBoundary getElementId() {
+	
+	@Id
+	@Embedded
+	public ElementIdEntity getElementId() {
 		return elementId;
 	}
 
 
-	public void setElementId(ElementIdBoundary elementId) {
+	public void setElementId(ElementIdEntity elementId) {
 		this.elementId = elementId;
 	}
 
@@ -107,7 +113,7 @@ public class ElementEntity {
 		this.active = active;
 	}
 
-	//@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.TIMESTAMP)
 	public Date getCreatedTimestamp() {
 		return createdTimestamp;
 	}
@@ -117,17 +123,18 @@ public class ElementEntity {
 		this.createdTimestamp = createdTimestamp;
 	}
 
-
-	public CreatedByBoundary getCreatedBy() {
+	@Embedded
+	public CreatedByEntity getCreatedBy() {
 		return createdBy;
 	}
 
 
-	public void setCreatedBy(CreatedByBoundary createdBy) {
+	public void setCreatedBy(CreatedByEntity createdBy) {
 		this.createdBy = createdBy;
 	}
 
-
+	@Convert(converter = MapToJSONConverter.class)
+	@Lob
 	public Map<String, Double> getLocation() {
 		return location;
 	}
@@ -137,14 +144,12 @@ public class ElementEntity {
 		this.location = location;
 	}
 
-	//@Convert(converter = MapToJSONConverter.class)
-	//@Lob
+	@Convert(converter = MapToJSONConverter.class)
+	@Lob
 	public Map<String, Object> getElementAttribues() {
 		return elementAttribues;
 	}
 
-	//@Convert(converter = MapToJSONConverter.class)
-	//@Lob
 	public void setElementAttribues(Map<String, Object> elementAttribues) {
 		this.elementAttribues = elementAttribues;
 	}
