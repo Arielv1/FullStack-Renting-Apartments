@@ -1,14 +1,14 @@
 package acs.rest.utils;
 
-public class ElementIdBoundary {
+public class IdBoundary {
 	
 	private String domain;
 	private String id;
 	
-	public ElementIdBoundary() {
+	public IdBoundary() {
 	}
 	
-	public ElementIdBoundary(String domain, String id) {
+	public IdBoundary(String domain, String id) {
 		super();
 		this.domain = domain;
 		this.id = id;

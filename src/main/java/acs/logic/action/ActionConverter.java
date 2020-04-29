@@ -3,39 +3,89 @@ package acs.logic.action;
 import org.springframework.stereotype.Component;
 
 import acs.data.ActionEntity;
+import acs.data.ActionIdEntity;
+import acs.data.UserIdEntity;
 import acs.rest.action.ActionBoundary;
+import acs.rest.action.boundaries.ElementBoundaryA;
+import acs.rest.action.boundaries.InvokedByBoundary;
+import acs.rest.utils.IdBoundary;
+import acs.rest.utils.UserIdBoundary;
 
 @Component
 public class ActionConverter {
-	public ActionBoundary entityToBoundary(ActionEntity entity) {
-		if (entity == null) 
-			return null;
-		return new ActionBoundary(entity.getActionId(), entity.getType(), entity.getElement(),
-				entity.getCreatedTimestamp(), entity.getInvokedBy(), entity.getActionAttributes());
+	public ActionBoundary fromEntity(ActionEntity entity) {
+
+		IdBoundary actionIdBoundary = new IdBoundary();
+		IdBoundary elemetIdBoundary = new IdBoundary();
+		ElementBoundaryA elementBoundaryA = new ElementBoundaryA();
+		InvokedByBoundary invokedByBoundary = new InvokedByBoundary();
+		UserIdBoundary userIdBoundary = new UserIdBoundary();
+
+		if (entity.getActionId() != null) {
+			actionIdBoundary.setDomain(entity.getActionId().getDomain());
+			actionIdBoundary.setId(entity.getActionId().getId());
+		} else {
+
+			actionIdBoundary = null;
+		}
+
+		if (entity.getElement() != null && entity.getElement().getElementId() != null) {
+			elemetIdBoundary.setDomain(entity.getElement().getElementId().getDomain());
+			elemetIdBoundary.setId(entity.getElement().getElementId().getId());
+			elementBoundaryA.setElementId(elemetIdBoundary);
+		} else {
+			elementBoundaryA = null;
+		}
+
+		if (entity.getInvokedBy() != null && entity.getInvokedBy().getUserId() != null) {
+			userIdBoundary.setDomain(entity.getInvokedBy().getUserId().getDomain());
+			userIdBoundary.setEmail(entity.getInvokedBy().getUserId().getEmail());
+			invokedByBoundary.setUserId(userIdBoundary);
+		} else {
+			invokedByBoundary = null;
+		}
+
+		return new ActionBoundary(actionIdBoundary, entity.getType(), elementBoundaryA, entity.getCreatedTimestamp(),
+				invokedByBoundary, entity.getActionAttributes());
 	}
 
-	public ActionEntity boundaryToEntity(ActionBoundary boundary) {
+	public ActionEntity toEntity(ActionBoundary boundary) {
 		ActionEntity entity = new ActionEntity();
-		entity.setActionId(boundary.getActionId());
+
+		if (boundary.getActionId() != null) {
+			ActionIdEntity actionIdEntity = new ActionIdEntity();
+			actionIdEntity.setDomain(boundary.getActionId().getDomain());
+			actionIdEntity.setId(boundary.getActionId().getId());
+			entity.setActionId(actionIdEntity);
+		} else {
+			entity.setActionId(new ActionIdEntity()); // or we need to throw exception
+		}
 
 		if (boundary.getType() != null) {
 			entity.setType(boundary.getType());
 		} else
 			throw new RuntimeException("ActionBoundary invalid type");
 
-		if (boundary.getElement() != null) {
-			entity.setElement(boundary.getElement());
-		} else throw new RuntimeException("ActionBoundary invalid element");
+		if (boundary.getElement() != null && boundary.getElement().getElementId() != null) {
+			IdBoundary elementId = new IdBoundary();
+			elementId.setDomain(boundary.getElement().getElementId().getDomain());
+			elementId.setId(boundary.getElement().getElementId().getId());
+		} else {
+			throw new RuntimeException("ActionBoundary invalid element");
+		}
 
 		entity.setCreatedTimestamp(boundary.getCreatedTimestamp());
-		if (boundary.getInvokedBy() != null) {
-			entity.setInvokedBy(boundary.getInvokedBy());
-		} else throw new RuntimeException("ActionBoundary invalid invokedby");
 
-
-		entity.setInvokedBy(boundary.getInvokedBy());
+		if (boundary.getInvokedBy() != null && boundary.getInvokedBy().getUserId() != null) {
+			UserIdEntity userIdEntity = new UserIdEntity();
+			userIdEntity.setDomain(boundary.getInvokedBy().getUserId().getDomain());
+			userIdEntity.setDomain(boundary.getInvokedBy().getUserId().getEmail());
+		} else {
+			throw new RuntimeException("ActionBoundary invalid invokedby");
+		}
 
 		entity.setActionAttributes(boundary.getActionAttributes());
+
 		return entity;
 	}
 }

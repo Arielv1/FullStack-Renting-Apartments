@@ -2,7 +2,7 @@ package acs.rest.element.boundaries;
 
 import java.util.*;
 
-import acs.rest.utils.ElementIdBoundary;
+import acs.rest.utils.IdBoundary;
 
 
 /*
@@ -28,7 +28,7 @@ import acs.rest.utils.ElementIdBoundary;
     }
  */
 public class ElementBoundary {
-	private ElementIdBoundary elementId;
+	private IdBoundary elementId;
 	private String type;
 	private String name;
 	private Boolean active;	
@@ -42,7 +42,7 @@ public class ElementBoundary {
 	}
 
 
-	public ElementBoundary(ElementIdBoundary elementId, String type, String name, Boolean active, Date createdTimestamp,
+	public ElementBoundary(IdBoundary elementId, String type, String name, Boolean active, Date createdTimestamp,
 			CreatedByBoundary createdBy, Map<String, Double> location, Map<String, Object> elementAttribues) {
 		super();
 		this.elementId = elementId;
@@ -56,12 +56,12 @@ public class ElementBoundary {
 	}
 
 
-	public ElementIdBoundary getElementId() {
+	public IdBoundary getElementId() {
 		return elementId;
 	}
 
 
-	public void setElementId(ElementIdBoundary elementId) {
+	public void setElementId(IdBoundary elementId) {
 		this.elementId = elementId;
 	}
 

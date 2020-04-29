@@ -8,7 +8,7 @@ import acs.data.UserIdEntity;
 import acs.data.elements.ElementEntity;
 import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
-import acs.rest.utils.ElementIdBoundary;
+import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
 
 
@@ -36,7 +36,7 @@ public class ElementConverter {
     }*/
 	public ElementBoundary fromEntity (ElementEntity entity) {
 		
-		ElementIdBoundary elementIdBoundary = new ElementIdBoundary();
+		IdBoundary elementIdBoundary = new IdBoundary();
 		CreatedByBoundary createdByBoundary = new CreatedByBoundary();
 		UserIdBoundary userIdBoundary = new UserIdBoundary();
 		

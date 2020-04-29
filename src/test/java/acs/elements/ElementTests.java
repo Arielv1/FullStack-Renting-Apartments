@@ -27,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import acs.data.ElementIdEntity;
 import acs.data.elements.ElementEntity;
 import acs.rest.element.boundaries.ElementBoundary;
-import acs.rest.utils.ElementIdBoundary;
+import acs.rest.utils.IdBoundary;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -84,7 +84,7 @@ public class ElementTests {
     "elementAttribues": {
         "demoAttribute": "demoValue"
     }*/
-    public String elementIdToURL(ElementIdBoundary eib) {
+    public String elementIdToURL(IdBoundary eib) {
 		return eib.getDomain() + "/" + eib.getId();
 	}
     
@@ -209,10 +209,10 @@ public class ElementTests {
 																ElementBoundary.class);
 		
 		// Creating the new elementId to update
-		ElementIdBoundary newElementId = new ElementIdBoundary("testDomain", "testId");
+		IdBoundary newElementId = new IdBoundary("testDomain", "testId");
 		
 		String elementIdentifierURL = elementIdToURL(element.getElementId());
-		element.setElementId(new ElementIdBoundary("testdomain", "1"));
+		element.setElementId(new IdBoundary("testdomain", "1"));
 			
 		//Invoke the UPDATE method
 		this.restTemplate.put(this.url + UPDATE_URL + elementIdentifierURL,
