@@ -17,12 +17,13 @@ import org.springframework.stereotype.Service;
 
 
 import acs.data.*;
-import acs.rest.boundaries.ElementIdBoundary;
-import acs.rest.boundaries.UserIdBoundary;
+import acs.data.elements.CreatedByEntity;
+import acs.data.elements.ElementEntity;
 import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
 
-@Service
+
+//@Service
 public class ElementServiceMockup implements ElementService {
 	
 	private String projectName;
@@ -57,11 +58,11 @@ public class ElementServiceMockup implements ElementService {
 		
 		String id = UUID.randomUUID().toString();
 		
-		entity.setElementId(new ElementIdBoundary(this.projectName, id));
+		entity.setElementId(new ElementIdEntity(this.projectName, id));
 		
 		entity.setCreatedTimestamp(new Date());
 		
-		entity.setCreatedBy(new CreatedByBoundary (new UserIdBoundary (managerDomain, managerEmail)));
+		entity.setCreatedBy(new CreatedByEntity (new UserIdEntity (managerDomain, managerEmail)));
 		
 		this.database.put(this.projectName + "!" + id, entity);
 		

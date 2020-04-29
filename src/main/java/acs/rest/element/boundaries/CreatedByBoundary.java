@@ -1,6 +1,6 @@
 package acs.rest.element.boundaries;
 
-import acs.rest.boundaries.UserIdBoundary;
+import acs.rest.utils.UserIdBoundary;
 
 public class CreatedByBoundary {
 	

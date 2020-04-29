@@ -2,7 +2,9 @@ package acs.rest.element.boundaries;
 
 import java.util.*;
 
-import acs.rest.boundaries.ElementIdBoundary;
+import acs.rest.utils.ElementIdBoundary;
+
+
 /*
     "elementId": {
     	"domain" : "2020B.Ofir.Cohen"

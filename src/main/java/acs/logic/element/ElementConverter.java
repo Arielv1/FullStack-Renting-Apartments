@@ -2,13 +2,19 @@ package acs.logic.element;
 
 import java.util.*;
 import org.springframework.stereotype.Component;
-import acs.data.ElementEntity;
+
+import acs.data.ElementIdEntity;
+import acs.data.UserIdEntity;
+import acs.data.elements.ElementEntity;
+import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
+import acs.rest.utils.ElementIdBoundary;
+import acs.rest.utils.UserIdBoundary;
+
 
 @Component
 public class ElementConverter {
-	/*"key" : "2020b.ofir.cohen!123456" <------ might be temp , will possibly removed
-    "elementId": {
+   /* "elementId": {
     	"domain" : "2020B.Ofir.Cohen"
         "ID": 1
     },
@@ -30,20 +36,50 @@ public class ElementConverter {
     }*/
 	public ElementBoundary fromEntity (ElementEntity entity) {
 		
-		return new ElementBoundary(entity.getElementId(),
+		ElementIdBoundary elementIdBoundary = new ElementIdBoundary();
+		CreatedByBoundary createdByBoundary = new CreatedByBoundary();
+		UserIdBoundary userIdBoundary = new UserIdBoundary();
+		
+		if (entity.getElementId() != null) {
+			elementIdBoundary.setDomain(entity.getElementId().getDomain());
+			elementIdBoundary.setId(entity.getElementId().getId());
+		}
+		else {
+			elementIdBoundary = null;
+		}
+		
+		
+		if (entity.getCreatedBy() != null && entity.getCreatedBy().getUserId() != null) {
+			userIdBoundary.setDomain(entity.getCreatedBy().getUserId().getDomain());
+			userIdBoundary.setEmail(entity.getCreatedBy().getUserId().getEmail());
+			createdByBoundary.setUserId(userIdBoundary);
+		}
+		else {
+			createdByBoundary = null;
+		}
+		
+		
+		return new ElementBoundary(elementIdBoundary,
 				entity.getType(),
 				entity.getName(),
 				entity.getActive(),
 				entity.getCreatedTimestamp(),
-				entity.getCreatedBy(),
+				createdByBoundary,
 				entity.getLocation(),
 				entity.getElementAttribues());
 	}
 	
 	public ElementEntity toEntity (ElementBoundary boundary) {
 		ElementEntity entity = new ElementEntity();
-			
-		entity.setElementId(boundary.getElementId());
+		
+		if (boundary.getElementId() != null) {
+			ElementIdEntity elementIdEntity = new ElementIdEntity();
+			elementIdEntity.setDomain(boundary.getElementId().getDomain());
+			elementIdEntity.setId(boundary.getElementId().getId());
+		}
+		else {
+			entity.setElementId(new ElementIdEntity());
+		}
 				
 		if(boundary.getType() != null && boundary.getType().trim().length() != 0) {
 			entity.setType(boundary.getType());
@@ -66,16 +102,17 @@ public class ElementConverter {
 			entity.setActive(true);
 		}
 		
-		if(boundary.getName() != null) {
-			entity.setName(boundary.getName());
-		}
-		else {
-			entity.setName(" ");
-		}
 		
 		entity.setCreatedTimestamp(boundary.getCreatedTimestamp());
 		
-		entity.setCreatedBy(boundary.getCreatedBy());
+		if(boundary.getCreatedBy()!= null && boundary.getCreatedBy().getUserId() != null) {
+			UserIdEntity userIdEntity = new UserIdEntity();
+			userIdEntity.setDomain(boundary.getCreatedBy().getUserId().getDomain());
+			userIdEntity.setEmail(boundary.getCreatedBy().getUserId().getEmail());
+		}
+		else {
+			entity.setCreatedBy(null);
+		}
 		
 		entity.setLocation(boundary.getLocation());
 		
