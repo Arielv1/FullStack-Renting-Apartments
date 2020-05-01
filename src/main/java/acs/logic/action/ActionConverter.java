@@ -6,7 +6,7 @@ import acs.data.ActionEntity;
 import acs.data.ActionIdEntity;
 import acs.data.UserIdEntity;
 import acs.rest.action.ActionBoundary;
-import acs.rest.action.boundaries.ElementBoundaryA;
+import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
@@ -17,7 +17,7 @@ public class ActionConverter {
 
 		IdBoundary actionIdBoundary = new IdBoundary();
 		IdBoundary elemetIdBoundary = new IdBoundary();
-		ElementBoundaryA elementBoundaryA = new ElementBoundaryA();
+		ActionElementBoundary elementBoundaryA = new ActionElementBoundary();
 		InvokedByBoundary invokedByBoundary = new InvokedByBoundary();
 		UserIdBoundary userIdBoundary = new UserIdBoundary();
 
@@ -58,13 +58,14 @@ public class ActionConverter {
 			actionIdEntity.setId(boundary.getActionId().getId());
 			entity.setActionId(actionIdEntity);
 		} else {
-			entity.setActionId(new ActionIdEntity()); // or we need to throw exception
+			throw new RuntimeException("ActionBoundary invalid id");
 		}
 
 		if (boundary.getType() != null) {
 			entity.setType(boundary.getType());
-		} else
+		} else {
 			throw new RuntimeException("ActionBoundary invalid type");
+		}
 
 		if (boundary.getElement() != null && boundary.getElement().getElementId() != null) {
 			IdBoundary elementId = new IdBoundary();

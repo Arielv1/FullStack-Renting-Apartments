@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import acs.data.UserRole;
 import acs.logic.element.ElementService;
 import acs.rest.action.ActionBoundary;
-import acs.rest.action.boundaries.ElementBoundaryA;
+import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.users.UserBoundary;
 import acs.rest.utils.IdBoundary;
@@ -94,7 +94,7 @@ public ActionBoundary[] exports_AllActions (
 return IntStream.range(0, 5) //stream of integers  // we using stream but we can use for as well
 		.mapToObj(i -> "Action #" + (i+1))  //stream of strings
 		.map(msg -> new ActionBoundary(
-				new IdBoundary(),"actionType",new ElementBoundaryA (),new Date(), new InvokedByBoundary(),actionAttributes)
+				new IdBoundary(),"actionType",new ActionElementBoundary (),new Date(), new InvokedByBoundary(),actionAttributes)
 				) // stream of ActionBoundary
 		.collect(Collectors.toList()) // list of ActionBoundary
 		.toArray(new ActionBoundary[0]); //ActionBoundary[]

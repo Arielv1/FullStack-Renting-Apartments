@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import acs.rest.action.boundaries.InvokedByBoundary;
-import acs.rest.action.boundaries.ElementBoundaryA;
+import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.utils.IdBoundary;
 
 /*
@@ -36,10 +36,9 @@ import acs.rest.utils.IdBoundary;
  */
 
 public class ActionBoundary {
-	
 	private IdBoundary actionId;
 	private String type;
-	private ElementBoundaryA element;
+	private ActionElementBoundary element;
 	private Date createdTimestamp;
 	private InvokedByBoundary invokedBy;
 	private Map <String, Object> actionAttributes;
@@ -49,7 +48,7 @@ public class ActionBoundary {
 
 	}
 
-	public ActionBoundary(IdBoundary actionId, String type, ElementBoundaryA element, Date createdTimestamp,
+	public ActionBoundary(IdBoundary actionId, String type, ActionElementBoundary element, Date createdTimestamp,
 			InvokedByBoundary invokedBy,Map <String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
@@ -76,11 +75,11 @@ public class ActionBoundary {
 		this.type = type;
 	}
 
-	public ElementBoundaryA getElement() {
+	public ActionElementBoundary getElement() {
 		return element;
 	}
 
-	public void setElement(ElementBoundaryA element) {
+	public void setElement(ActionElementBoundary element) {
 		this.element = element;
 	}
 

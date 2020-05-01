@@ -3,16 +3,16 @@
 import java.util.Date;
 import java.util.Map;
 
-import acs.data.actions.ElementEntityA;
+import acs.data.actions.ActionElementEntity;
 import acs.data.actions.InvokedByEntity;
-import acs.rest.action.boundaries.ElementBoundaryA;
+import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.utils.IdBoundary;
 
 public class ActionEntity {
 	private ActionIdEntity actionId;
 	private String type;
-	private ElementEntityA element;
+	private ActionElementEntity element;
 	private Date createdTimestamp;
 	private InvokedByEntity invokedBy;
 	private Map <String, Object> actionAttributes;
@@ -33,10 +33,10 @@ public class ActionEntity {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public ElementEntityA getElement() {
+	public ActionElementEntity getElement() {
 		return element;
 	}
-	public void setElement(ElementEntityA element) {
+	public void setElement(ActionElementEntity element) {
 		this.element = element;
 	}
 	public Date getCreatedTimestamp() {

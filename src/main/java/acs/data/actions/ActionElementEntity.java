@@ -1,14 +1,14 @@
-package acs.rest.action.boundaries;
+package acs.data.actions;
 
 import acs.rest.utils.IdBoundary;
 
-public class ElementBoundaryA {
+public class ActionElementEntity {
 	private IdBoundary elementId;
-	
-	public ElementBoundaryA() {
+
+	public ActionElementEntity() {
 	}
 	
-	public ElementBoundaryA(IdBoundary elementId) {
+	public ActionElementEntity(IdBoundary elementId) {
 		super();
 		this.elementId = elementId;
 	}
@@ -23,8 +23,6 @@ public class ElementBoundaryA {
 
 	@Override
 	public String toString() {
-		return "elementBoundary [elementId=" + elementId + "]";
+		return "elementEntiny [elementId=" + elementId + "]";
 	}
-
-
 }
