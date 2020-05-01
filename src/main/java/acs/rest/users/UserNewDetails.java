@@ -1,6 +1,7 @@
 package acs.rest.users;
 
 import acs.data.UserRole;
+import acs.rest.utils.UserNameBoundray;
 
 /*
  * {
@@ -17,12 +18,12 @@ import acs.data.UserRole;
 public class UserNewDetails {
 
 	private String email;
-	private String userName;
+	private UserNameBoundray userName;
 	private UserRole role;
 	private String avatar;
 	
 	
-	public UserNewDetails(String email, String userName, UserRole role, String avatar) {
+	public UserNewDetails(String email, UserNameBoundray userName, UserRole role, String avatar) {
 		super();
 		this.email = email;
 		this.userName = userName;
@@ -51,12 +52,12 @@ public class UserNewDetails {
 	}
 
 
-	public String getUserName() {
+	public UserNameBoundray getUserName() {
 		return userName;
 	}
 
 
-	public void setUserName(String userName) {
+	public void setUserName(UserNameBoundray userName) {
 		this.userName = userName;
 	}
 

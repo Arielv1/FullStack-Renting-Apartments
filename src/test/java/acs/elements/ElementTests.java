@@ -1,7 +1,9 @@
 package acs.elements;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.Date;
@@ -22,7 +24,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
-import acs.rest.element.ElementBoundary;
+import acs.data.ElementIdEntity;
+import acs.data.elements.ElementEntity;
+import acs.rest.element.boundaries.ElementBoundary;
+import acs.rest.utils.ElementIdBoundary;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -33,9 +38,12 @@ public class ElementTests {
 	private String url;
 	
 	private final static String GET_ALL_URL = "/TestUserDomain/TestUserEmail/";
-	private final static String GET_URL = "/TestUserDomain/TestUserEmail/TestElementDomain/";
+	private final static String GET_URL = "/TestUserDomain/TestUserEmail/";
 	private final static String POST_URL = "/TestManagerDomain/TestManagerEmail";
-	private final static String UPDATE_URL = "/TestManagerDomain}/TestManagerEmail}/TestElementDomain/";
+	private final static String UPDATE_URL = "/TestManagerDomain}/TestManagerEmail/";
+	
+	
+	// TODO - change url when delete is implemented
 	private final static String DELETE_ALL_URL =  "/admin/TestAdminDomain/TestAdminEmail/";
 	
 	
@@ -55,10 +63,34 @@ public class ElementTests {
 		this.restTemplate.delete(this.url + DELETE_ALL_URL);
 	}
 	
-	@Test
+	
+	/*"elementId": {
+    	"domain" : "2020B.Ofir.Cohen"
+        "ID": 1
+    },
+    "type": "demoType",
+    "name": "demoName",
+    "active": false,
+    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
+    "createdBy": {
+    	"userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
+    },
+    "location": {
+        "lat": "00.00"
+    },
+    "elementAttribues": {
+        "demoAttribute": "demoValue"
+    }*/
+    public String elementIdToURL(ElementIdBoundary eib) {
+		return eib.getDomain() + "/" + eib.getId();
+	}
+    
+    @Test
 	public void testContext() {	
 	}
-	
 	
 	
 	@Test
@@ -81,13 +113,15 @@ public class ElementTests {
 		
 		assertEquals(output.getName(), input.getName());
 	}
+	
+	
 
 	@Test
 	public void testGetSpecificElementWithSpecificAttributesInDatabaseAndValidateObjectReturnedByDatabase() throws Exception{
 		
 		// GIVEN - server is up and contains a single Element
 		// WHEN - invoke GET /acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}
-		// THEN - server varifies that the element given has same attributes as element which was created,
+		// THEN - server verifies that the element given has same attributes as element which was created,
 		//			return 2xx afterwards
 		
 		Map <String , Object> elementAttributes = new HashMap<String, Object>();
@@ -108,10 +142,10 @@ public class ElementTests {
 									null, 
 									null,
 									elementAttributes),
-									ElementBoundary.class);
+							ElementBoundary.class);
 		
 		
-		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + newElementObject.getKey(),
+		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + elementIdToURL(newElementObject.getElementId()),
 																ElementBoundary.class,
 																newElementObject.getElementAttribues());
 		
@@ -121,8 +155,8 @@ public class ElementTests {
 	@Test
 	public void testCreate5ElementsCheckThatTheyWereAddedToDatabaseThenDeleteDatabaseAndCheckThatItIsEmptyAndNotNull() throws Exception{
 		// GIVEN - Database contains 5 Elements
-		// WHEN - Invoked GET to all Elements , the size of the database will be 5
-		// THEN - Delete the entire database , confirm it is not null , is empty and return 2xx message from server
+		// WHEN - Invoked GET to all Elements
+		// THEN - Confirm database size is 5,  delete the entire database , confirm it is not null , is empty and return 2xx message from server
 		
 		// Create 5 Elements for database
 		List <ElementBoundary> dbContent = IntStream.range(0, 5) //Stream <Integer> with size of 5 (0,1,2,3,4)
@@ -156,11 +190,10 @@ public class ElementTests {
 	}
 	
 	@Test
-	public void idk () throws Exception {
-		// GIVEN - Server is up 
-		// WHEN - Database contains a single element
-		// THEN - Invoke UPDATE method in an attempt to change the elementId attribute , check that the new id 
-		// 			has not been updated in the database and server returns 2xx message
+	public void testCreateNewElementAttemptToChangeItsIdAndVerifyThatTheDatabaseHadNotChangedTheId () throws Exception {
+		// GIVEN - Database contains an element 
+		// WHEN - I change elementAttributes with UPDATE method
+		// THEN - Check that the new id has not been updated in the database and server returns 2xx message
 		
 		// Creating new ElementBoundary and adding it to the database through POST
 		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
@@ -176,15 +209,13 @@ public class ElementTests {
 																ElementBoundary.class);
 		
 		// Creating the new elementId to update
-		Map <String, Object> newElementId = new HashMap <String, Object>();
+		ElementIdBoundary newElementId = new ElementIdBoundary("testDomain", "testId");
 		
-		newElementId.put("domain", "verybaddomain@doesntwork.uk");
-		newElementId.put("ID", 2.3);
-		
-		element.setElementId(newElementId);
+		String elementIdentifierURL = elementIdToURL(element.getElementId());
+		element.setElementId(new ElementIdBoundary("testdomain", "1"));
 			
 		//Invoke the UPDATE method
-		this.restTemplate.put(this.url + UPDATE_URL + element.getKey(),
+		this.restTemplate.put(this.url + UPDATE_URL + elementIdentifierURL,
 							  element ,
 							  newElementId);
 		
@@ -195,5 +226,118 @@ public class ElementTests {
 		// Check that the databases' old key was kept 
 		assertThat(database[0].getElementId()).isNotEqualTo(element.getElementId());
 		
+	}
+	
+	@Test
+	public void testCreateNewElementThenUpdateItWithNullNameExpectAndCheckForRuntimeException() throws Exception{
+		//GIVEN - An element in the database
+		//WHEN - Attempt to set the elements name to 'null'
+		//THEN - Server receives an exception and return 2xx message
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+																	new ElementBoundary(null,
+																						"TypeTest4", 
+																						"NameTest4", 
+																						false,
+																						new Date(), 
+																						null, 
+																						null,
+																						null
+																						),
+																	ElementBoundary.class);
+		String newName = null;
+		element.setName(newName);
+		try {
+			this.restTemplate.put(this.url + UPDATE_URL + elementIdToURL(element.getElementId()),
+				  element ,
+				  newName);
+			fail("Expected Invalid Name Exception");
+		}
+		catch (RuntimeException e) {
+		}
+	}
+	
+	@Test
+	public void testCreateNewElementThenUpdateItWithEmptyNameWith5SpacesExpectAndCheckForRuntimeException() throws Exception{
+		//GIVEN - An element in the database
+		//WHEN - Attempt to set the elements name to a name with 5 spaces "    "
+		//THEN - Server receives an exception and return 2xx message
+		
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+																	new ElementBoundary(null,
+																						"TypeTest4", 
+																						"NameTest4", 
+																						false,
+																						new Date(), 
+																						null, 
+																						null,
+																						null
+																						),
+																	ElementBoundary.class);
+		String newName = "     ";
+		element.setName(newName);
+		try {
+			this.restTemplate.put(this.url + UPDATE_URL + elementIdToURL(element.getElementId()),
+				  element ,
+				  newName);
+			fail("Expected Invalid Name Exception");
+		}
+		catch (RuntimeException e) {
+		}
+	}
+	
+	@Test
+	public void testCreateNewElementThenUpdateItWithNullTypeExpectAndCheckForRuntimeException() throws Exception{
+		//GIVEN - An element in the database
+		//WHEN - Attempt to set the elements' type to 'null'
+		//THEN - Server receives an exception and return 2xx message
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+																	new ElementBoundary(null,
+																						"TypeTest4", 
+																						"NameTest4", 
+																						false,
+																						new Date(), 
+																						null, 
+																						null,
+																						null
+																						),
+																	ElementBoundary.class);
+		String newType = null;
+		element.setType(newType);
+		try {
+			this.restTemplate.put(this.url + UPDATE_URL + elementIdToURL(element.getElementId()),
+				  element ,
+				  newType);
+			fail("Expected Invalid Type Exception");
+		}
+		catch (RuntimeException e) {
+		}
+	}
+	
+	@Test
+	public void testCreateNewElementThenUpdateItWithTypeThatHas3SpacestAndCheckForRuntimeException() throws Exception{
+		//GIVEN - An element in the database
+		//WHEN - Attempt to set the elements type to "   "
+		//THEN - Server receives an exception and return 2xx message
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+																	new ElementBoundary(null,
+																						"TypeTest4", 
+																						"NameTest4", 
+																						false,
+																						new Date(), 
+																						null, 
+																						null,
+																						null
+																						),
+																	ElementBoundary.class);
+		String newType = "   ";
+		element.setName(newType);
+		try {
+			this.restTemplate.put(this.url + UPDATE_URL + elementIdToURL(element.getElementId()),
+				  element ,
+				  newType);
+			fail("Expected Invalid Type Exception");
+		}
+		catch (RuntimeException e) {
+		}
 	}
 }

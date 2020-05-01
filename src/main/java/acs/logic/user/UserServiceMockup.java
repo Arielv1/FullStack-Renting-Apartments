@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import acs.data.UserEntity;
 import acs.data.UserRole;
 import acs.rest.users.UserBoundary;
+import acs.rest.utils.UserIdBoundary;
 
 @Service
 public class UserServiceMockup implements UserService {
@@ -42,7 +43,7 @@ public class UserServiceMockup implements UserService {
 	// create new user
 	@Override
 	public UserBoundary createUser(UserBoundary user) {
-		user.getUserId().put("domain", this.ProjectName);
+		user.getUserId().setDomain(this.ProjectName);
 		UserEntity entity = this.dataBase.get(user.getUserId());
 		if (entity != null) {
 			throw new RuntimeException("the User alreay exsite in the data base!!");
@@ -61,9 +62,7 @@ public class UserServiceMockup implements UserService {
 	// login to user in the data base
 	@Override
 	public UserBoundary login(String domain, String email) {
-		Map<String, Object> userId = new HashMap<>();
-		userId.put("domain", domain);
-		userId.put("email", email);
+		UserIdBoundary userId = new UserIdBoundary(domain, email);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
 			return convert.fromEntity(entity);
@@ -76,12 +75,10 @@ public class UserServiceMockup implements UserService {
 	// update user details in the data base
 	@Override
 	public UserBoundary updateUser(String domain, String email, UserBoundary update) {
-		Map<String, Object> userId = new HashMap<>();
-		userId.put("domain", domain);
-		userId.put("email", email);
+		UserIdBoundary userId = new UserIdBoundary(domain, email);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
-			entity.setUserName(update.getUserName());
+			entity.setUserName(update.getUserName().getFirst() +" "+ update.getUserName().getLast());
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());
 			return convert.fromEntity(entity);
@@ -93,9 +90,7 @@ public class UserServiceMockup implements UserService {
 	// get all users from the data base
 	@Override
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
-		Map<String, Object> userId = new HashMap<>();
-		userId.put("domain", adminDomain);
-		userId.put("email", adminEmail);
+		UserIdBoundary userId = new UserIdBoundary(adminDomain, adminEmail);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity.getRole().equals(UserRole.ADMIN)) {
 			return this.dataBase.values().stream().map(this.convert::fromEntity).collect(Collectors.toList());

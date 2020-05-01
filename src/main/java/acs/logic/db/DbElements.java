@@ -1,45 +1,39 @@
-package acs.logic.element;
+package acs.logic.db;
 
-
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import java.util.stream.StreamSupport;
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-
+import org.springframework.transaction.annotation.Transactional;
+import acs.dal.ElementDao;
 import acs.data.*;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
-import acs.rest.element.boundaries.CreatedByBoundary;
+import acs.logic.element.ElementConverter;
+import acs.logic.element.ElementService;
 import acs.rest.element.boundaries.ElementBoundary;
 
+@Service
+public class DbElements implements ElementService {
 
-//@Service
-public class ElementServiceMockup implements ElementService {
-	
 	private String projectName;
-	
-	private Map <String, ElementEntity> database;
-	
+	private ElementDao elementDao;
 	private ElementConverter converter;
 	
-	@Value("${spring.application.name:2020b.ofir.cohen}")
+	@Value("${spring.application.name:ofir.cohen}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
 	
 	@Autowired
-	public ElementServiceMockup(ElementConverter converter) {
+	public DbElements(ElementDao elementDao, ElementConverter converter) {
 		this.converter = converter;
+		this.elementDao = elementDao;
 	}
 	
 	@PostConstruct
@@ -47,11 +41,10 @@ public class ElementServiceMockup implements ElementService {
 		// initialize object after injection
 		System.err.println("Project : " + this.projectName + " initialized ElementServiceMockup");
 		
-		// make sure that this is actually the proper Map for this application
-		this.database = Collections.synchronizedMap(new HashMap<>()); 
 	}
 	
 	@Override
+	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary element) {
 		
 		ElementEntity entity = this.converter.toEntity(element);
@@ -64,37 +57,38 @@ public class ElementServiceMockup implements ElementService {
 		
 		entity.setCreatedBy(new CreatedByEntity (new UserIdEntity (managerDomain, managerEmail)));
 		
-		this.database.put(this.projectName + "!" + id, entity);
-		
-		return this.converter.fromEntity(entity);
+		// select + insert / update
+		return this.converter.fromEntity(this.elementDao.save(entity));
 	}
 
 	@Override
+	@Transactional
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 		
 		
-		ElementEntity entity = this.database.get(elementDomain + "!" + elementId);		
-		
-		if (entity == null) {
-			throw new RuntimeException("There Is No Element With Given ID");
-		}
-		
-		if(update.getType() != null) {
-			entity.setType(update.getType());
+		ElementEntity entity = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId)).orElseThrow(
+				() -> new RuntimeException("DB No Element With Id " + elementId));
+	
+	
+		if(update.getType() != null  && update.getType().trim().length() != 0) {
+			entity.setType(update.getType()); 
 		}
 		else {
-			throw new RuntimeException("Invalid Element Type");
+			throw new RuntimeException("ElementEntity invalid type");
 		}
 		
 		if(update.getName() != null && update.getName().trim().length() != 0) {
-			entity.setType(update.getName());
-		} 
+			entity.setName(update.getName()); 
+		}
 		else {
-			throw new RuntimeException("Invalid Element Name");
-		} 
+			throw new RuntimeException("ElementEntity invalid name");
+		}
 		
-		if(update.getActive() == null) {
+		if (update.getActive() != null) {
+			entity.setActive(update.getActive());
+		}
+		else {
 			entity.setActive(false);
 		}
 		
@@ -108,33 +102,32 @@ public class ElementServiceMockup implements ElementService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List <ElementBoundary> getAll(String userDomain, String userEmail) {
+		// invoke select * from database
 		
-		return this.database
-				.values() // Collection<ElementEntity>
-				.stream()  // Stream<ElementEntity>
-				.map(this.converter::fromEntity) // Convert to Stream<ElementBoundary>
-				.collect(Collectors.toList()); // List<ElementBoundary>*/
-		
+		return StreamSupport.stream(this.elementDao.findAll().spliterator(), false)
+				.map(this.converter :: fromEntity)
+				.collect(Collectors.toList());
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain, String elementId) {
+		// invoke select database
 		
-		ElementBoundary boundary = this.converter.fromEntity(this.database.get(elementDomain + "!" + elementId));
-		
-		if(boundary == null) {
-			throw new RuntimeException("No element with the given ID");
-		}
-		else {
-			 return boundary;
-		}
+	
+		return this.converter.fromEntity(
+				  this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
+				 .orElseThrow(() -> new RuntimeException("DB No Element With ID"))
+				 );
 	}
 	
 	
 	@Override
+	@Transactional
 	public void deleteAllElements(String adminDomain, String adminEmail) {
-		
-		this.database.clear();
+		//Invoke delete database
+		this.elementDao.deleteAll();
 	}
 }

@@ -1,51 +1,81 @@
 package acs.data;
 
-import java.util.Map;
+
+import acs.data.UserRole;
+import acs.rest.utils.UserIdBoundary;
+
+
+/*
+ {
+ 	"userId": { 
+ 		"domain" : "2020.b@demo",
+ 		"email" : "tomerarnon@gma"il.com"
+ 	},
+ 	"role" : "PLAYER",
+ 	"userName" : "demo user",
+ 	"avatar" : ";-)"
+ } 
+ * 
+ */
 
 public class UserEntity {
-	private Map<String, Object> userId;
-	private UserRole role; 
-	private String username;
+	private UserIdBoundary userId;
 	private String avatar;
-	
-	
+	private String userName;
+	private UserRole role;
+
 	public UserEntity() {
+
 	}
-	
-	
-	public UserEntity(Map<String, Object> userId, UserRole role, String username, String avatar) {
+
+	public UserEntity(UserIdBoundary userId,  String userName, UserRole role, String avatar) {
 		super();
 		this.userId = userId;
+		this.userName = userName;
 		this.role = role;
-		this.username = username;
 		this.avatar = avatar;
 	}
 
-
-	public Map<String, Object> getUserId() {
+	public UserIdBoundary getUserId() {
 		return userId;
 	}
-	public void setUserId(Map<String, Object> userId) {
+
+	public void setUserId(UserIdBoundary userId) {
 		this.userId = userId;
 	}
-	public UserRole getRole() {
-		return role;
-	}
-	public void setRole(UserRole role) {
-		this.role = role;
-	}
-	public String getUserName() {
-		return username;
-	}
-	public void setUserName(String username) {
-		this.username = username;
-	}
+
 	public String getAvatar() {
 		return avatar;
 	}
+
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public UserRole getRole() {
+		return role;
+	}
+
+	public void setRole(UserRole role) {
+		this.role = role;
+	}
+
+	@Override
+	public String toString() {
+		return "UserBoundry [userId=" + userId + ", avatar=" + avatar + ", userName=" + userName + ", role=" + role
+				+ "]";
+	}
+
+
+
+	
 
 }

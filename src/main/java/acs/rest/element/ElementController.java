@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.element.ElementService;
+import acs.rest.element.boundaries.ElementBoundary;
 
 @RestController
 public class ElementController {	

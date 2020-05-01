@@ -1,8 +1,7 @@
 package acs.rest.users;
 
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -14,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import acs.logic.user.UserService;
+import acs.rest.utils.UserIdBoundary;
+import acs.rest.utils.UserNameBoundray;
 
 @RestController
 public class UserController {
@@ -40,10 +41,8 @@ public class UserController {
 				produces = MediaType.APPLICATION_JSON_VALUE, 
 				consumes = MediaType.APPLICATION_JSON_VALUE)
 		public UserBoundary createUser(@RequestBody UserNewDetails user) {
-			Map<String, Object> userId = new HashMap<>();
-			userId.put("domain", null);
-			userId.put("email", user.getEmail());
-			UserBoundary userBoundary = new UserBoundary(userId, user.getUserName(), user.getRole(), user.getAvatar());
+			UserBoundary userBoundary = new UserBoundary(new UserIdBoundary(null, user.getEmail()), new UserNameBoundray(user.getUserName().getFirst(),
+					user.getUserName().getLast()) , user.getRole(), user.getAvatar());
 			return this.userService.createUser(userBoundary);
 		}
 

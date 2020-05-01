@@ -1,63 +1,118 @@
 package acs.logic.element;
 
 import java.util.*;
-
 import org.springframework.stereotype.Component;
 
-import acs.data.ElementEntity;
-import acs.rest.element.ElementBoundary;
+import acs.data.ElementIdEntity;
+import acs.data.UserIdEntity;
+import acs.data.elements.ElementEntity;
+import acs.rest.element.boundaries.CreatedByBoundary;
+import acs.rest.element.boundaries.ElementBoundary;
+import acs.rest.utils.ElementIdBoundary;
+import acs.rest.utils.UserIdBoundary;
+
 
 @Component
 public class ElementConverter {
-	
-	public ElementBoundary entityToBoundary (ElementEntity entity) {
-		if (entity == null) 
-			return null;
+   /* "elementId": {
+    	"domain" : "2020B.Ofir.Cohen"
+        "ID": 1
+    },
+    "type": "demoType",
+    "name": "demoName",
+    "active": false,
+    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
+    "createdBy": {
+    	"userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
+    },
+    "location": {
+        "lat": "00.00"
+    },
+    "elementAttribues": {
+        "demoAttribute": "demoValue"
+    }*/
+	public ElementBoundary fromEntity (ElementEntity entity) {
 		
-		return new ElementBoundary(entity.getKey(),
-				entity.getElementId(),
+		ElementIdBoundary elementIdBoundary = new ElementIdBoundary();
+		CreatedByBoundary createdByBoundary = new CreatedByBoundary();
+		UserIdBoundary userIdBoundary = new UserIdBoundary();
+		
+		if (entity.getElementId() != null) {
+			elementIdBoundary.setDomain(entity.getElementId().getDomain());
+			elementIdBoundary.setId(entity.getElementId().getId());
+		}
+		else {
+			elementIdBoundary = null;
+		}
+		
+		
+		if (entity.getCreatedBy() != null && entity.getCreatedBy().getUserId() != null) {
+			userIdBoundary.setDomain(entity.getCreatedBy().getUserId().getDomain());
+			userIdBoundary.setEmail(entity.getCreatedBy().getUserId().getEmail());
+			createdByBoundary.setUserId(userIdBoundary);
+		}
+		else {
+			createdByBoundary = null;
+		}
+		
+		
+		return new ElementBoundary(elementIdBoundary,
 				entity.getType(),
 				entity.getName(),
 				entity.getActive(),
 				entity.getCreatedTimestamp(),
-				entity.getCreatedBy(),
+				createdByBoundary,
 				entity.getLocation(),
 				entity.getElementAttribues());
-
 	}
 	
-	/*
-	Map <String, Object> elementId; --> Can be null
-	String type; --> Can't be null
-	String name; --> Can't be null
-	boolean active; --> Can't be null
-	Date createdTimestamp; --> Can be null
-	Map <String, Object> createdBy; --> Can be null
-	Map <String, Double> location; --> Can be null
-	Map <String, Object> elementAttribues; --> Can be null
-	*/
-	public ElementEntity boundaryToEntity (ElementBoundary boundary) {
-		
+	public ElementEntity toEntity (ElementBoundary boundary) {
 		ElementEntity entity = new ElementEntity();
 		
-		if (boundary.getElementId() != null) entity.setElementId(boundary.getElementId());	
+		if (boundary.getElementId() != null) {
+			ElementIdEntity elementIdEntity = new ElementIdEntity();
+			elementIdEntity.setDomain(boundary.getElementId().getDomain());
+			elementIdEntity.setId(boundary.getElementId().getId());
+		}
+		else {
+			entity.setElementId(new ElementIdEntity());
+		}
+				
+		if(boundary.getType() != null && boundary.getType().trim().length() != 0) {
+			entity.setType(boundary.getType());
+		} 
+		else {
+			throw new RuntimeException("Invalid ElementBoundary Type");
+		}
 		
-		// TODO - remove 'key' element is turns out to be irrelevent
-		if (boundary.getKey() != null)	entity.setKey(boundary.getKey());
-		else entity.setKey();
+		if(boundary.getName() != null && boundary.getName().trim().length() != 0) {
+			entity.setName(boundary.getName());
+		} 
+		else {
+			throw new RuntimeException("Invalid ElementBoundary Name");
+		}
 		
-		if(boundary.getType() != null) 	entity.setType(boundary.getType()); 
-		else throw new RuntimeException("ElementBoundary invalid type");
+		if(boundary.getActive() != null) {
+			entity.setActive(boundary.getActive());
+		} 
+		else {
+			entity.setActive(true);
+		}
 		
-		if(boundary.getName() != null) 	entity.setName(boundary.getName()); 
-		else throw new RuntimeException("ElementBoundary invalid name");
 		
-		if (boundary.getActive() != null) entity.setActive(boundary.getActive());
-		else entity.setActive(false);
+		entity.setCreatedTimestamp(boundary.getCreatedTimestamp());
 		
-		entity.setCreatedTimestamp(new Date());
-		
-		entity.setCreatedBy(boundary.getCreatedBy());
+		if(boundary.getCreatedBy()!= null && boundary.getCreatedBy().getUserId() != null) {
+			UserIdEntity userIdEntity = new UserIdEntity();
+			userIdEntity.setDomain(boundary.getCreatedBy().getUserId().getDomain());
+			userIdEntity.setEmail(boundary.getCreatedBy().getUserId().getEmail());
+		}
+		else {
+			entity.setCreatedBy(null);
+		}
 		
 		entity.setLocation(boundary.getLocation());
 		

@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 import javax.annotation.PostConstruct;
 
@@ -19,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 
 import acs.data.UserRole;
 import acs.rest.users.UserBoundary;
+import acs.rest.utils.UserIdBoundary;
+import acs.rest.utils.UserNameBoundray;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class UserTests {
@@ -58,7 +59,7 @@ public class UserTests {
 		// WHEN - post /users AND send new userBoundary with specific user id
 		// THEN - the server return same user id and gines 2xx massage
 		UserBoundary userInput = new UserBoundary(null,
-				"test name",
+				new UserNameBoundray("Test", "Test"),
 				UserRole.PLAYER,
 				null);
 		
@@ -75,9 +76,7 @@ public class UserTests {
 		// WHEN the user details in the data base
 		// THEN the server retrieve user details from the data base AND send 2xx message
 		
-		Map<String, Object> userId = new HashMap<>();
-		userId.put("domain", "test.domain");
-		userId.put("email", "test@gmail.com");
+		UserIdBoundary userId = new UserIdBoundary("domain Test", "test@gmail.com");
 		
 		
 		UserBoundary userInput = this.restTemplate.postForObject(this.url, new UserBoundary(userId,
@@ -99,9 +98,7 @@ public class UserTests {
 		// WHEN user in the data base 
 		// THEN the server update the user details according to the input
 		
-		Map<String, Object> userId = new HashMap<>();
-		userId.put("domain", "test.domain");
-		userId.put("email", "test@gmail.com");
+		UserIdBoundary userId = new UserIdBoundary("domain test", "test@gmail.com");
 		
 		
 		UserBoundary userInput = this.restTemplate.postForObject(this.url, new UserBoundary(userId,
@@ -109,10 +106,10 @@ public class UserTests {
 				UserRole.ADMIN, 
 				null), UserBoundary.class);
 		
-			String domain = userInput.getUserId().get("domain").toString();
-			String email = userInput.getUserId().get("email").toString();
+			String domain = userInput.getUserId().getDomain();
+			String email = userInput.getUserId().getEmail();
 			
-			userInput.setUserName("testUser");
+			userInput.setUserName(new UserNameBoundray("testUser", null));
 			this.restTemplate.put(this.url + PUT, userInput, domain, email);
 			
 			assertThat(this.restTemplate.getForObject(this.url + GET, UserBoundary.class, domain, email).getUserName()
