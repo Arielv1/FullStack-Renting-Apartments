@@ -3,22 +3,28 @@
 import java.util.Date;
 import java.util.Map;
 
+import acs.data.actions.ActionElementEntity;
+import acs.data.actions.InvokedByEntity;
+import acs.rest.action.boundaries.ActionElementBoundary;
+import acs.rest.action.boundaries.InvokedByBoundary;
+import acs.rest.utils.IdBoundary;
+
 public class ActionEntity {
-	private Map <String, Object> actionId;
+	private ActionIdEntity actionId;
 	private String type;
-	private Map <String, Object> element;
+	private ActionElementEntity element;
 	private Date createdTimestamp;
-	private Map <String, Object> invokedBy;
+	private InvokedByEntity invokedBy;
 	private Map <String, Object> actionAttributes;
 	
 
 	public ActionEntity() {
 	}
 	
-	public Map<String, Object> getActionId() {
+	public ActionIdEntity getActionId() {
 		return actionId;
 	}
-	public void setActionId(Map<String, Object> actionId) {
+	public void setActionId(ActionIdEntity actionId) {
 		this.actionId = actionId;
 	}
 	public String getType() {
@@ -27,10 +33,10 @@ public class ActionEntity {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public Map<String, Object> getElement() {
+	public ActionElementEntity getElement() {
 		return element;
 	}
-	public void setElement(Map<String, Object> element) {
+	public void setElement(ActionElementEntity element) {
 		this.element = element;
 	}
 	public Date getCreatedTimestamp() {
@@ -39,10 +45,10 @@ public class ActionEntity {
 	public void setCreatedTimestamp(Date createdTimestamp) {
 		this.createdTimestamp = createdTimestamp;
 	}
-	public Map<String, Object> getInvokedBy() {
+	public InvokedByEntity getInvokedBy() {
 		return invokedBy;
 	}
-	public void setInvokedBy(Map<String, Object> invokedBy) {
+	public void setInvokedBy(InvokedByEntity invokedBy) {
 		this.invokedBy = invokedBy;
 	}
 	public Map<String, Object> getActionAttributes() {

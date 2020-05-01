@@ -30,10 +30,10 @@ public class UserBoundary {
 
 	public UserBoundary(UserIdBoundary userId,  UserNameBoundray userName, UserRole role, String avatar) {
 		super();
-		this.userId = userId;
-		this.userName = userName;
-		this.role = role;
-		this.avatar = avatar;
+		setUserId(userId);
+		setUserName(userName);
+		setRole(role);
+		setAvatar(avatar);
 	}
 
 	public UserIdBoundary getUserId() {

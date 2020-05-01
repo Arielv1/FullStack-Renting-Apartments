@@ -1,5 +1,7 @@
 package acs.rest.users;
 
+import java.util.regex.Pattern;
+
 import acs.data.UserRole;
 import acs.rest.utils.UserNameBoundray;
 
@@ -21,64 +23,56 @@ public class UserNewDetails {
 	private UserNameBoundray userName;
 	private UserRole role;
 	private String avatar;
-	
-	
+
 	public UserNewDetails(String email, UserNameBoundray userName, UserRole role, String avatar) {
 		super();
-		this.email = email;
-		this.userName = userName;
-		this.role = role;
-		this.avatar = avatar;
+		setEmail(email);
+		setUserName(userName);
+		setRole(role);
+		setAvatar(avatar);
 	}
-	
-	
-
 
 	public UserNewDetails() {
 		super();
-		
+
 	}
-
-
-
 
 	public String getEmail() {
 		return email;
 	}
 
-
 	public void setEmail(String email) {
 		this.email = email;
-	}
 
+	}
 
 	public UserNameBoundray getUserName() {
 		return userName;
 	}
 
-
 	public void setUserName(UserNameBoundray userName) {
 		this.userName = userName;
 	}
-
 
 	public UserRole getRole() {
 		return role;
 	}
 
-
 	public void setRole(UserRole role) {
 		this.role = role;
 	}
-
 
 	public String getAvatar() {
 		return avatar;
 	}
 
-
 	public void setAvatar(String avatar) {
-		this.avatar = avatar;
+		if (avatar != null && !avatar.trim().isEmpty()) {
+			this.avatar = avatar;
+		} else {
+			throw new RuntimeException("avatar invalid!!");
+		}
+
 	}
-	
+
 }

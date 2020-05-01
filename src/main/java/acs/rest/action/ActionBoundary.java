@@ -3,6 +3,10 @@ package acs.rest.action;
 import java.util.Date;
 import java.util.Map;
 
+import acs.rest.action.boundaries.InvokedByBoundary;
+import acs.rest.action.boundaries.ActionElementBoundary;
+import acs.rest.utils.IdBoundary;
+
 /*
  {
  	"actionId":{
@@ -32,12 +36,11 @@ import java.util.Map;
  */
 
 public class ActionBoundary {
-	
-	private Map <String, Object> actionId;
+	private IdBoundary actionId;
 	private String type;
-	private Map <String, Object> element;
+	private ActionElementBoundary element;
 	private Date createdTimestamp;
-	private Map <String, Object> invokedBy;
+	private InvokedByBoundary invokedBy;
 	private Map <String, Object> actionAttributes;
 
 	
@@ -45,8 +48,8 @@ public class ActionBoundary {
 
 	}
 
-	public ActionBoundary(Map <String, Object> actionId, String type, Map <String, Object> element, Date createdTimestamp,
-			Map <String, Object> invokedBy,Map <String, Object> actionAttributes) {
+	public ActionBoundary(IdBoundary actionId, String type, ActionElementBoundary element, Date createdTimestamp,
+			InvokedByBoundary invokedBy,Map <String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
 		this.type = type;
@@ -56,11 +59,11 @@ public class ActionBoundary {
 		this.actionAttributes = actionAttributes;
 	}
 
-	public Map<String, Object> getActionId() {
+	public IdBoundary getActionId() {
 		return actionId;
 	}
 
-	public void setActionId(Map<String, Object> actionId) {
+	public void setActionId(IdBoundary actionId) {
 		this.actionId = actionId;
 	}
 
@@ -72,11 +75,11 @@ public class ActionBoundary {
 		this.type = type;
 	}
 
-	public Map<String, Object> getElement() {
+	public ActionElementBoundary getElement() {
 		return element;
 	}
 
-	public void setElement(Map<String, Object> element) {
+	public void setElement(ActionElementBoundary element) {
 		this.element = element;
 	}
 
@@ -88,11 +91,11 @@ public class ActionBoundary {
 		this.createdTimestamp = createdTimestamp;
 	}
 
-	public Map<String, Object> getInvokedBy() {
+	public InvokedByBoundary getInvokedBy() {
 		return invokedBy;
 	}
 
-	public void setInvokedBy(Map<String, Object> invokedBy) {
+	public void setInvokedBy(InvokedByBoundary invokedBy) {
 		this.invokedBy = invokedBy;
 	}
 

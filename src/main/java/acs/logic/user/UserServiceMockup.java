@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -43,6 +44,15 @@ public class UserServiceMockup implements UserService {
 	// create new user
 	@Override
 	public UserBoundary createUser(UserBoundary user) {
+		if (!isEmailValid(user.getUserId().getEmail())) {
+			throw new RuntimeException("Email invaliud!!");
+		}
+		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
+			throw new RuntimeException("Avatar invaliud!!");
+		}
+		if (user.getUserName() == null) {
+			throw new RuntimeException("User Name invaliud!!");
+		}
 		user.getUserId().setDomain(this.ProjectName);
 		UserEntity entity = this.dataBase.get(user.getUserId());
 		if (entity != null) {
@@ -62,6 +72,9 @@ public class UserServiceMockup implements UserService {
 	// login to user in the data base
 	@Override
 	public UserBoundary login(String domain, String email) {
+		if (!isEmailValid(email)) {
+			throw new RuntimeException("Email invalid!!");
+		}
 		UserIdBoundary userId = new UserIdBoundary(domain, email);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
@@ -75,10 +88,20 @@ public class UserServiceMockup implements UserService {
 	// update user details in the data base
 	@Override
 	public UserBoundary updateUser(String domain, String email, UserBoundary update) {
+		if (!isEmailValid(email)) {
+			throw new RuntimeException("Email invalid!!");
+		}
+		if (update.getAvatar() == null && update.getAvatar().trim().isEmpty()) {
+			throw new RuntimeException("Avatar invalid!!");
+		}
+		if (update.getUserName() == null) {
+			throw new RuntimeException("User Name invalid!!");
+		}
+
 		UserIdBoundary userId = new UserIdBoundary(domain, email);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
-			entity.setUserName(update.getUserName().getFirst() +" "+ update.getUserName().getLast());
+			entity.setUserName(update.getUserName().getFirst() + " " + update.getUserName().getLast());
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());
 			return convert.fromEntity(entity);
@@ -90,6 +113,9 @@ public class UserServiceMockup implements UserService {
 	// get all users from the data base
 	@Override
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
+		if (!isEmailValid(adminEmail)) {
+			throw new RuntimeException("Email invalid");
+		}
 		UserIdBoundary userId = new UserIdBoundary(adminDomain, adminEmail);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity.getRole().equals(UserRole.ADMIN)) {
@@ -102,17 +128,18 @@ public class UserServiceMockup implements UserService {
 	// delete all users from the data base
 	@Override
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
-		/*
-		 * Map<String, Object> userId = new HashMap<>(); userId.put("domain",
-		 * adminDomain); userId.put("email", adminEmail); UserEntity entity =
-		 * this.dataBase.get(userId); if (entity.getRole().equals(UserRole.ADMIN)) {
-		 */
-		this.dataBase.clear();
+		if (!isEmailValid(adminEmail)) {
+			throw new RuntimeException("Email invalid!!");
+		}
 
-		// } else {
-		// throw new RuntimeException("admin details invalid");
-		// }
+		UserIdBoundary userId = new UserIdBoundary(adminDomain, adminEmail);
+		UserEntity entity = this.dataBase.get(userId);
 
+		if (entity.getRole().equals(UserRole.ADMIN)) {
+			this.dataBase.clear();
+		} else {
+			throw new RuntimeException("admin details invalid");
+		}
 	}
 
 	public Map<Object, UserEntity> getDataBase() {
@@ -125,6 +152,16 @@ public class UserServiceMockup implements UserService {
 
 	public String getProjectName() {
 		return ProjectName;
+	}
+
+	public boolean isEmailValid(String email) {
+		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
+				+ "A-Z]{2,7}$";
+
+		Pattern pat = Pattern.compile(emailRegex);
+		if (email == null)
+			return false;
+		return pat.matcher(email).matches();
 	}
 
 }
