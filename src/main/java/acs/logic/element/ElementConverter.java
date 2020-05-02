@@ -81,14 +81,14 @@ public class ElementConverter {
 			entity.setElementId(new ElementIdEntity());
 		}
 				
-		if(boundary.getType() != null && boundary.getType().trim().length() != 0) {
+		if(boundary.getType() != null && !boundary.getType().trim().isEmpty()) {
 			entity.setType(boundary.getType());
 		} 
 		else {
 			throw new RuntimeException("Invalid ElementBoundary Type");
 		}
 		
-		if(boundary.getName() != null && boundary.getName().trim().length() != 0) {
+		if(boundary.getName() != null && !boundary.getName().trim().isEmpty()) {
 			entity.setName(boundary.getName());
 		} 
 		else {

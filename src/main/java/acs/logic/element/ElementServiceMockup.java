@@ -80,14 +80,14 @@ public class ElementServiceMockup implements ElementService {
 			throw new RuntimeException("There Is No Element With Given ID");
 		}
 		
-		if(update.getType() != null) {
+		if(update.getType() != null  && !update.getType().trim().isEmpty()) {
 			entity.setType(update.getType());
 		}
 		else {
 			throw new RuntimeException("Invalid Element Type");
 		}
 		
-		if(update.getName() != null && update.getName().trim().length() != 0) {
+		if(update.getName() != null && !update.getName().trim().isEmpty()) {
 			entity.setType(update.getName());
 		} 
 		else {
@@ -103,7 +103,9 @@ public class ElementServiceMockup implements ElementService {
 		entity.setElementAttribues(update.getElementAttribues());
 		
 		update = this.converter.fromEntity(entity);
-
+		
+		this.database.put(elementDomain + "!" + elementId, entity);
+		
 		return update;
 	}
 

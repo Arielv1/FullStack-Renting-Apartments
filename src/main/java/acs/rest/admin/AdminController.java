@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import acs.logic.action.ActionService;
-import acs.logic.db.DbElements;
+import acs.logic.db.DbElementService;
 import acs.logic.element.ElementService;
 import acs.logic.user.UserService;
 import acs.logic.user.UserConvertor;
@@ -21,7 +21,7 @@ import acs.rest.users.UserBoundary;
 public class AdminController {
 	
 	private UserService userService;
-	private DbElements dbElementeService;
+	private DbElementService dbElementeService;
 	private ActionService actionService;
 
 	

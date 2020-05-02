@@ -8,16 +8,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import acs.logic.element.ElementService;
+import acs.logic.element.ExtendedElementService;
 import acs.rest.element.boundaries.ElementBoundary;
+import acs.rest.utils.IdBoundary;
 
 @RestController
 public class ElementController {	
 	
-	private ElementService elementService;
+	private ExtendedElementService elementService;
 
 	@Autowired
-	public void setElementService(ElementService elementService) {
+	public void setElementService(ExtendedElementService elementService) {
 		this.elementService = elementService;
 	}
 	
@@ -70,10 +71,46 @@ public class ElementController {
 	
 	 // DUMMY DELETE METHOD - COPY TO ADMINCONTROLLER OR DELETE IF NEEDED
 	 // Delete (DELETE) all elements
-		@RequestMapping(path = "/acs/elements/admin/{adminDomain}/{adminEmail}",
-				method = RequestMethod.DELETE)
-		public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
-				 					  @PathVariable("adminEmail") String adminEmail) {
-			this.elementService.deleteAllElements(adminDomain, adminEmail);	
-		}
+	@RequestMapping(path = "/acs/elements/admin/{adminDomain}/{adminEmail}",
+			method = RequestMethod.DELETE)
+	public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
+			 					  @PathVariable("adminEmail") String adminEmail) {
+		this.elementService.deleteAllElements(adminDomain, adminEmail);	
+	}
+	
+	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
+			method = RequestMethod.PUT,			
+			consumes = MediaType.APPLICATION_JSON_VALUE)	
+	public void addChildElementToParentElement(@PathVariable("managerDomain") String managerDomain ,
+											  @PathVariable("managerEmail") String managerEmail,
+											  @PathVariable("elementDomain") String elementDomain,
+											  @PathVariable("elementId") String elementId,
+											  @RequestBody IdBoundary childId) {
+			
+		this.elementService.bindChildToParent(elementDomain, elementId, childId);
+		
+	}
+		
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/children",
+			method = RequestMethod.GET,		
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] getAllElementChildrenFromElementParent(@PathVariable("managerDomain") String managerDomain ,
+																	  @PathVariable("managerEmail") String managerEmail,
+																	  @PathVariable("elementDomain") String elementDomain,
+																	  @PathVariable("elementId") String elementId) {
+
+		return this.elementService.getChildren(elementDomain, elementId)
+				.toArray(new ElementBoundary[0]);
+	}
+		
+	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/parents",
+			method = RequestMethod.GET,			
+			produces = MediaType.APPLICATION_JSON_VALUE)	
+	public ElementBoundary[] getParentsFromChild(@PathVariable("managerDomain") String managerDomain ,
+												  @PathVariable("managerEmail") String managerEmail,
+												  @PathVariable("elementDomain") String elementDomain,
+												  @PathVariable("elementId") String elementId) {
+		ElementBoundary parent = this.elementService.getParent(elementDomain , elementId);
+		return null;
+	}
 }
