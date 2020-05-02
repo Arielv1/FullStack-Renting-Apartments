@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +16,7 @@ import acs.data.UserEntity;
 import acs.data.UserRole;
 import acs.rest.users.UserBoundary;
 import acs.rest.utils.UserIdBoundary;
+import acs.rest.utils.ValidEmail;
 
 @Service
 public class UserServiceMockup implements UserService {
@@ -24,6 +24,7 @@ public class UserServiceMockup implements UserService {
 	private String ProjectName;
 	private Map<Object, UserEntity> dataBase;
 	private UserConvertor convert;
+	private ValidEmail valid;
 
 	@Autowired
 	public UserServiceMockup(UserConvertor convert) {
@@ -44,7 +45,7 @@ public class UserServiceMockup implements UserService {
 	// create new user
 	@Override
 	public UserBoundary createUser(UserBoundary user) {
-		if (!isEmailValid(user.getUserId().getEmail())) {
+		if (!valid.isEmailVaild(user.getUserId().getEmail())) {
 			throw new RuntimeException("Email invaliud!!");
 		}
 		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
@@ -72,7 +73,7 @@ public class UserServiceMockup implements UserService {
 	// login to user in the data base
 	@Override
 	public UserBoundary login(String domain, String email) {
-		if (!isEmailValid(email)) {
+		if (!valid.isEmailVaild(email)) {
 			throw new RuntimeException("Email invalid!!");
 		}
 		UserIdBoundary userId = new UserIdBoundary(domain, email);
@@ -88,7 +89,7 @@ public class UserServiceMockup implements UserService {
 	// update user details in the data base
 	@Override
 	public UserBoundary updateUser(String domain, String email, UserBoundary update) {
-		if (!isEmailValid(email)) {
+		if (!valid.isEmailVaild(email)) {
 			throw new RuntimeException("Email invalid!!");
 		}
 		if (update.getAvatar() == null && update.getAvatar().trim().isEmpty()) {
@@ -113,7 +114,7 @@ public class UserServiceMockup implements UserService {
 	// get all users from the data base
 	@Override
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
-		if (!isEmailValid(adminEmail)) {
+		if (!valid.isEmailVaild(adminEmail)) {
 			throw new RuntimeException("Email invalid");
 		}
 		UserIdBoundary userId = new UserIdBoundary(adminDomain, adminEmail);
@@ -128,7 +129,9 @@ public class UserServiceMockup implements UserService {
 	// delete all users from the data base
 	@Override
 	public void deleteAllUsers(String adminDomain, String adminEmail) {
-		if (!isEmailValid(adminEmail)) {
+		this.dataBase.clear();
+		/*
+		if (!valid.isEmailVaild(adminEmail)) {
 			throw new RuntimeException("Email invalid!!");
 		}
 
@@ -140,6 +143,7 @@ public class UserServiceMockup implements UserService {
 		} else {
 			throw new RuntimeException("admin details invalid");
 		}
+		*/
 	}
 
 	public Map<Object, UserEntity> getDataBase() {
@@ -154,14 +158,6 @@ public class UserServiceMockup implements UserService {
 		return ProjectName;
 	}
 
-	public boolean isEmailValid(String email) {
-		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
-				+ "A-Z]{2,7}$";
 
-		Pattern pat = Pattern.compile(emailRegex);
-		if (email == null)
-			return false;
-		return pat.matcher(email).matches();
-	}
 
 }

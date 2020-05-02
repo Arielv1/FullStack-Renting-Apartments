@@ -3,8 +3,7 @@ package acs.users;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-
+import java.util.Collections;
 
 import javax.annotation.PostConstruct;
 
@@ -28,9 +27,9 @@ public class UserTests {
 	private RestTemplate restTemplate;
 	private String url;
 	
-	private final static String GET = "/login/{userDomain}/{userEmail}";
-	private final static String PUT = "/{userDomain}/{userEmail}";  
-	private final static String DELETE = "/admin/TestAdminDomain/TestAdminEmail/";
+	private final static String GET = "/login/userDomain/userEmail";
+	private final static String PUT = "/userDomain/userEmail";  
+	private final static String DELETE_ALL_USERS = "/admin/TestAdminDomain/TestAdminEmail/";
 	
 	@LocalServerPort
 	public void setPort(int port) {
@@ -43,32 +42,39 @@ public class UserTests {
 		this.restTemplate = new RestTemplate();
 	}
 	
+	
 	@AfterEach
 	public void tearDown() {
-		this.restTemplate.delete(this.url + DELETE);
+		this.restTemplate.delete(this.url + DELETE_ALL_USERS);
 	}
+	
+	
 	
 	@Test
 	public void testContext() {
 		
 	}
 	
+	
 	@Test
 	public void testCreateNewUserReturnTheUserCreatedWithSpecificName() throws Exception{
 		// GIVEN the server is up
 		// WHEN - post /users AND send new userBoundary with specific user id
-		// THEN - the server return same user id and gines 2xx massage
-		UserBoundary userInput = new UserBoundary(null,
+		// THEN - the server return same user id and return 2xx massage
+		
+		UserBoundary userInput = new UserBoundary(new UserIdBoundary("test.domain", "tomer82@gmail.com"),
 				new UserNameBoundray("Test", "Test"),
 				UserRole.PLAYER,
-				null);
+				":0");
 		
 		UserBoundary userOutput = this.restTemplate.postForObject(this.url, userInput, UserBoundary.class);
 		
-		assertEquals(userInput.getUserName(), userOutput.getUserName());
+		assertEquals(userOutput.getUserName(), userInput.getUserName());
 		
 		
 	}
+	
+	
 	
 	@Test
 	public void testLoginToUserDetails() throws Exception{
@@ -80,9 +86,9 @@ public class UserTests {
 		
 		
 		UserBoundary userInput = this.restTemplate.postForObject(this.url, new UserBoundary(userId,
-				null, 
+				new UserNameBoundray("tom", "ron"), 
 				UserRole.ADMIN, 
-				null), UserBoundary.class);
+				";("), UserBoundary.class);
 		
 		UserBoundary resultUser = this.restTemplate.getForObject(this.url + GET, UserBoundary.class, userInput.getUserId());
 		
@@ -92,6 +98,7 @@ public class UserTests {
 		
 	}
 	
+	/*
 	@Test
 	public void testUpdateUserDetails() throws Exception {
 		// GIVEN server is up 
@@ -119,6 +126,7 @@ public class UserTests {
 		
 		
 	}
+	*/
 	
 	
 	

@@ -9,7 +9,7 @@ import acs.rest.utils.UserNameBoundray;
  {
  	"userId": { 
  		"domain" : "2020.b@demo",
- 		"email" : "tomerarnon@gma"il.com"
+ 		"email" : "tomerarnon@gmail.com"
  	},
  	"role" : "PLAYER",
  	"userName" : "demo user",

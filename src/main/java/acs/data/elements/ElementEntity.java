@@ -7,9 +7,12 @@ import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,7 +45,6 @@ import acs.rest.element.boundaries.CreatedByBoundary;
  */
 
 
-
 @Entity 
 @Table(name = "ELEMENTS")
 public class ElementEntity {
@@ -55,7 +57,12 @@ public class ElementEntity {
 	private Map <String, Double> location; 
 	private Map <String, Object> elementAttribues;
 	
+	private ElementEntity parent;
+	private Set<ElementEntity> children;
+	
 	public ElementEntity() {	
+		
+		this.children = new HashSet<>();
 	}
 
 
@@ -70,6 +77,7 @@ public class ElementEntity {
 		this.createdBy = createdBy;
 		this.location = location;
 		this.elementAttribues = elementAttribues;
+		this.children = new HashSet<>();
 	}
 	
 	@Id
@@ -78,21 +86,18 @@ public class ElementEntity {
 		return elementId;
 	}
 
-
+	
 	public void setElementId(ElementIdEntity elementId) {
 		this.elementId = elementId;
 	}
 
-
-	public String getType() {
-		return type;
-	}
-
-
 	public void setType(String type) {
 		this.type = type;
 	}
-
+	
+	public String getType() {
+		return type;
+	}
 
 	public String getName() {
 		return name;
@@ -153,7 +158,30 @@ public class ElementEntity {
 	public void setElementAttribues(Map<String, Object> elementAttribues) {
 		this.elementAttribues = elementAttribues;
 	}
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	public ElementEntity getParent() {	
+		return parent;
+	}
 
+
+	public void setParent(ElementEntity parent) {
+		this.parent = parent;
+	}
+
+	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+	public Set<ElementEntity> getChildren() {
+		return children;
+	}
+
+	public void setChildren(Set<ElementEntity> children) {
+		this.children = children;
+	}
+	
+	public void addChild(ElementEntity child) {
+		this.children.add(child);
+		child.setParent(this);
+	}
 
 	@Override
 	public String toString() {
@@ -161,8 +189,5 @@ public class ElementEntity {
 				+ ", createdTimestamp=" + createdTimestamp + ", createdBy=" + createdBy + ", location=" + location
 				+ ", elementAttribues=" + elementAttribues + "]";
 	}
-	
-	
-	
 
 }
