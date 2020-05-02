@@ -98,7 +98,7 @@ public class UserTests {
 		
 	}
 	
-	/*
+	
 	@Test
 	public void testUpdateUserDetails() throws Exception {
 		// GIVEN server is up 
@@ -126,7 +126,7 @@ public class UserTests {
 		
 		
 	}
-	*/
+	
 	
 	
 	
