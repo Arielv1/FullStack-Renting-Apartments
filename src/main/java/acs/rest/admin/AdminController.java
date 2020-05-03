@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.action.ActionService;
 import acs.logic.db.DbElementService;
+import acs.logic.db.DbUserService;
 import acs.logic.element.ElementService;
 import acs.logic.user.UserService;
 import acs.logic.user.UserConvertor;
@@ -22,7 +23,7 @@ public class AdminController {
 	
 	
 	
-	private UserService userService;
+	private DbUserService userService;
 	private DbElementService dbElementeService;
 	private ActionService actionService;
 

@@ -27,8 +27,7 @@ public class UserTests {
 	private RestTemplate restTemplate;
 	private String url;
 	
-	private final static String GET = "/login/userDomain/userEmail";
-	private final static String PUT = "/userDomain/userEmail";  
+	private final static String GET = "/login/";  
 	private final static String DELETE_ALL_USERS = "/admin/TestAdminDomain/TestAdminEmail/";
 	
 	@LocalServerPort
@@ -48,6 +47,9 @@ public class UserTests {
 		this.restTemplate.delete(this.url + DELETE_ALL_USERS);
 	}
 	
+	public String userIdToURL(UserIdBoundary userId) {
+		return userId.getDomain() + "/" + userId.getEmail();
+	}
 	
 	
 	@Test
@@ -62,8 +64,8 @@ public class UserTests {
 		// WHEN - post /users AND send new userBoundary with specific user id
 		// THEN - the server return same user id and return 2xx massage
 		
-		UserBoundary userInput = new UserBoundary(new UserIdBoundary("test.domain", "tomer82@gmail.com"),
-				new UserNameBoundray("Test", "Test"),
+		UserBoundary userInput = new UserBoundary(new UserIdBoundary("test.domain", "tomerarnon83@gmail.com"),
+				new UserNameBoundray("Test", "name"),
 				UserRole.PLAYER,
 				":0");
 		
@@ -82,7 +84,7 @@ public class UserTests {
 		// WHEN the user details in the data base
 		// THEN the server retrieve user details from the data base AND send 2xx message
 		
-		UserIdBoundary userId = new UserIdBoundary("domain Test", "test@gmail.com");
+		UserIdBoundary userId = new UserIdBoundary(null, "tomerarnon83@gmail.com");
 		
 		
 		UserBoundary userInput = this.restTemplate.postForObject(this.url, new UserBoundary(userId,
@@ -90,9 +92,10 @@ public class UserTests {
 				UserRole.ADMIN, 
 				";("), UserBoundary.class);
 		
-		UserBoundary resultUser = this.restTemplate.getForObject(this.url + GET, UserBoundary.class, userInput.getUserId());
+		UserBoundary resultUser = this.restTemplate.getForObject(this.url + GET + userIdToURL(userInput.getUserId()),
+				UserBoundary.class, userInput.getUserId());
 		
-		assertThat(userInput.getUserId().equals(resultUser.getUserId()));
+		assertThat(userInput.getRole().equals(resultUser.getRole()));
 		
 		
 		
@@ -109,15 +112,15 @@ public class UserTests {
 		
 		
 		UserBoundary userInput = this.restTemplate.postForObject(this.url, new UserBoundary(userId,
-				null, 
+				new UserNameBoundray("test", "before"), 
 				UserRole.ADMIN, 
 				null), UserBoundary.class);
 		
 			String domain = userInput.getUserId().getDomain();
 			String email = userInput.getUserId().getEmail();
 			
-			userInput.setUserName(new UserNameBoundray("testUser", null));
-			this.restTemplate.put(this.url + PUT, userInput, domain, email);
+			 userInput.setUserName(new UserNameBoundray("test", "after"));
+			this.restTemplate.put(this.url , userInput, domain, email);
 			
 			assertThat(this.restTemplate.getForObject(this.url + GET, UserBoundary.class, domain, email).getUserName()
 					.equals("testUser"));

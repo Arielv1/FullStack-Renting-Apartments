@@ -1,10 +1,17 @@
 package acs.data;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class UserIdEntity {
+public class UserIdEntity implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	@Column(name = "USER_DOMAIN", insertable = false, updatable = false)
 	private String domain;

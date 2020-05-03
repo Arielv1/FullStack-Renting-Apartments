@@ -2,11 +2,16 @@ package acs.rest.utils;
 
 import java.util.regex.Pattern;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ValidEmail {
 	
 	public  boolean isEmailVaild(String email) {
-		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z"
-				+ "A-Z]{2,7}$";
+		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\"+
+							"[a-zA-Z0-9_+&*-]+)*@"+
+							"(?:[a-zA-Z0-9-]+\\.)"+
+							"+[a-zA-Z]{2-7}$";
 
 		Pattern pat = Pattern.compile(emailRegex);
 		if (email == null)

@@ -1,8 +1,11 @@
 package acs.data;
 
 
+import javax.persistence.Embedded;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import acs.data.UserRole;
-import acs.rest.utils.UserIdBoundary;
 
 
 /*
@@ -18,8 +21,10 @@ import acs.rest.utils.UserIdBoundary;
  * 
  */
 
+@javax.persistence.Entity
+@Table(name = "USERS")
 public class UserEntity {
-	private UserIdBoundary userId;
+	private UserIdEntity userId;
 	private String avatar;
 	private String userName;
 	private UserRole role;
@@ -28,7 +33,7 @@ public class UserEntity {
 
 	}
 
-	public UserEntity(UserIdBoundary userId,  String userName, UserRole role, String avatar) {
+	public UserEntity(UserIdEntity userId,  String userName, UserRole role, String avatar) {
 		super();
 		this.userId = userId;
 		this.userName = userName;
@@ -36,11 +41,13 @@ public class UserEntity {
 		this.avatar = avatar;
 	}
 
-	public UserIdBoundary getUserId() {
+	@Id
+	@Embedded
+	public UserIdEntity getUserId() {
 		return userId;
 	}
 
-	public void setUserId(UserIdBoundary userId) {
+	public void setUserId(UserIdEntity userId) {
 		this.userId = userId;
 	}
 

@@ -18,7 +18,7 @@ import acs.rest.users.UserBoundary;
 import acs.rest.utils.UserIdBoundary;
 import acs.rest.utils.ValidEmail;
 
-@Service
+//@Service
 public class UserServiceMockup implements UserService {
 
 	private String ProjectName;
@@ -27,8 +27,9 @@ public class UserServiceMockup implements UserService {
 	private ValidEmail valid;
 
 	@Autowired
-	public UserServiceMockup(UserConvertor convert) {
+	public UserServiceMockup(UserConvertor convert, ValidEmail valid) {
 		this.convert = convert;
+		this.valid = valid;
 	}
 
 	@Value("${spring.application.name:ofir.cohen}")
@@ -47,7 +48,7 @@ public class UserServiceMockup implements UserService {
 	public UserBoundary createUser(UserBoundary user) {
 		if (!valid.isEmailVaild(user.getUserId().getEmail())) {
 			throw new RuntimeException("Email invaliud!!");
-		}
+			}
 		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
 			throw new RuntimeException("Avatar invaliud!!");
 		}
@@ -73,9 +74,9 @@ public class UserServiceMockup implements UserService {
 	// login to user in the data base
 	@Override
 	public UserBoundary login(String domain, String email) {
-		if (!valid.isEmailVaild(email)) {
-			throw new RuntimeException("Email invalid!!");
-		}
+		//if (!(valid.isEmailVaild(email))) {
+			//throw new RuntimeException("Email invalid!!");
+		//}
 		UserIdBoundary userId = new UserIdBoundary(domain, email);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
@@ -146,17 +147,7 @@ public class UserServiceMockup implements UserService {
 		*/
 	}
 
-	public Map<Object, UserEntity> getDataBase() {
-		return dataBase;
-	}
-
-	public void setDataBase(Map<Object, UserEntity> dataBase) {
-		this.dataBase = dataBase;
-	}
-
-	public String getProjectName() {
-		return ProjectName;
-	}
+	
 
 
 
