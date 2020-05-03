@@ -1,4 +1,4 @@
-package acs.actions;
+package acs;
 
 import java.util.Date;
 import java.util.HashMap;

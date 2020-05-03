@@ -1,4 +1,4 @@
-package acs.elements;
+package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -339,5 +339,20 @@ public class ElementTests {
 		}
 		catch (RuntimeException e) {
 		}
+	}
+	
+	@Test
+	public void testCreateAnElementAndAttemptToBindItToItself() throws Exception {
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null,
+									"BindingType", 
+									"BindingElement", 
+									true,
+									new Date(), 
+									null, 
+									null,
+									null
+									),
+				ElementBoundary.class);
 	}
 }

@@ -78,6 +78,8 @@ public class ElementController {
 		this.elementService.deleteAllElements(adminDomain, adminEmail);	
 	}
 	
+	
+		// Bind child to parent
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
 			method = RequestMethod.PUT,			
 			consumes = MediaType.APPLICATION_JSON_VALUE)	
@@ -91,6 +93,7 @@ public class ElementController {
 		
 	}
 		
+		//  Get all children from parent
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/children",
 			method = RequestMethod.GET,		
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,6 +106,7 @@ public class ElementController {
 				.toArray(new ElementBoundary[0]);
 	}
 		
+		// Get all parents from child
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/parents",
 			method = RequestMethod.GET,			
 			produces = MediaType.APPLICATION_JSON_VALUE)	

@@ -1,4 +1,4 @@
-package acs.users;
+package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

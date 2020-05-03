@@ -1,4 +1,4 @@
-package acs.admin;
+package acs;
 
 import javax.annotation.PostConstruct;
 

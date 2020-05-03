@@ -42,7 +42,7 @@ public class DbElementService implements ExtendedElementService {
 	@PostConstruct
 	public void init() {
 		// initialize object after injection
-		System.err.println("Project : " + this.projectName + " initialized ElementServiceMockup");
+		System.err.println("Project : " + this.projectName + " initialized DbElementService");
 		
 	}
 	
@@ -141,13 +141,18 @@ public class DbElementService implements ExtendedElementService {
 	public void bindChildToParent(String elementDomain , String elementId, IdBoundary childId) {
 		
 		if(childId == null) {
-			throw new RuntimeException("No Child Element In DB");
+			throw new RuntimeException("Child Element Isn't Initialized");
 		}
+		
+		if(childId.getId().equalsIgnoreCase(elementId)) {
+			throw new RuntimeException("Parent and Child share Id - Cannot Bind Element To Itself");
+		}
+		
+		
 		
 		ElementEntity parent = this.elementDao.findById(new ElementIdEntity (elementDomain, elementId))
 								.orElseThrow(() -> new RuntimeException("DB No Parent With ID" + elementDomain + "!" + elementId));
 		
-		//TODO - consider adding converter for IdBoundary -> entity and vice versa
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(childId.getDomain(), childId.getId()))
 								.orElseThrow(() -> new RuntimeException("DB No Child With ID" + elementDomain + "!" + elementId));
 		
