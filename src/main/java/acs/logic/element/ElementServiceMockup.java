@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import acs.data.*;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
-import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
 
 
