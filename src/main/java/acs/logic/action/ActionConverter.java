@@ -25,7 +25,6 @@ public class ActionConverter {
 			actionIdBoundary.setDomain(entity.getActionId().getDomain());
 			actionIdBoundary.setId(entity.getActionId().getId());
 		} else {
-
 			actionIdBoundary = null;
 		}
 

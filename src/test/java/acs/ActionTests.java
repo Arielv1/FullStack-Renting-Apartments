@@ -19,7 +19,11 @@ import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ActionTests {
 
@@ -65,44 +69,48 @@ public class ActionTests {
 		if (output.getActionId().getId() == null) {
 			throw new Exception("expected non null id but id was null");
 		}
-	}
-
-	@Test
-	public void testPostNewActionReturnActionWithSameType() throws Exception {
-		// GIVEN server is up
-
-		// WHEN I POST /samples AND send a Action boundary
-
-		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "update",
-				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
-				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
-
-		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
-
-		// THEN the server returns status 2xx
-		// AND retrieves a action with same Type as sent to server
-		if (!output.getType().equals(input.getType())) {
-			throw new Exception("expected update type to input but received: " + output.getType());
+		
+		//assertThat(output.getActionId().getId())
+//		.isNotNull();
 		}
-	}
 
-	@Test
-	public void testPostNewActionReturnActionWithUpdaedDate() throws Exception {
-		// GIVEN server is up
-
-		// WHEN I POST /samples AND send a Action boundary
-
-		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "update",
-				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
-				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
-
-		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
-
-		// THEN the server returns status 2xx
-		// AND action a Type with different date as sent to server
-		if (output.getCreatedTimestamp().equals(input.getCreatedTimestamp())) {
-			throw new Exception("expected update type to input but received: " + output.getCreatedTimestamp());
-		}
-	}
+//	@Test
+//	public void testPostNewActionReturnActionWithSameType() throws Exception {
+//		// GIVEN server is up
+//
+//		// WHEN I POST /samples AND send a Action boundary
+//
+//		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "update",
+//				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
+//				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
+//
+//		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
+//
+////		 THEN the server returns status 2xx
+////		 AND retrieves a action with same Type as sent to server
+//		if (!output.getType().equals(input.getType())) {
+//			throw new Exception("expected update type to input but received: " + output.getType());
+//		}
+//		
+//	}
+//
+//	@Test
+//	public void testPostNewActionReturnActionWithUpdaedDate() throws Exception {
+//		// GIVEN server is up
+//
+//		// WHEN I POST /samples AND send a Action boundary
+//
+//		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "update",
+//				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
+//				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
+//
+//		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
+//
+//		// THEN the server returns status 2xx
+//		// AND action a Type with different date as sent to server
+//		if (output.getCreatedTimestamp().equals(input.getCreatedTimestamp())) {
+//			throw new Exception("expected update type to input but received: " + output.getCreatedTimestamp());
+//		}
+//	}
 
 }

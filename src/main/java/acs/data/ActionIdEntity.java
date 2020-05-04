@@ -2,11 +2,10 @@ package acs.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class ActionIdEntity {
+public class ActionIdEntity implements Serializable {
 	
 private static final long serialVersionUID = 1L;
 	
@@ -22,7 +21,7 @@ private static final long serialVersionUID = 1L;
 		this.id = id;
 	}
 	
-	@Column(name = "ACTION_DOMAIN")
+
 	public String getDomain() {
 		return domain;
 	}

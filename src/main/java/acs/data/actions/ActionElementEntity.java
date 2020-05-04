@@ -1,8 +1,12 @@
 package acs.data.actions;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+
 import acs.rest.utils.IdBoundary;
 
-public class ActionElementEntity {
+@Embeddable
+public class ActionElementEntity  {
 	private IdBoundary elementId;
 
 	public ActionElementEntity() {
@@ -13,6 +17,7 @@ public class ActionElementEntity {
 		this.elementId = elementId;
 	}
 	
+	@Embedded
 	public IdBoundary getElementId() {
 		return elementId;
 	}
