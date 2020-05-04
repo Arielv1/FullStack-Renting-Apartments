@@ -5,6 +5,12 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+/*
+ "userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
+ */
 @Embeddable
 public class UserIdEntity implements Serializable{
 	

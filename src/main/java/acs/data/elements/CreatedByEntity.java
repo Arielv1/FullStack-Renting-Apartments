@@ -5,6 +5,14 @@ import javax.persistence.Embedded;
 
 import acs.data.UserIdEntity;
 
+/*
+ "createdBy": {
+    	"userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
+    }
+ */
 @Embeddable
 public class CreatedByEntity {
 	

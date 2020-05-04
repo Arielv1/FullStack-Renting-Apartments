@@ -97,8 +97,8 @@ public class ElementController {
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/children",
 			method = RequestMethod.GET,		
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary[] getAllElementChildrenFromElementParent(@PathVariable("managerDomain") String managerDomain ,
-																	  @PathVariable("managerEmail") String managerEmail,
+	public ElementBoundary[] getAllElementChildrenFromElementParent(@PathVariable("userDomain") String userDomain ,
+																	  @PathVariable("userEmail") String userEmail,
 																	  @PathVariable("elementDomain") String elementDomain,
 																	  @PathVariable("elementId") String elementId) {
 
@@ -107,14 +107,20 @@ public class ElementController {
 	}
 		
 		// Get all parents from child
-	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/parents",
+	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}/parents",
 			method = RequestMethod.GET,			
 			produces = MediaType.APPLICATION_JSON_VALUE)	
-	public ElementBoundary[] getParentsFromChild(@PathVariable("managerDomain") String managerDomain ,
-												  @PathVariable("managerEmail") String managerEmail,
+	public ElementBoundary[] getParentsFromChild(@PathVariable("userDomain") String userDomain ,
+												  @PathVariable("userEmail") String userEmail,
 												  @PathVariable("elementDomain") String elementDomain,
 												  @PathVariable("elementId") String elementId) {
 		ElementBoundary parent = this.elementService.getParent(elementDomain , elementId);
-		return null;
+		
+		if(parent != null) {
+			return new ElementBoundary[] {parent};
+		}
+		else {
+			return new ElementBoundary[0];
+		}
 	}
 }

@@ -81,14 +81,14 @@ public class ElementServiceMockup implements ElementService {
 		}
 		
 		if(update.getType() != null  && !update.getType().trim().isEmpty()) {
-			entity.setType(update.getType());
+			entity.setType(TypeEnum.valueOf(update.getType()));
 		}
 		else {
 			throw new RuntimeException("Invalid Element Type");
 		}
 		
 		if(update.getName() != null && !update.getName().trim().isEmpty()) {
-			entity.setType(update.getName());
+			entity.setName(update.getName());
 		} 
 		else {
 			throw new RuntimeException("Invalid Element Name");
