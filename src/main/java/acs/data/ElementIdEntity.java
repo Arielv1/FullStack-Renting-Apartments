@@ -38,7 +38,7 @@ public class ElementIdEntity implements Serializable {
 		this.domain = domain;
 	}
 	
-	
+	@Column(name = "ELEMENT_ID")
 	public String getId() {
 		return id;
 	}
