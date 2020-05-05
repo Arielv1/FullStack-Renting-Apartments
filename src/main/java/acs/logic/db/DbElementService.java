@@ -76,7 +76,7 @@ public class DbElementService implements ExtendedElementService {
 	
 	
 		if(update.getType() != null  && !update.getType().trim().isEmpty()) {
-			entity.setType(TypeEnum.valueOf(update.getType())); 
+			entity.setType(update.getType()); 
 		}
 		else {
 			throw new RuntimeException("ElementEntity invalid type");
@@ -145,15 +145,15 @@ public class DbElementService implements ExtendedElementService {
 			throw new EntityNotFoundException("Child Element Isn't Initialized");
 		}
 		
-		if(childId.getId().equalsIgnoreCase(elementId)) {
-			throw new RuntimeException("Parent and Child share Id - Cannot Bind Element To Itself");
-		}
-		
 		ElementEntity parent = this.elementDao.findById(new ElementIdEntity (elementDomain, elementId))
 								.orElseThrow(() -> new EntityNotFoundException("DB No Parent With ID" + elementDomain + "!" + elementId));
 		
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(childId.getDomain(), childId.getId()))
 								.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID" + elementDomain + "!" + elementId));
+		
+		if(parent.getElementId().equals(child.getElementId())) {
+			throw new RuntimeException("Parent and Child share Id - Cannot Bind Element To Itself");
+		}
 		
 		parent.addChild(child);
 		this.elementDao.save(parent);

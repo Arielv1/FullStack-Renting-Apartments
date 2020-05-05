@@ -426,4 +426,120 @@ public class ElementTests {
 				  new IdBoundary(domain, id), 
 				  "TestManagerDomain", "TestManagerEmail", domain, id));
 	}
+	
+	@Test
+	public void testBindParentToChildCheckThatChildHasAParentAndValidateItstheInitialParent() throws Exception {
+		//GIVEN - Database contains a parent and child element
+		//WHEN - Child is bound to parent
+		//THEN - Get all parents of the child , confirm it has the same Id of the initial parent element
+		
+		ElementBoundary parent = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"parentType", 
+																					"Parent", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+
+		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"childType", 
+																					"Child", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+	
+		this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+				child.getElementId(),
+				"TestManagerDomain", "TestManagerEmail", parent.getElementId().getDomain(), parent.getElementId().getId());
+		
+		ElementBoundary allParents[] = this.restTemplate.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
+				ElementBoundary[].class, 
+				"userTestDomain", "userTestEmail", child.getElementId().getDomain(), child.getElementId().getId());
+		
+		assertThat(allParents[0].getElementId().getId()).isEqualTo(parent.getElementId().getId());
+		
+	}
+	
+	@Test
+	public void testBindChildToFirstParentThenBindToSecondParentCheckThatFirstParentLostChildAndSecondParentHasIt() throws Exception {
+		// GIVEN - Database contains 2 parent elements , 1 child element
+		// WHEN - bind child to first parent, then to second parent
+		// THEN - Confirm that only the second parent has a child 
+		ElementBoundary parent1 = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"parentType", 
+																					"Parent #1", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+
+		ElementBoundary parent2 = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"parentType", 
+																					"Parent #2", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+		
+		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"childType", 
+																					"Child", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+		
+		Stream.of(parent1, parent2)
+		.map(ElementBoundary::getElementId)
+		.forEach(parentIdBoundary->
+			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+					child.getElementId(),
+					"TestManagerDomain", "TestManagerEmail", parentIdBoundary.getDomain(), parentIdBoundary.getId()));
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
+						ElementBoundary[].class, 
+						"userTestDomain", "userTestEmail", parent1.getElementId().getDomain(), parent1.getElementId().getId()))
+			.hasSize(0);
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
+						ElementBoundary[].class, 
+						"userTestDomain", "userTestEmail", parent2.getElementId().getDomain(), parent2.getElementId().getId()))
+			.hasSize(1);
+		
+		ElementBoundary allParents[] = this.restTemplate.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
+				ElementBoundary[].class, 
+				"userTestDomain", "userTestEmail", child.getElementId().getDomain(), child.getElementId().getId());
+		
+		assertThat(allParents[0].getElementId().getId()).isEqualTo(parent2.getElementId().getId());
+		
+	}
+	
 }

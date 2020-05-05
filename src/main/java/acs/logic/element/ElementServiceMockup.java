@@ -13,7 +13,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 
 import acs.data.*;
@@ -80,7 +79,7 @@ public class ElementServiceMockup implements ElementService {
 		}
 		
 		if(update.getType() != null  && !update.getType().trim().isEmpty()) {
-			entity.setType(TypeEnum.valueOf(update.getType()));
+			entity.setType(update.getType());
 		}
 		else {
 			throw new RuntimeException("Invalid Element Type");

@@ -16,10 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
 import acs.dal.MapToJsonConverter;
 import acs.data.ElementIdEntity;
-import acs.data.TypeEnum;
 import acs.rest.element.*;
 import acs.rest.element.boundaries.CreatedByBoundary;
 /*
@@ -50,7 +48,7 @@ import acs.rest.element.boundaries.CreatedByBoundary;
 @Table(name = "ELEMENTS")
 public class ElementEntity {
 	private ElementIdEntity elementId;
-	private TypeEnum type;
+	private String type;
 	private String name;
 	private boolean active;	
 	private Date createdTimestamp;
@@ -67,7 +65,7 @@ public class ElementEntity {
 	}
 
 
-	public ElementEntity(ElementIdEntity elementId, TypeEnum type, String name, boolean active, Date createdTimestamp,
+	public ElementEntity(ElementIdEntity elementId, String type, String name, boolean active, Date createdTimestamp,
 			CreatedByEntity createdBy, Map<String, Double> location, Map<String, Object> elementAttribues) {
 		super();
 		this.elementId = elementId;
@@ -92,11 +90,11 @@ public class ElementEntity {
 		this.elementId = elementId;
 	}
 
-	public void setType(TypeEnum type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 	
-	public TypeEnum getType() {
+	public String getType() {
 		return type;
 	}
 
