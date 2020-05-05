@@ -40,7 +40,8 @@ public class UserIdEntity implements Serializable{
 	public void setDomain(String domain) {
 		this.domain = domain;
 	}
-
+	
+	@Column(name = "USER_EMAIL")
 	public String getEmail() {
 		return email;
 	}
