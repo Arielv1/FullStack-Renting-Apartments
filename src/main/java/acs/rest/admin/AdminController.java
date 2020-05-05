@@ -7,29 +7,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import acs.logic.action.ActionService;
 import acs.logic.db.DbActionService;
 import acs.logic.db.DbElementService;
 import acs.logic.db.DbUserService;
+import acs.logic.element.ElementService;
+import acs.logic.user.UserService;
 import acs.rest.action.ActionBoundary;
 import acs.rest.users.UserBoundary;
 
 //consumes =  type of input
 //produces =  type of output
+
 @RestController
 public class AdminController {
 	
 	
-	
-	private DbUserService userService;
-	private DbElementService dbElementeService;
-	private DbActionService actionService;
+	// ask if should i change to extended Element service
+	private UserService userService;
+	private ElementService dbElementeService;
+	private ActionService actionService;
 
 	
 	
 	@Autowired
-	public AdminController(DbUserService userService, DbElementService dbElementeService,
-			DbActionService actionService) {
+	public AdminController(UserService userService, ElementService dbElementeService,
+			ActionService actionService) {
 		this.userService = userService;
 		this.dbElementeService = dbElementeService;
 		this.actionService = actionService;
