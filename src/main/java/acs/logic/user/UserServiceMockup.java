@@ -53,7 +53,7 @@ public class UserServiceMockup implements UserService {
 		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
 			throw new RuntimeException("Avatar invaliud!!");
 		}
-		if (user.getUserName() == null) {
+		if (user.getUsername() == null) {
 			throw new RuntimeException("User Name invaliud!!");
 		}
 		user.getUserId().setDomain(this.ProjectName);
@@ -97,14 +97,14 @@ public class UserServiceMockup implements UserService {
 		if (update.getAvatar() == null && update.getAvatar().trim().isEmpty()) {
 			throw new RuntimeException("Avatar invalid!!");
 		}
-		if (update.getUserName() == null) {
+		if (update.getUsername() == null) {
 			throw new RuntimeException("User Name invalid!!");
 		}
 
 		UserIdBoundary userId = new UserIdBoundary(domain, email);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
-			UserNameEntity name = new UserNameEntity(update.getUserName().getFirst(), update.getUserName().getLast());
+			UserNameEntity name = new UserNameEntity(update.getUsername().getFirst(), update.getUsername().getLast());
 			entity.setUserName(name);
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());

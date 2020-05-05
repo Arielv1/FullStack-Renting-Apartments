@@ -50,7 +50,7 @@ public class ActionServiceMockup implements ActionService {
 	public Object invokeAction(ActionBoundary action) {
 
 		String id = UUID.randomUUID().toString();
-
+		// domain + , + id - into the database with delimeter between them
 		ActionEntity entity = this.converter.toEntity(action);
 
 		entity.setActionId(new ActionIdEntity (this.projectName,id));

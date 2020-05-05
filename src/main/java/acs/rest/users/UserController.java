@@ -41,8 +41,8 @@ public class UserController {
 				produces = MediaType.APPLICATION_JSON_VALUE, 
 				consumes = MediaType.APPLICATION_JSON_VALUE)
 		public UserBoundary createUser(@RequestBody UserNewDetails user) {
-			UserBoundary userBoundary = new UserBoundary(new UserIdBoundary(null, user.getEmail()), new UserNameBoundray(user.getUserName().getFirst(),
-					user.getUserName().getLast()) , user.getRole(), user.getAvatar());
+			UserBoundary userBoundary = new UserBoundary(new UserIdBoundary(null, user.getEmail()), new UserNameBoundray(user.getUsername().getFirst(),
+					user.getUsername().getLast()) , user.getRole(), user.getAvatar());
 			return this.userService.createUser(userBoundary);
 		}
 

@@ -28,17 +28,17 @@ import acs.data.UserRole;
 public class UserEntity {
 	private UserIdEntity userId;
 	private String avatar;
-	private UserNameEntity userName;
+	private UserNameEntity username;
 	private UserRole role;
 
 	public UserEntity() {
 
 	}
 
-	public UserEntity(UserIdEntity userId,  UserNameEntity userName, UserRole role, String avatar) {
+	public UserEntity(UserIdEntity userId,  UserNameEntity username, UserRole role, String avatar) {
 		super();
 		this.userId = userId;
-		this.userName = userName;
+		this.username = username;
 		this.role = role;
 		this.avatar = avatar;
 	}
@@ -62,12 +62,12 @@ public class UserEntity {
 	}
 
 	@Embedded
-	public UserNameEntity getUserName() {
-		return userName;
+	public UserNameEntity getUsername() {
+		return username;
 	}
 
-	public void setUserName(UserNameEntity userName) {
-		this.userName = userName;
+	public void setUserName(UserNameEntity username) {
+		this.username = username;
 	}
 
 	@Enumerated(EnumType.STRING)
@@ -81,7 +81,7 @@ public class UserEntity {
 
 	@Override
 	public String toString() {
-		return "UserBoundry [userId=" + userId + ", avatar=" + avatar + ", userName=" + userName + ", role=" + role
+		return "UserBoundry [userId=" + userId + ", avatar=" + avatar + ", userName=" + username + ", role=" + role
 				+ "]";
 	}
 

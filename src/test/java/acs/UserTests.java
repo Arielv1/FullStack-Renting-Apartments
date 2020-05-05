@@ -71,7 +71,7 @@ public class UserTests {
 		
 		UserBoundary userOutput = this.restTemplate.postForObject(this.url, userInput, UserBoundary.class);
 		
-		assertEquals(userOutput.getUserName(), userInput.getUserName());
+		assertEquals(userOutput.getUsername(), userInput.getUsername());
 		
 		
 	}
@@ -122,7 +122,7 @@ public class UserTests {
 			 userInput.setUserName(new UserNameBoundray("test", "after"));
 			this.restTemplate.put(this.url , userInput, domain, email);
 			
-			assertThat(this.restTemplate.getForObject(this.url + GET, UserBoundary.class, domain, email).getUserName()
+			assertThat(this.restTemplate.getForObject(this.url + GET, UserBoundary.class, domain, email).getUsername()
 					.equals("testUser"));
 		
 		

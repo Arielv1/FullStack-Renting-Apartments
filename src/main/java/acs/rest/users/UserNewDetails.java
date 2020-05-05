@@ -27,7 +27,7 @@ public class UserNewDetails {
 	public UserNewDetails(String email, UserNameBoundray userName, UserRole role, String avatar) {
 		super();
 		setEmail(email);
-		setUserName(userName);
+		setUsername(userName);
 		setRole(role);
 		setAvatar(avatar);
 	}
@@ -46,11 +46,11 @@ public class UserNewDetails {
 
 	}
 
-	public UserNameBoundray getUserName() {
+	public UserNameBoundray getUsername() {
 		return userName;
 	}
 
-	public void setUserName(UserNameBoundray userName) {
+	public void setUsername(UserNameBoundray userName) {
 		this.userName = userName;
 	}
 

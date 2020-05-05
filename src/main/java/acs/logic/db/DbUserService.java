@@ -60,7 +60,7 @@ public class DbUserService implements UserService {
 		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
 			throw new RuntimeException("Avatar invaliud!!");
 		}
-		if (user.getUserName() == null) {
+		if (user.getUsername() == null) {
 			throw new RuntimeException("User Name invaliud!!");
 		}
 		UserIdEntity userId = new UserIdEntity(user.getUserId().getDomain(), user.getUserId().getEmail());
@@ -107,7 +107,7 @@ public class DbUserService implements UserService {
 		if (update.getAvatar() == null && update.getAvatar().trim().isEmpty()) {
 			throw new RuntimeException("Avatar invalid!!");
 		}
-		if (update.getUserName() == null) {
+		if (update.getUsername() == null) {
 			throw new RuntimeException("User Name invalid!!");
 		}
 
@@ -115,7 +115,7 @@ public class DbUserService implements UserService {
 		Optional<UserEntity> entityOptional = this.userDao.findById(userId);
 		if (entityOptional.isPresent()) {
 			UserEntity entity = entityOptional.get();
-			UserNameEntity name = new UserNameEntity(update.getUserName().getFirst(), update.getUserName().getLast());
+			UserNameEntity name = new UserNameEntity(update.getUsername().getFirst(), update.getUsername().getLast());
 			entity.setUserName(name);
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());

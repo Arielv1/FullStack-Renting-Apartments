@@ -21,17 +21,17 @@ import acs.rest.utils.UserNameBoundray;
 public class UserBoundary {
 	private UserIdBoundary userId;
 	private String avatar;
-	private UserNameBoundray userName;
+	private UserNameBoundray username;
 	private UserRole role;
 
 	public UserBoundary() {
 
 	}
 
-	public UserBoundary(UserIdBoundary userId,  UserNameBoundray userName, UserRole role, String avatar) {
+	public UserBoundary(UserIdBoundary userId,  UserNameBoundray username, UserRole role, String avatar) {
 		super();
 		setUserId(userId);
-		setUserName(userName);
+		setUserName(username);
 		setRole(role);
 		setAvatar(avatar);
 	}
@@ -52,12 +52,12 @@ public class UserBoundary {
 		this.avatar = avatar;
 	}
 
-	public UserNameBoundray getUserName() {
-		return userName;
+	public UserNameBoundray getUsername() {
+		return username;
 	}
 
-	public void setUserName(UserNameBoundray userName) {
-		this.userName = userName;
+	public void setUserName(UserNameBoundray username) {
+		this.username = username;
 	}
 
 	public UserRole getRole() {
@@ -70,7 +70,7 @@ public class UserBoundary {
 
 	@Override
 	public String toString() {
-		return "UserBoundry [userId=" + userId + ", avatar=" + avatar + ", userName=" + userName + ", role=" + role
+		return "UserBoundry [userId=" + userId + ", avatar=" + avatar + ", userName=" + username + ", role=" + role
 				+ "]";
 	}
 

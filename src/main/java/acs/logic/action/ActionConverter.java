@@ -58,6 +58,7 @@ public class ActionConverter {
 			entity.setActionId(actionIdEntity);
 		} else {
 			throw new RuntimeException("ActionBoundary invalid id");
+			// create default action id 
 		}
 
 		if (boundary.getType() != null) {
