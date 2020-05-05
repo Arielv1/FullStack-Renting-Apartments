@@ -23,29 +23,9 @@ public class ActionController {
 	}
 
 	// Invoke an action (POST)
-	@RequestMapping(path = "/acs/actions", 
-			method = RequestMethod.POST, 
-			produces = MediaType.APPLICATION_JSON_VALUE,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public Object invokeAnAction(@RequestBody ActionBoundary action) {
 		return this.actionService.invokeAction(action);
 	}
-
-	// GET all actions
-//	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	// public ActionBoundary[] getAllActions(@PathVariable("adminDomain") String
-	// adminDomain,
-	// @PathVariable("adminEmail") String adminEmail) {
-	// return this.actionService.getAllActions(adminDomain,
-	// adminEmail).stream().toArray(i -> new ActionBoundary[i]);
-	// }
-
-	// DELETE all actions in the system
-	// @RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}",
-	// method = RequestMethod.DELETE)
-	// public void deleteAllActions(@PathVariable("adminDomain") String adminDomain,
-	// @PathVariable("adminEmail") String adminEmail) {
-	// this.actionService.deleteAllActions(adminDomain, adminEmail);
-	// }
 
 }

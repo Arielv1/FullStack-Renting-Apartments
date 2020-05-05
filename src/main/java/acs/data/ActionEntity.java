@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import acs.dal.MapToJSONConverter;
+import acs.dal.MapToJsonConverter;
 import acs.data.actions.ActionElementEntity;
 import acs.data.actions.InvokedByEntity;
 import acs.rest.action.boundaries.ActionElementBoundary;
@@ -78,7 +78,7 @@ public class ActionEntity {
 		this.invokedBy = invokedBy;
 	}
 
-	@Convert(converter = MapToJSONConverter.class)
+	@Convert(converter = MapToJsonConverter.class)
 	@Lob
 	public Map<String, Object> getActionAttributes() {
 		return actionAttributes;

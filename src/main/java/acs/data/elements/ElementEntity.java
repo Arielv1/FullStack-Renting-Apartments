@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import acs.dal.MapToJSONConverter;
+import acs.dal.MapToJsonConverter;
 import acs.data.ElementIdEntity;
 import acs.data.TypeEnum;
 import acs.rest.element.*;
@@ -139,7 +139,7 @@ public class ElementEntity {
 		this.createdBy = createdBy;
 	}
 
-	@Convert(converter = MapToJSONConverter.class)
+	@Convert(converter = MapToJsonConverter.class)
 	@Lob
 	public Map<String, Double> getLocation() {
 		return location;
@@ -150,7 +150,7 @@ public class ElementEntity {
 		this.location = location;
 	}
 
-	@Convert(converter = MapToJSONConverter.class)
+	@Convert(converter = MapToJsonConverter.class)
 	@Lob
 	public Map<String, Object> getElementAttribues() {
 		return elementAttribues;

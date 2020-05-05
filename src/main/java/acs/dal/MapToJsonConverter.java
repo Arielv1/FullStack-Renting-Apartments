@@ -6,10 +6,10 @@ import javax.persistence.AttributeConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class MapToJSONConverter implements AttributeConverter<Map<String, Object>, String>{
+public class MapToJsonConverter implements AttributeConverter<Map<String, Object>, String>{
 	private ObjectMapper jackson;
 	
-	public MapToJSONConverter() {
+	public MapToJsonConverter() {
 		this.jackson = new ObjectMapper();
 	}
 	
