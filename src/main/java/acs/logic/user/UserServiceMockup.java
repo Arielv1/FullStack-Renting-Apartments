@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import acs.data.UserEntity;
+import acs.data.UserNameEntity;
 import acs.data.UserRole;
 import acs.rest.users.UserBoundary;
 import acs.rest.utils.UserIdBoundary;
@@ -103,7 +104,8 @@ public class UserServiceMockup implements UserService {
 		UserIdBoundary userId = new UserIdBoundary(domain, email);
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
-			entity.setUserName(update.getUserName().getFirst() + " " + update.getUserName().getLast());
+			UserNameEntity name = new UserNameEntity(update.getUserName().getFirst(), update.getUserName().getLast());
+			entity.setUserName(name);
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());
 			return convert.fromEntity(entity);

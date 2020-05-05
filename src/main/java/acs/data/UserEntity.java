@@ -2,6 +2,8 @@ package acs.data;
 
 
 import javax.persistence.Embedded;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -26,14 +28,14 @@ import acs.data.UserRole;
 public class UserEntity {
 	private UserIdEntity userId;
 	private String avatar;
-	private String userName;
+	private UserNameEntity userName;
 	private UserRole role;
 
 	public UserEntity() {
 
 	}
 
-	public UserEntity(UserIdEntity userId,  String userName, UserRole role, String avatar) {
+	public UserEntity(UserIdEntity userId,  UserNameEntity userName, UserRole role, String avatar) {
 		super();
 		this.userId = userId;
 		this.userName = userName;
@@ -59,14 +61,16 @@ public class UserEntity {
 		this.avatar = avatar;
 	}
 
-	public String getUserName() {
+	@Embedded
+	public UserNameEntity getUserName() {
 		return userName;
 	}
 
-	public void setUserName(String userName) {
+	public void setUserName(UserNameEntity userName) {
 		this.userName = userName;
 	}
 
+	@Enumerated(EnumType.STRING)
 	public UserRole getRole() {
 		return role;
 	}

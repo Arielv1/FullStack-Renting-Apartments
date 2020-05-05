@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import acs.dal.UserDao;
 import acs.data.UserEntity;
 import acs.data.UserIdEntity;
+import acs.data.UserNameEntity;
 import acs.data.UserRole;
 import acs.logic.user.UserConvertor;
 import acs.logic.user.UserService;
@@ -114,7 +115,8 @@ public class DbUserService implements UserService {
 		Optional<UserEntity> entityOptional = this.userDao.findById(userId);
 		if (entityOptional.isPresent()) {
 			UserEntity entity = entityOptional.get();
-			entity.setUserName(update.getUserName().getFirst() + " " + update.getUserName().getLast());
+			UserNameEntity name = new UserNameEntity(update.getUserName().getFirst(), update.getUserName().getLast());
+			entity.setUserName(name);
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());
 			return this.convertor.fromEntity(entity);
