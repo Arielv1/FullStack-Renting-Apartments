@@ -1,4 +1,4 @@
-package acs.elements;
+package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import acs.data.ElementIdEntity;
@@ -37,10 +39,9 @@ public class ElementTests {
 	private RestTemplate restTemplate;
 	private String url;
 	
-	private final static String GET_ALL_URL = "/TestUserDomain/TestUserEmail/";
-	private final static String GET_URL = "/TestUserDomain/TestUserEmail/";
-	private final static String POST_URL = "/TestManagerDomain/TestManagerEmail";
-	private final static String UPDATE_URL = "/TestManagerDomain}/TestManagerEmail/";
+	private final static String GET_URL = "/{userDomain}/{userEmail}/";
+	private final static String POST_URL = "/{managerDomain}/{managerEmail}/";
+	private final static String UPDATE_URL = "/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}";
 	
 	
 	// TODO - change url when delete is implemented
@@ -64,26 +65,6 @@ public class ElementTests {
 	}
 	
 	
-	/*"elementId": {
-    	"domain" : "2020B.Ofir.Cohen"
-        "ID": 1
-    },
-    "type": "demoType",
-    "name": "demoName",
-    "active": false,
-    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
-    "createdBy": {
-    	"userid":{
-    		"domain:"2020b.ofir.cohen",
-        	"email": "ofir.cohen@gmail.com"
-        	}
-    },
-    "location": {
-        "lat": "00.00"
-    },
-    "elementAttribues": {
-        "demoAttribute": "demoValue"
-    }*/
     public String elementIdToURL(IdBoundary eib) {
 		return eib.getDomain() + "/" + eib.getId();
 	}
@@ -101,7 +82,7 @@ public class ElementTests {
 		
 		
 		ElementBoundary input = new ElementBoundary(null,
-													"Type", 
+													"INFO", 
 													"testName", 
 													true,
 													new Date(), 
@@ -109,7 +90,10 @@ public class ElementTests {
 													null ,
 													null);
 		
-		ElementBoundary output = this.restTemplate.postForObject(this.url + POST_URL , input, ElementBoundary.class);
+		ElementBoundary output = this.restTemplate.postForObject(this.url + POST_URL , 
+																input,
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
 		
 		assertEquals(output.getName(), input.getName());
 	}
@@ -135,19 +119,21 @@ public class ElementTests {
 				  this.restTemplate
 					.postForObject(this.url + POST_URL, 
 							new ElementBoundary(null,
-									"Type", 
+									"INFO", 
 									"Name", 
 									true,
 									new Date(), 
 									null, 
 									null,
 									elementAttributes),
-							ElementBoundary.class);
+							ElementBoundary.class,
+							"managerTestDomain", "managerTestEmail");
 		
 		
 		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + elementIdToURL(newElementObject.getElementId()),
 																ElementBoundary.class,
-																newElementObject.getElementAttribues());
+																newElementObject.getElementAttribues(),
+																"userTestDomain", "userTestEmail");
 		
 		assertThat(resultElementObject.getElementAttribues().equals(newElementObject.getElementAttribues()));
 	}
@@ -163,7 +149,7 @@ public class ElementTests {
 				.mapToObj(n -> "Object #" + n) // Stream<Strings> to Stream <Objects>
 				.map(current -> 				// Initialize each object 
 				new ElementBoundary (null,
-									"Type", 
+									"INFO", 
 									"Name", 
 									 true,
 									new Date(), 
@@ -173,7 +159,8 @@ public class ElementTests {
 				.map(boundary -> //Invoke POST for each object
 					this.restTemplate.postForObject(this.url + POST_URL, 
 													boundary,
-													ElementBoundary.class))
+													ElementBoundary.class,
+													"1","2"))
 				.collect(Collectors.toList());
 		
 		// Confirm database size == 5
@@ -183,7 +170,9 @@ public class ElementTests {
 		this.restTemplate.delete(this.url + DELETE_ALL_URL);
 		
 		// Retrieve all elements from database
-		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_ALL_URL, ElementBoundary[].class);
+		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL,
+																  ElementBoundary[].class, 
+																  "userTestDomain", "userTestEmail");
 		
 		// Confirm that the database is empty yet is not null
 		assertThat(result).isNotNull().isEmpty();
@@ -198,7 +187,7 @@ public class ElementTests {
 		// Creating new ElementBoundary and adding it to the database through POST
 		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
-																					"TypeTest4", 
+																					"INFO", 
 																					"NameTest4", 
 																					false,
 																					new Date(), 
@@ -206,22 +195,25 @@ public class ElementTests {
 																					null,
 																					null
 																					),
-																ElementBoundary.class);
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
 		
 		// Creating the new elementId to update
 		IdBoundary newElementId = new IdBoundary("testDomain", "testId");
 		
-		String elementIdentifierURL = elementIdToURL(element.getElementId());
-		element.setElementId(new IdBoundary("testdomain", "1"));
+		IdBoundary orgElementId = element.getElementId();
+		element.setElementId(newElementId);
 			
 		//Invoke the UPDATE method
-		this.restTemplate.put(this.url + UPDATE_URL + elementIdentifierURL,
-							  element ,
-							  newElementId);
+		this.restTemplate.put(this.url + UPDATE_URL,
+							  element,
+							  "managerTestEmail", "ManagerTestDomain",  orgElementId.getDomain(),orgElementId.getId());
 		
 		
 		// Retrieve the entire database content
-		ElementBoundary database[] = this.restTemplate.getForObject(this.url + GET_ALL_URL, ElementBoundary[].class);
+		ElementBoundary database[] = this.restTemplate.getForObject(this.url + GET_URL, 
+																	ElementBoundary[].class, 
+																	"userTestDomain", "userTestEmail");
 		
 		// Check that the databases' old key was kept 
 		assertThat(database[0].getElementId()).isNotEqualTo(element.getElementId());
@@ -235,7 +227,7 @@ public class ElementTests {
 		//THEN - Server receives an exception and return 2xx message
 		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
 																	new ElementBoundary(null,
-																						"TypeTest4", 
+																						"INFO", 
 																						"NameTest4", 
 																						false,
 																						new Date(), 
@@ -243,7 +235,8 @@ public class ElementTests {
 																						null,
 																						null
 																						),
-																	ElementBoundary.class);
+																	ElementBoundary.class,
+																	"managerTestDomain", "managerTestEmail");
 		String newName = null;
 		element.setName(newName);
 		try {
@@ -264,7 +257,7 @@ public class ElementTests {
 		
 		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
 																	new ElementBoundary(null,
-																						"TypeTest4", 
+																						"INFO", 
 																						"NameTest4", 
 																						false,
 																						new Date(), 
@@ -272,7 +265,8 @@ public class ElementTests {
 																						null,
 																						null
 																						),
-																	ElementBoundary.class);
+																	ElementBoundary.class,
+																	"managerTestDomain", "managerTestEmail");
 		String newName = "     ";
 		element.setName(newName);
 		try {
@@ -292,7 +286,7 @@ public class ElementTests {
 		//THEN - Server receives an exception and return 2xx message
 		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
 																	new ElementBoundary(null,
-																						"TypeTest4", 
+																						"INFO", 
 																						"NameTest4", 
 																						false,
 																						new Date(), 
@@ -300,7 +294,8 @@ public class ElementTests {
 																						null,
 																						null
 																						),
-																	ElementBoundary.class);
+																	ElementBoundary.class,
+																	"managerTestDomain", "managerTestEmail");
 		String newType = null;
 		element.setType(newType);
 		try {
@@ -320,7 +315,7 @@ public class ElementTests {
 		//THEN - Server receives an exception and return 2xx message
 		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
 																	new ElementBoundary(null,
-																						"TypeTest4", 
+																						"INFO", 
 																						"NameTest4", 
 																						false,
 																						new Date(), 
@@ -328,7 +323,8 @@ public class ElementTests {
 																						null,
 																						null
 																						),
-																	ElementBoundary.class);
+																	ElementBoundary.class,
+																	"managerTestDomain", "managerTestEmail");
 		String newType = "   ";
 		element.setName(newType);
 		try {
@@ -339,5 +335,95 @@ public class ElementTests {
 		}
 		catch (RuntimeException e) {
 		}
+	}
+	
+	
+	@Test
+	public void testBindTwoChildrenToParentConfirmAfterwards() throws Exception {
+			
+		//GIVEN - Database has 3 elements - 1 parent and 2 children
+		//WHEN - Bind 2 children elements to parent
+		//THEN - Confirm parent has 2 children and validate attributes, server gives 2xx message afterwards
+		
+		ElementBoundary parent = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"INFO", 
+																					"Parent", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+		
+		ElementBoundary child1 = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"INFO", 
+																					"Child #1", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+		
+		ElementBoundary child2 = this.restTemplate.postForObject(this.url + POST_URL,
+																new ElementBoundary(null,
+																					"INFO", 
+																					"Child #2", 
+																					true,
+																					new Date(), 
+																					null, 
+																					null,
+																					null
+																					),
+																ElementBoundary.class,
+																"managerTestDomain", "managerTestEmail");
+		Stream.of(child1, child2)
+		.map(ElementBoundary::getElementId)
+		.forEach(childIdBoundary->
+			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+					childIdBoundary,
+					"TestManagerDomain", "TestManagerEmail", parent.getElementId().getDomain(), parent.getElementId().getId()));
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
+						ElementBoundary[].class, 
+						"userTestDomain", "userTestEmail", parent.getElementId().getDomain(), parent.getElementId().getId()))
+			.hasSize(2)
+			.usingRecursiveFieldByFieldElementComparator()
+			.containsExactlyInAnyOrder(child1, child2);
+	}
+	
+	
+	@Test
+	public void testCreateAnElementAndAttemptToBindItToItself() throws Exception {
+		//GIVEN - Database contains a single element
+		//WHEN - Invoke binding child to parent method with the same element
+		//THEN - Expect to receive an exception
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null,
+									"INFO", 
+									"BindingElement", 
+									true,
+									new Date(), 
+									null, 
+									null,
+									null
+									),
+				ElementBoundary.class,
+				"managerTestDomain", "managerTestEmail");
+		
+		String domain = element.getElementId().getDomain();
+		String id = element.getElementId().getId();
+			
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.put(this.url + UPDATE_URL + "/children", 
+				  new IdBoundary(domain, id), 
+				  "TestManagerDomain", "TestManagerEmail", domain, id));
 	}
 }

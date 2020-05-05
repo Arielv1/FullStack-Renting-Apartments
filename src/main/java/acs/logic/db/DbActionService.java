@@ -1,33 +1,40 @@
-package acs.logic.action;
+package acs.logic.db;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.Date;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import acs.dal.ActionDao;
 import acs.data.ActionEntity;
 import acs.data.ActionIdEntity;
 import acs.data.UserIdEntity;
 import acs.data.actions.InvokedByEntity;
+import acs.logic.action.ActionConverter;
+import acs.logic.action.ActionService;
 import acs.rest.action.ActionBoundary;
 
-//@Service
-public class ActionServiceMockup implements ActionService {
+@Service
+public class DbActionService implements ActionService {
 	private String projectName;
-	private Map<String, ActionEntity> database;
+	private ActionDao actionDao;
 	private ActionConverter converter;
 
 	@Autowired
-	public ActionServiceMockup(ActionConverter converter) {
+	public DbActionService(ActionDao actionDao, ActionConverter converter) {
+		this.actionDao = actionDao;
 		this.converter = converter;
 	}
 
@@ -41,43 +48,42 @@ public class ActionServiceMockup implements ActionService {
 	public void init() {
 		// initialize object after injection
 		System.err.println("project name: " + this.projectName);
-
-		// make sure that this is actually the proper Map for this application
-		this.database = Collections.synchronizedMap(new HashMap<>());
 	}
 
 	@Override
+	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
 
 		String id = UUID.randomUUID().toString();
 
 		ActionEntity entity = this.converter.toEntity(action);
 
-		entity.setActionId(new ActionIdEntity (this.projectName,id));
+		entity.setActionId(new ActionIdEntity(this.projectName, id));
 
 		entity.setCreatedTimestamp(new Date());
 
 		entity.setInvokedBy(new InvokedByEntity(new UserIdEntity(action.getInvokedBy().getUserId().getDomain(),
 				action.getInvokedBy().getUserId().getEmail())));
 
-		this.database.put(id, entity);
-
-		return this.converter.fromEntity(entity);
+		return this.converter.fromEntity(this.actionDao.save(entity)); // SELECT +INSERT / UPDATE
 
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail) {
-		return this.database.values() // Collection<ActionEntity>
-				.stream() // Stream<ActionEntity>
-				.map(this.converter::fromEntity) // Stream<ActionBoundary>
+		// INVOKE SELECT DATABASE
+		return StreamSupport.stream(this.actionDao.findAll().spliterator(), false) // Stream<ActionEntity>
+				.map(this.converter::fromEntity)// Stream<ActionBoundary>
 				.collect(Collectors.toList()); // List<ActionBoundary>
 	}
 
 	@Override
+	@Transactional
 	public void deleteAllActions(String adminDomain, String adminEmail) {
-		// TODO - check admin privileges
-		this.database.clear();
+		// INVOKE DELETE DATABASE: DELETE
+		this.actionDao.deleteAll(); // DELETE
+
 	}
 
 }

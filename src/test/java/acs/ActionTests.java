@@ -1,4 +1,4 @@
-package acs.actions;
+package acs;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +19,11 @@ import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ActionTests {
 
@@ -65,7 +69,10 @@ public class ActionTests {
 		if (output.getActionId().getId() == null) {
 			throw new Exception("expected non null id but id was null");
 		}
-	}
+		
+		//assertThat(output.getActionId().getId())
+//		.isNotNull();
+		}
 
 	@Test
 	public void testPostNewActionReturnActionWithSameType() throws Exception {
@@ -79,11 +86,12 @@ public class ActionTests {
 
 		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
 
-		// THEN the server returns status 2xx
-		// AND retrieves a action with same Type as sent to server
+//		 THEN the server returns status 2xx
+//		 AND retrieves a action with same Type as sent to server
 		if (!output.getType().equals(input.getType())) {
 			throw new Exception("expected update type to input but received: " + output.getType());
 		}
+		
 	}
 
 	@Test

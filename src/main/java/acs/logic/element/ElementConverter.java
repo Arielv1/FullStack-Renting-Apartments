@@ -4,6 +4,7 @@ import java.util.*;
 import org.springframework.stereotype.Component;
 
 import acs.data.ElementIdEntity;
+import acs.data.TypeEnum;
 import acs.data.UserIdEntity;
 import acs.data.elements.ElementEntity;
 import acs.rest.element.boundaries.CreatedByBoundary;
@@ -58,9 +59,8 @@ public class ElementConverter {
 			createdByBoundary = null;
 		}
 		
-		
 		return new ElementBoundary(elementIdBoundary,
-				entity.getType(),
+				entity.getType().toString(),
 				entity.getName(),
 				entity.getActive(),
 				entity.getCreatedTimestamp(),
@@ -82,7 +82,7 @@ public class ElementConverter {
 		}
 				
 		if(boundary.getType() != null && !boundary.getType().trim().isEmpty()) {
-			entity.setType(boundary.getType());
+			entity.setType(TypeEnum.valueOf(boundary.getType()));
 		} 
 		else {
 			throw new RuntimeException("Invalid ElementBoundary Type");

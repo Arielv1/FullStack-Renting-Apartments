@@ -6,10 +6,14 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class ActionIdEntity {
+public class ActionIdEntity implements Serializable{
 	
-private static final long serialVersionUID = 1L;
+
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2500686198823941618L;
 	private String domain;
 	private String id;
 	

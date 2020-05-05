@@ -1,23 +1,29 @@
 package acs.data.actions;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+
+import acs.data.ElementIdEntity;
 import acs.rest.utils.IdBoundary;
 
-public class ActionElementEntity {
-	private IdBoundary elementId;
+@Embeddable
+public class ActionElementEntity  {
+	private ElementIdEntity elementId;
 
 	public ActionElementEntity() {
 	}
 	
-	public ActionElementEntity(IdBoundary elementId) {
+	public ActionElementEntity(ElementIdEntity elementId) {
 		super();
 		this.elementId = elementId;
 	}
 	
-	public IdBoundary getElementId() {
+	@Embedded
+	public ElementIdEntity getElementId() {
 		return elementId;
 	}
 
-	public void setElementId(IdBoundary elementId) {
+	public void setElementId(ElementIdEntity elementId) {
 		this.elementId = elementId;
 	}
 
