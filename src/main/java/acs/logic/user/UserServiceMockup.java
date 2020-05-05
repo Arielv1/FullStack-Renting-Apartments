@@ -105,7 +105,7 @@ public class UserServiceMockup implements UserService {
 		UserEntity entity = this.dataBase.get(userId);
 		if (entity != null) {
 			UserNameEntity name = new UserNameEntity(update.getUsername().getFirst(), update.getUsername().getLast());
-			entity.setUserName(name);
+			entity.setUsername(name);
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());
 			return convert.fromEntity(entity);

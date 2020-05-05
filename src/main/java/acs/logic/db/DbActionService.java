@@ -25,6 +25,7 @@ import acs.data.actions.InvokedByEntity;
 import acs.logic.action.ActionConverter;
 import acs.logic.action.ActionService;
 import acs.rest.action.ActionBoundary;
+import acs.rest.utils.ValidEmail;
 
 @Service
 public class DbActionService implements ActionService {
@@ -52,8 +53,11 @@ public class DbActionService implements ActionService {
 
 	@Override
 	@Transactional // (readOnly = false)
-	public Object invokeAction(ActionBoundary action) {
-
+	public Object invokeAction(ActionBoundary action) {	
+		if(action.getType() == null) {
+			throw new RuntimeException("Type can not be null");
+		}
+				
 		String id = UUID.randomUUID().toString();
 
 		ActionEntity entity = this.converter.toEntity(action);

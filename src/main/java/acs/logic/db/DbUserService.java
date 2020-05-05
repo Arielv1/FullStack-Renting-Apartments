@@ -116,7 +116,7 @@ public class DbUserService implements UserService {
 		if (entityOptional.isPresent()) {
 			UserEntity entity = entityOptional.get();
 			UserNameEntity name = new UserNameEntity(update.getUsername().getFirst(), update.getUsername().getLast());
-			entity.setUserName(name);
+			entity.setUsername(name);
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());
 			return this.convertor.fromEntity(entity);

@@ -66,7 +66,7 @@ public class UserEntity {
 		return username;
 	}
 
-	public void setUserName(UserNameEntity username) {
+	public void setUsername(UserNameEntity username) {
 		this.username = username;
 	}
 
