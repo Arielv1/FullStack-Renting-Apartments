@@ -1,5 +1,12 @@
 package acs.data;
 
+/*
+username:{
+		"first": "tomer",
+		"last": "arnon"
+},
+*/ 
+
 public class UserNameEntity {
 	
 	

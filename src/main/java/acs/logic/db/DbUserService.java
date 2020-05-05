@@ -20,6 +20,7 @@ import acs.data.UserRole;
 import acs.logic.user.UserConvertor;
 import acs.logic.user.UserService;
 import acs.rest.users.UserBoundary;
+import acs.rest.utils.UserIdBoundary;
 import acs.rest.utils.ValidEmail;
 
 @Service
@@ -38,9 +39,10 @@ public class DbUserService implements UserService {
 	
 
 	@Autowired
-	public DbUserService(UserDao userDao, UserConvertor convertor) {
+	public DbUserService(UserDao userDao, UserConvertor convertor, ValidEmail valid) {
 		this.userDao = userDao;
 		this.convertor = convertor;
+		this.valid = valid;
 		
 	}
 
@@ -54,17 +56,21 @@ public class DbUserService implements UserService {
 	@Override
 	@Transactional
 	public UserBoundary createUser(UserBoundary user) {
+		
 		if (!valid.isEmailVaild(user.getUserId().getEmail())) {
 			throw new RuntimeException("Email invaliud!!");
 		}
+		
 		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
 			throw new RuntimeException("Avatar invaliud!!");
 		}
 		if (user.getUsername() == null) {
 			throw new RuntimeException("User Name invaliud!!");
 		}
+		
+		user.setUserId(new UserIdBoundary(this.projectName, user.getUserId().getEmail()));
 		UserIdEntity userId = new UserIdEntity(user.getUserId().getDomain(), user.getUserId().getEmail());
-		userId.setDomain(this.projectName);
+		
 		Optional<UserEntity> entityOptional = this.userDao.findById(userId);
 		if (entityOptional.isPresent()) {
 			throw new RuntimeException("the User alreay exsite in the data base!!");
@@ -82,9 +88,11 @@ public class DbUserService implements UserService {
 	@Override
 	@Transactional
 	public UserBoundary login(String userDomain, String userEmail) {
+		
 		if (!(valid.isEmailVaild(userEmail))) {
 			throw new RuntimeException("Email invalid!!");
 		}
+		
 		UserIdEntity userId = new UserIdEntity(userDomain, userEmail);
 		Optional<UserEntity> entityOptional = this.userDao.findById(userId);
 		if (entityOptional.isPresent()) {
@@ -101,9 +109,11 @@ public class DbUserService implements UserService {
 	@Override
 	@Transactional
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update) {
+		
 		if (!valid.isEmailVaild(userEmail)) {
 			throw new RuntimeException("Email invalid!!");
 		}
+		
 		if (update.getAvatar() == null && update.getAvatar().trim().isEmpty()) {
 			throw new RuntimeException("Avatar invalid!!");
 		}
@@ -116,7 +126,7 @@ public class DbUserService implements UserService {
 		if (entityOptional.isPresent()) {
 			UserEntity entity = entityOptional.get();
 			UserNameEntity name = new UserNameEntity(update.getUsername().getFirst(), update.getUsername().getLast());
-			entity.setUserName(name);
+			entity.setUsername(name);
 			entity.setRole(update.getRole());
 			entity.setAvatar(update.getAvatar());
 			return this.convertor.fromEntity(entity);
@@ -128,9 +138,11 @@ public class DbUserService implements UserService {
 	@Override
 	@Transactional
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
+		
 		if (!valid.isEmailVaild(adminEmail)) {
 			throw new RuntimeException("Email invalid");
 		}
+		
 		UserIdEntity userId = new UserIdEntity(adminDomain, adminEmail);
 		Optional<UserEntity> entityOptional = this.userDao.findById(userId);
 		if (entityOptional.isPresent()) {

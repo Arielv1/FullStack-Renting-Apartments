@@ -1,5 +1,17 @@
 package acs.rest.utils;
 
+
+/*
+ * username:{
+  		"first": "tomer",
+  		"last": "arnon"
+  }, 
+ * 
+ * 
+ * 
+ */
+
+
 public class UserNameBoundray {
 	
 	private String first;
@@ -12,7 +24,7 @@ public class UserNameBoundray {
 	}
 
 	public UserNameBoundray() {
-		super();
+		
 	}
 
 	public String getFirst() {

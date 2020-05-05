@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Collections;
 
 import javax.annotation.PostConstruct;
-
+import javax.persistence.EnumType;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import acs.data.UserRole;
 import acs.rest.users.UserBoundary;
+import acs.rest.users.UserNewDetails;
 import acs.rest.utils.UserIdBoundary;
 import acs.rest.utils.UserNameBoundray;
 
@@ -27,7 +28,8 @@ public class UserTests {
 	private RestTemplate restTemplate;
 	private String url;
 	
-	private final static String GET = "/login/";  
+	private final static String GET = "/login/userDomain/userEmail";  
+	private final static String PUT = "/userDomain/userEmail";
 	private final static String DELETE_ALL_USERS = "/admin/TestAdminDomain/TestAdminEmail/";
 	
 	@LocalServerPort
@@ -57,80 +59,151 @@ public class UserTests {
 		
 	}
 	
-	
+
 	@Test
-	public void testCreateNewUserReturnTheUserCreatedWithSpecificName() throws Exception{
-		// GIVEN the server is up
-		// WHEN - post /users AND send new userBoundary with specific user id
-		// THEN - the server return same user id and return 2xx massage
+	public void testPostNewUserReturnUserWithId() throws Exception {
+		// GIVEN server is up
 		
-		UserBoundary userInput = new UserBoundary(new UserIdBoundary("test.domain", "tomerarnon83@gmail.com"),
-				new UserNameBoundray("Test", "name"),
-				UserRole.PLAYER,
-				":0");
+		// WHEN I POST /samples AND send a message boundary
+		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
+				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
 		
-		UserBoundary userOutput = this.restTemplate.postForObject(this.url, userInput, UserBoundary.class);
+		UserBoundary output = 
+		  this.restTemplate
+			.postForObject(
+					this.url, 
+					input, 
+					UserBoundary.class);
 		
-		assertEquals(userOutput.getUsername(), userInput.getUsername());
-		
-		
+		// THEN the server returns status 2xx 
+		// AND retrieves a message with non null id
+		if (output.getUserId() == null) {
+			throw new Exception("expected non null id but id was null");
+		}
 	}
 	
-	
-	
 	@Test
-	public void testLoginToUserDetails() throws Exception{
-		// GIVEN the server is up 
-		// WHEN the user details in the data base
-		// THEN the server retrieve user details from the data base AND send 2xx message
+	public void testPostNewUserReturnUserWithSameEmail() throws Exception {
+		// GIVEN server is up
 		
-		UserIdBoundary userId = new UserIdBoundary(null, "tomerarnon83@gmail.com");
+		// WHEN I POST /users AND send a user boundary
+		UserNewDetails input = new UserNewDetails("tomer32@gmail.com", 
+				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
 		
+		UserBoundary output = 
+		  this.restTemplate
+			.postForObject(
+					this.url, 
+					input, 
+					UserBoundary.class);
 		
-		UserBoundary userInput = this.restTemplate.postForObject(this.url, new UserBoundary(userId,
-				new UserNameBoundray("tom", "ron"), 
-				UserRole.ADMIN, 
-				";("), UserBoundary.class);
-		
-		UserBoundary resultUser = this.restTemplate.getForObject(this.url + GET + userIdToURL(userInput.getUserId()),
-				UserBoundary.class, userInput.getUserId());
-		
-		assertThat(userInput.getRole().equals(resultUser.getRole()));
-		
-		
-		
+		// THEN the server returns status 2xx 
+		// AND retrieves a message with same message as sent to server
+		if (!(output.getUserId().getEmail().equals(input.getEmail()))) {
+			throw new Exception("expected simplar message to input but received: " + output.getUserId().getEmail());
+		}
 	}
 	
+	/*
+	@Test
+	public void testPostNewUserAndValidateTheDatabseContainsASingleUserWithTheSameUserId() throws Exception {
+		// GIVEN server is up
+		
+		// WHEN I POST /samples AND send a user boundary
+		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
+				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
+		
+		this.restTemplate
+			.postForObject(
+					this.url, 
+					input, 
+					UserBoundary.class);
+		
+		// THEN server contains a single user in the database
+		// AND it's userId  is similar input's
+		UserBoundary[] output = 
+		  this.restTemplate
+			.getForObject(this.url, UserBoundary[].class);
+		
+		assertThat(output)
+			.hasSize(1);
+				
+//		assertThat(output[0].getMessage())
+//			.isEqualTo(input.getMessage());
+		
+//		assertThat(output[0])
+//			.usingRecursiveComparison()
+//			.isEqualTo(input);
+		
+		assertThat(output[0])
+			.extracting(
+					"tomer32@gmail.com", 
+					new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[")
+			.containsExactly(
+				input.getEmail());
+
+	}
+	/*
 	
 	@Test
-	public void testUpdateUserDetails() throws Exception {
-		// GIVEN server is up 
-		// WHEN user in the data base 
-		// THEN the server update the user details according to the input
+	public void testPostNewMessageTheDatabaseContainsMessageWithCreatedId() throws Exception {
+		// GIVEN server is up
 		
-		UserIdBoundary userId = new UserIdBoundary("domain test", "test@gmail.com");
+		// WHEN I POST /samples AND send a message boundary
+		ComplexMessageBoundary input = new ComplexMessageBoundary("test", null, true, 1, 1.0, new NameBoundary("Jane", "Smith"), null, null);
 		
+		String id = this.restTemplate
+			.postForObject(
+					this.url, 
+					input, 
+					ComplexMessageBoundary.class)
+				.getId();
 		
-		UserBoundary userInput = this.restTemplate.postForObject(this.url, new UserBoundary(userId,
-				new UserNameBoundray("test", "before"), 
-				UserRole.ADMIN, 
-				null), UserBoundary.class);
+		// THEN server contains message with generated id
+		ComplexMessageBoundary output = 
+		  this.restTemplate
+			.getForObject(
+					this.url + "/{id}", 
+					ComplexMessageBoundary.class,
+					id);
 		
-			String domain = userInput.getUserId().getDomain();
-			String email = userInput.getUserId().getEmail();
-			
-			 userInput.setUserName(new UserNameBoundray("test", "after"));
-			this.restTemplate.put(this.url , userInput, domain, email);
-			
-			assertThat(this.restTemplate.getForObject(this.url + GET, UserBoundary.class, domain, email).getUsername()
-					.equals("testUser"));
+		assertThat(output)
+			.isNotNull();
 		
+		assertThat(output)
+			.isEqualToComparingOnlyGivenFields(input, 
+					"message", "critical", "value", "value2");
 		
+		assertThat(output.getName())
+			.usingRecursiveComparison()
+			.isEqualTo(input.getName());
+	}
+
+	@Test
+	public void testUpdateMessageValue2ActuallyUpdateDatabse() throws Exception{
+		// GIVEN the server is up AND the database contains a message
+		ComplexMessageBoundary input = 
+  		  this.restTemplate
+			.postForObject(this.url, 
+					new ComplexMessageBoundary("test", null, false, 1, 999.99, new NameBoundary("x", "y"), null, null), 
+					ComplexMessageBoundary.class);
 		
+			String id = input 
+					.getId();
 		
+		// WHEN I update value2 of the object to 1.5
+		input.setValue2(1.5);
+		this.restTemplate
+			.put(this.url + "/{id}", input, id);
+		
+		// THEN the database is updated with the new value
+		assertThat(this.restTemplate
+				.getForObject(this.url + "/{id}", ComplexMessageBoundary.class, id)
+				.getValue2())
+			.isEqualTo(1.5);
 	}
 	
-	
+	*/
 	
 	
 	

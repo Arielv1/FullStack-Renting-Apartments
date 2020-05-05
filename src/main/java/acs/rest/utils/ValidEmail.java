@@ -8,10 +8,7 @@ import org.springframework.stereotype.Component;
 public class ValidEmail {
 	
 	public  boolean isEmailVaild(String email) {
-		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\"+
-							"[a-zA-Z0-9_+&*-]+)*@"+
-							"(?:[a-zA-Z0-9-]+\\.)"+
-							"+[a-zA-Z]{2-7}$";
+		String emailRegex = "^[\\w-\\.+]*[\\w-\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 
 		Pattern pat = Pattern.compile(emailRegex);
 		if (email == null)
