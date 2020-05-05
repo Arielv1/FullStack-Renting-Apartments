@@ -64,7 +64,7 @@ public class UserTests {
 	public void testPostNewUserReturnUserWithId() throws Exception {
 		// GIVEN server is up
 		
-		// WHEN I POST /samples AND send a message boundary
+		// WHEN I POST /users AND send a message boundary
 		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
 				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
 		
@@ -76,7 +76,7 @@ public class UserTests {
 					UserBoundary.class);
 		
 		// THEN the server returns status 2xx 
-		// AND retrieves a message with non null id
+		// AND retrieves a user with non null id
 		if (output.getUserId() == null) {
 			throw new Exception("expected non null id but id was null");
 		}
