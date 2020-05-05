@@ -20,11 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ActionDao;
 import acs.data.ActionEntity;
 import acs.data.ActionIdEntity;
+import acs.data.ElementIdEntity;
 import acs.data.UserIdEntity;
+import acs.data.actions.ActionElementEntity;
 import acs.data.actions.InvokedByEntity;
 import acs.logic.action.ActionConverter;
 import acs.logic.action.ActionService;
 import acs.rest.action.ActionBoundary;
+import acs.rest.utils.ValidEmail;
 
 @Service
 public class DbActionService implements ActionService {
@@ -53,6 +56,9 @@ public class DbActionService implements ActionService {
 	@Override
 	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
+		if (action.getType() == null) {
+			throw new RuntimeException("Type can not be null");
+		}
 
 		String id = UUID.randomUUID().toString();
 
@@ -64,6 +70,9 @@ public class DbActionService implements ActionService {
 
 		entity.setInvokedBy(new InvokedByEntity(new UserIdEntity(action.getInvokedBy().getUserId().getDomain(),
 				action.getInvokedBy().getUserId().getEmail())));
+
+		entity.setElement(new ActionElementEntity(new ElementIdEntity(action.getElement().getElementId().getDomain(),
+				action.getElement().getElementId().getId())));
 
 		return this.converter.fromEntity(this.actionDao.save(entity)); // SELECT +INSERT / UPDATE
 
