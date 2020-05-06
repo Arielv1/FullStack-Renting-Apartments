@@ -3,10 +3,10 @@ package acs.logic.element;
 import java.util.*;
 import org.springframework.stereotype.Component;
 
-import acs.data.ElementIdEntity;
-import acs.data.UserIdEntity;
 import acs.data.elements.ElementEntity;
 import acs.data.elements.LocationEntity;
+import acs.data.utils.ElementIdEntity;
+import acs.data.utils.UserIdEntity;
 import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.element.boundaries.LocationBoundary;

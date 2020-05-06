@@ -1,35 +1,38 @@
-package acs.data;
+package acs.data.utils;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-
+/*
+ "userid":{
+    		"domain:"2020b.ofir.cohen",
+        	"email": "ofir.cohen@gmail.com"
+        	}
+ */
 @Embeddable
-public class ElementIdEntity implements Serializable {
+public class UserIdEntity implements Serializable{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@Column(name = "USER_DOMAIN", insertable = false, updatable = false)
 	private String domain;
-	private String id;
+	private String email;
 	
-	public ElementIdEntity() {
+	public UserIdEntity() {
 	}
 	
-	public ElementIdEntity(String domain, String id) {
+	public UserIdEntity(String domain, String email) {
 		super();
 		this.domain = domain;
-		this.id = id;
+		this.email = email;
 	}
 	
-	@Column(name = "ELEMENT_DOMAIN")
+	@Column(name = "USER_DOMAIN")
 	public String getDomain() {
 		return domain;
 	}
@@ -38,18 +41,18 @@ public class ElementIdEntity implements Serializable {
 		this.domain = domain;
 	}
 	
-	@Column(name = "ELEMENT_ID")
-	public String getId() {
-		return id;
+	@Column(name = "USER_EMAIL")
+	public String getEmail() {
+		return email;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	@Override
 	public String toString() {
-		return "ElementIdEntity [domain=" + domain + ", id=" + id + "]";
+		return "UserIdEntity [domain=" + domain + ", email=" + email + "]";
 	}
 
 	@Override
@@ -57,7 +60,7 @@ public class ElementIdEntity implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((domain == null) ? 0 : domain.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		return result;
 	}
 
@@ -69,20 +72,21 @@ public class ElementIdEntity implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ElementIdEntity other = (ElementIdEntity) obj;
+		UserIdEntity other = (UserIdEntity) obj;
 		if (domain == null) {
 			if (other.domain != null)
 				return false;
 		} else if (!domain.equals(other.domain))
 			return false;
-		if (id == null) {
-			if (other.id != null)
+		if (email == null) {
+			if (other.email != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!email.equals(other.email))
 			return false;
 		return true;
 	}
 	
-
+	
+	
 	
 }

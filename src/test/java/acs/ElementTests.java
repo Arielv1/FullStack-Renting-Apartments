@@ -26,8 +26,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import acs.data.ElementIdEntity;
 import acs.data.elements.ElementEntity;
+import acs.data.utils.ElementIdEntity;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
 

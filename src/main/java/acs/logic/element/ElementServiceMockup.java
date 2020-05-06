@@ -19,6 +19,8 @@ import acs.data.*;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
 import acs.data.elements.LocationEntity;
+import acs.data.utils.ElementIdEntity;
+import acs.data.utils.UserIdEntity;
 import acs.rest.element.boundaries.ElementBoundary;
 
 

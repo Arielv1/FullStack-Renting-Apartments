@@ -3,7 +3,7 @@ package acs.data.elements;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 
-import acs.data.UserIdEntity;
+import acs.data.utils.UserIdEntity;
 
 /*
  "createdBy": {

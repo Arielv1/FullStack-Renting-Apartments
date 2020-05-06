@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import acs.dal.UserDao;
-import acs.data.UserEntity;
-import acs.data.UserIdEntity;
+import acs.data.users.UserEntity;
+import acs.data.utils.UserIdEntity;
 import acs.logic.user.UserConvertor;
 import acs.logic.user.UserService;
 import acs.rest.users.UserBoundary;

@@ -1,4 +1,4 @@
-package acs.data;
+package acs.data.actions;
 
 import java.util.Date;
 import java.util.Map;
@@ -13,8 +13,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import acs.dal.MapToJsonConverter;
-import acs.data.actions.ActionElementEntity;
-import acs.data.actions.InvokedByEntity;
+import acs.data.utils.ActionIdEntity;
 import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.utils.IdBoundary;

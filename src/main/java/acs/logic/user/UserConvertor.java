@@ -2,8 +2,8 @@ package acs.logic.user;
 
 import org.springframework.stereotype.Component;
 
-import acs.data.UserEntity;
-import acs.data.UserIdEntity;
+import acs.data.users.UserEntity;
+import acs.data.utils.UserIdEntity;
 import acs.rest.users.UserBoundary;
 import acs.rest.utils.UserIdBoundary;
 

@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import acs.dal.MapToJsonConverter;
-import acs.data.ElementIdEntity;
+import acs.data.utils.ElementIdEntity;
 import acs.rest.element.*;
 import acs.rest.element.boundaries.CreatedByBoundary;
 /*

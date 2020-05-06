@@ -7,8 +7,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import acs.data.UserIdEntity;
-import acs.data.UserRole;
+import acs.data.utils.UserIdEntity;
+import acs.data.utils.UserRole;
 
 
 /*

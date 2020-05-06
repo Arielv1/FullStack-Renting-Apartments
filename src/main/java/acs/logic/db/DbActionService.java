@@ -18,12 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import acs.dal.ActionDao;
-import acs.data.ActionEntity;
-import acs.data.ActionIdEntity;
-import acs.data.ElementIdEntity;
-import acs.data.UserIdEntity;
 import acs.data.actions.ActionElementEntity;
+import acs.data.actions.ActionEntity;
 import acs.data.actions.InvokedByEntity;
+import acs.data.utils.ActionIdEntity;
+import acs.data.utils.ElementIdEntity;
+import acs.data.utils.UserIdEntity;
 import acs.logic.action.ActionConverter;
 import acs.logic.action.ActionService;
 import acs.rest.action.ActionBoundary;

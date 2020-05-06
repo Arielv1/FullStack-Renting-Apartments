@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import acs.data.ActionEntity;
-import acs.data.ActionIdEntity;
-import acs.data.UserIdEntity;
+import acs.data.actions.ActionEntity;
 import acs.data.actions.InvokedByEntity;
+import acs.data.utils.ActionIdEntity;
+import acs.data.utils.UserIdEntity;
 import acs.rest.action.ActionBoundary;
 
 //@Service

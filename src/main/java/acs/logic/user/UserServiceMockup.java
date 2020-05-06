@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import acs.data.UserEntity;
-import acs.data.UserRole;
+import acs.data.users.UserEntity;
+import acs.data.utils.UserRole;
 import acs.rest.users.UserBoundary;
 import acs.rest.utils.UserIdBoundary;
 import acs.rest.utils.ValidEmail;

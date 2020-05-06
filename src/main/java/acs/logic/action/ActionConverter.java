@@ -2,9 +2,9 @@ package acs.logic.action;
 
 import org.springframework.stereotype.Component;
 
-import acs.data.ActionEntity;
-import acs.data.ActionIdEntity;
-import acs.data.UserIdEntity;
+import acs.data.actions.ActionEntity;
+import acs.data.utils.ActionIdEntity;
+import acs.data.utils.UserIdEntity;
 import acs.rest.action.ActionBoundary;
 import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;

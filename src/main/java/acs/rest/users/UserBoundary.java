@@ -1,7 +1,7 @@
 package acs.rest.users;
 
 
-import acs.data.UserRole;
+import acs.data.utils.UserRole;
 import acs.rest.utils.UserIdBoundary;
 
 /*

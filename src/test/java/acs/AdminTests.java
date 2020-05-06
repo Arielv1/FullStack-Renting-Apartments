@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
-import acs.data.UserRole;
+import acs.data.utils.UserRole;
 import acs.rest.action.ActionBoundary;
 import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
