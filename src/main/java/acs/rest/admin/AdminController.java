@@ -91,18 +91,6 @@ public ActionBoundary[] exports_AllActions (
 	@PathVariable("adminDomain") String adminDomain,
 	 @PathVariable("adminEmail") String adminEmail) 
 	{
-	
-	return this.actionService.getAllActions(adminDomain,adminEmail).toArray(new ActionBoundary[0]);
-	
-//		return StreamSupport
-//		.stream(
-//				// INVOKE SELECT DATABASE 
-//				this.actionDao
-//					.findAll()
-//					.spliterator(),
-//				false) //Stream<ActionEntity>
-//		.map(this.actionConverter::fromEntity) // Stream<ActionBoundary>
-//		.collect(Collectors.toList()) // List<ActionBoundary>
-//		.toArray(new UserBoundary [0]); //ActionBoundary[]
-}
+		return this.actionService.getAllActions(adminDomain,adminEmail).toArray(new ActionBoundary[0]);
+	}
 }

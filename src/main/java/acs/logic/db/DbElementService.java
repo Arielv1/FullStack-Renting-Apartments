@@ -21,6 +21,7 @@ import acs.logic.element.ElementService;
 import acs.logic.element.ExtendedElementService;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
+import acs.rest.utils.ValidEmail;
 
 @Service
 public class DbElementService implements ExtendedElementService {
@@ -28,6 +29,7 @@ public class DbElementService implements ExtendedElementService {
 	private String projectName;
 	private ElementDao elementDao;
 	private ElementConverter converter;
+	private ValidEmail valid;
 	
 	@Value("${spring.application.name:ofir.cohen}")
 	public void setProjectName(String projectName) {
@@ -35,9 +37,10 @@ public class DbElementService implements ExtendedElementService {
 	}
 	
 	@Autowired
-	public DbElementService(ElementDao elementDao, ElementConverter converter) {
+	public DbElementService(ElementDao elementDao, ElementConverter converter, ValidEmail valid) {
 		this.converter = converter;
 		this.elementDao = elementDao;
+		this.valid = valid;
 	}
 	
 	@PostConstruct
@@ -50,6 +53,10 @@ public class DbElementService implements ExtendedElementService {
 	@Override
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary element) {
+		
+		if (!valid.isEmailVaild(managerEmail)) {
+			throw new RuntimeException("Element Post - Invalid Manager Email");
+		}
 		
 		ElementEntity entity = this.converter.toEntity(element);
 		
@@ -70,6 +77,9 @@ public class DbElementService implements ExtendedElementService {
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 		
+		if (!valid.isEmailVaild(managerEmail)) {
+			throw new RuntimeException("Elements Update - Invalid Manager Email");
+		}
 		
 		ElementEntity entity = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId)).orElseThrow(
 				() -> new EntityNotFoundException("DB No Element With Id " + elementDomain + "!" + elementId));
@@ -111,6 +121,9 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 	public List <ElementBoundary> getAll(String userDomain, String userEmail) {
 		// invoke select * from database
+		if (!valid.isEmailVaild(userEmail)) {
+			throw new RuntimeException("Elements Get - Invalid User Email " + userEmail);
+		}
 		
 		return StreamSupport.stream(this.elementDao.findAll().spliterator(), false)
 				.map(this.converter :: fromEntity)
@@ -122,6 +135,9 @@ public class DbElementService implements ExtendedElementService {
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain, String elementId) {
 		// invoke select database
 		
+		if (!valid.isEmailVaild(userEmail)) {
+			throw new RuntimeException("Elements Get - Invalid User Email " + userEmail);
+		}
 	
 		return this.converter.fromEntity(
 				  this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
@@ -134,12 +150,19 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional
 	public void deleteAllElements(String adminDomain, String adminEmail) {
 		//Invoke delete database
+		if (!valid.isEmailVaild(adminEmail)) {
+			throw new RuntimeException("Element Delete - Invalid Admin Email");
+		}
 		this.elementDao.deleteAll();
 	}
 
 	@Override
 	@Transactional
-	public void bindChildToParent(String elementDomain , String elementId, IdBoundary childId) {
+	public void bindChildToParent(String managerDomain, String managerEmail, String elementDomain , String elementId, IdBoundary childId) {
+		
+		if(!valid.isEmailVaild(managerEmail)) {
+			throw new RuntimeException("Element Bind - Invalid Manager Email");
+		}
 		
 		if(childId == null) {
 			throw new EntityNotFoundException("Child Element Isn't Initialized");
@@ -161,7 +184,11 @@ public class DbElementService implements ExtendedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Set<ElementBoundary> getChildren(String elementDomain , String elementId) {
+	public Set<ElementBoundary> getChildren(String userDomain, String userEmail, String elementDomain , String elementId) {
+		
+		if(!valid.isEmailVaild(userEmail)) {
+			throw new RuntimeException("Element Get Children - Invalid User Email");
+		}
 		
 		ElementEntity parent = this.elementDao.findById(new ElementIdEntity (elementDomain , elementId))
 								.orElseThrow(() -> new EntityNotFoundException("DB No Parent With ID" + elementDomain + "!" + elementId));
@@ -175,7 +202,11 @@ public class DbElementService implements ExtendedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ElementBoundary getParent(String elementDomain , String elementId) {
+	public ElementBoundary getParent(String userDomain, String userEmail, String elementDomain , String elementId) {
+		
+		if(!valid.isEmailVaild(userEmail)) {
+			throw new RuntimeException("Element Get Parents - Invalid User Email");
+		}
 		
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain , elementId))
 				.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID" + elementDomain + "!" + elementId));

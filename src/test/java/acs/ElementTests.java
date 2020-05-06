@@ -39,18 +39,18 @@ public class ElementTests {
 	private RestTemplate restTemplate;
 	private String url;
 	
-	private final static String GET_URL = "/{userDomain}/{userEmail}/";
-	private final static String POST_URL = "/{managerDomain}/{managerEmail}/";
-	private final static String UPDATE_URL = "/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}";
+	private final static String GET_URL = "elements/{userDomain}/{userEmail}/";
+	private final static String POST_URL = "elements/{managerDomain}/{managerEmail}/";
+	private final static String UPDATE_URL = "elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}";
 	
 	
 	// TODO - change url when delete is implemented
-	private final static String DELETE_ALL_URL =  "/admin/TestAdminDomain/TestAdminEmail/";
+	private final static String DELETE_ALL_URL =  "admin/elements/TestAdminDomain/adminEmail@gmail.com/";
 	
 	
 	@PostConstruct
 	public void init() {
-		this.url = "http://localhost:" + this.port + "/acs/elements";
+		this.url = "http://localhost:" + this.port + "/acs/";
 		this.restTemplate = new RestTemplate();
 	}
 	
@@ -93,7 +93,7 @@ public class ElementTests {
 		ElementBoundary output = this.restTemplate.postForObject(this.url + POST_URL , 
 																input,
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTest@gmail.com");
 		
 		assertEquals(output.getName(), input.getName());
 	}
@@ -127,13 +127,12 @@ public class ElementTests {
 									null,
 									elementAttributes),
 							ElementBoundary.class,
-							"managerTestDomain", "managerTestEmail");
+							"managerTestDomain", "managerTest@gmail.com");
 		
 		
 		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + elementIdToURL(newElementObject.getElementId()),
 																ElementBoundary.class,
-																newElementObject.getElementAttribues(),
-																"userTestDomain", "userTestEmail");
+																"userTestDomain", "userTestEmail@gmail.com");
 		
 		assertThat(resultElementObject.getElementAttribues().equals(newElementObject.getElementAttribues()));
 	}
@@ -160,7 +159,7 @@ public class ElementTests {
 					this.restTemplate.postForObject(this.url + POST_URL, 
 													boundary,
 													ElementBoundary.class,
-													"1","2"))
+													"managerDomain","managerTestDomain@gmail.com"))
 				.collect(Collectors.toList());
 		
 		// Confirm database size == 5
@@ -172,7 +171,7 @@ public class ElementTests {
 		// Retrieve all elements from database
 		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL,
 																  ElementBoundary[].class, 
-																  "userTestDomain", "userTestEmail");
+																  "userTestDomain", "userTestEmail@gmail.com");
 		
 		// Confirm that the database is empty yet is not null
 		assertThat(result).isNotNull().isEmpty();
@@ -196,7 +195,7 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTest@gmail.com");
 		
 		// Creating the new elementId to update
 		IdBoundary newElementId = new IdBoundary("testDomain", "testId");
@@ -207,13 +206,13 @@ public class ElementTests {
 		//Invoke the UPDATE method
 		this.restTemplate.put(this.url + UPDATE_URL,
 							  element,
-							  "managerTestEmail", "ManagerTestDomain",  orgElementId.getDomain(),orgElementId.getId());
+							  "managerTestDomain", "managerTest@gmail.com",  orgElementId.getDomain(),orgElementId.getId());
 		
 		
 		// Retrieve the entire database content
 		ElementBoundary database[] = this.restTemplate.getForObject(this.url + GET_URL, 
 																	ElementBoundary[].class, 
-																	"userTestDomain", "userTestEmail");
+																	"userTestDomain", "userTestEmail@gmail.com");
 		
 		// Check that the databases' old key was kept 
 		assertThat(database[0].getElementId()).isNotEqualTo(element.getElementId());
@@ -236,7 +235,7 @@ public class ElementTests {
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail");
+																	"managerTestDomain", "managerTestEmail@gmail.com");
 		String newName = null;
 		element.setName(newName);
 		try {
@@ -266,7 +265,7 @@ public class ElementTests {
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail");
+																	"managerTestDomain", "managerTestEmail@gmail.com");
 		String newName = "     ";
 		element.setName(newName);
 		try {
@@ -295,7 +294,7 @@ public class ElementTests {
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail");
+																	"managerTestDomain", "managerTestEmail@gmail.com");
 		String newType = null;
 		element.setType(newType);
 		try {
@@ -324,7 +323,7 @@ public class ElementTests {
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail");
+																	"managerTestDomain", "managerTestEmail@gmail.com");
 		String newType = "   ";
 		element.setName(newType);
 		try {
@@ -356,7 +355,7 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 		
 		ElementBoundary child1 = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -369,7 +368,7 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 		
 		ElementBoundary child2 = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -382,18 +381,18 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 		Stream.of(child1, child2)
 		.map(ElementBoundary::getElementId)
 		.forEach(childIdBoundary->
 			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
 					childIdBoundary,
-					"TestManagerDomain", "TestManagerEmail", parent.getElementId().getDomain(), parent.getElementId().getId()));
+					"TestManagerDomain", "TestManagerEmail@gmail.com", parent.getElementId().getDomain(), parent.getElementId().getId()));
 		
 		assertThat(this.restTemplate
 				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
 						ElementBoundary[].class, 
-						"userTestDomain", "userTestEmail", parent.getElementId().getDomain(), parent.getElementId().getId()))
+						"userTestDomain", "userTestEmail@gmail.com", parent.getElementId().getDomain(), parent.getElementId().getId()))
 			.hasSize(2)
 			.usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(child1, child2);
@@ -416,7 +415,7 @@ public class ElementTests {
 									null
 									),
 				ElementBoundary.class,
-				"managerTestDomain", "managerTestEmail");
+				"managerTestDomain", "managerTestEmail@gmail.com");
 		
 		String domain = element.getElementId().getDomain();
 		String id = element.getElementId().getId();
@@ -424,7 +423,7 @@ public class ElementTests {
 		assertThrows(RuntimeException.class, ()->
 		this.restTemplate.put(this.url + UPDATE_URL + "/children", 
 				  new IdBoundary(domain, id), 
-				  "TestManagerDomain", "TestManagerEmail", domain, id));
+				  "TestManagerDomain", "TestManagerEmail@gmail.com", domain, id));
 	}
 	
 	@Test
@@ -444,7 +443,7 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 
 		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -457,15 +456,15 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 	
 		this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
 				child.getElementId(),
-				"TestManagerDomain", "TestManagerEmail", parent.getElementId().getDomain(), parent.getElementId().getId());
+				"TestManagerDomain", "TestManagerEmail@gmail.com", parent.getElementId().getDomain(), parent.getElementId().getId());
 		
 		ElementBoundary allParents[] = this.restTemplate.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
 				ElementBoundary[].class, 
-				"userTestDomain", "userTestEmail", child.getElementId().getDomain(), child.getElementId().getId());
+				"userTestDomain", "userTestEmail@gmail.com", child.getElementId().getDomain(), child.getElementId().getId());
 		
 		assertThat(allParents[0].getElementId().getId()).isEqualTo(parent.getElementId().getId());
 		
@@ -487,7 +486,7 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 
 		ElementBoundary parent2 = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -500,7 +499,7 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 		
 		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -513,32 +512,34 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail");
+																"managerTestDomain", "managerTestEmail@gmail.com");
 		
 		Stream.of(parent1, parent2)
 		.map(ElementBoundary::getElementId)
 		.forEach(parentIdBoundary->
 			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
 					child.getElementId(),
-					"TestManagerDomain", "TestManagerEmail", parentIdBoundary.getDomain(), parentIdBoundary.getId()));
+					"TestManagerDomain", "TestManagerEmail@gmail.com", parentIdBoundary.getDomain(), parentIdBoundary.getId()));
 		
 		assertThat(this.restTemplate
 				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
 						ElementBoundary[].class, 
-						"userTestDomain", "userTestEmail", parent1.getElementId().getDomain(), parent1.getElementId().getId()))
+						"userTestDomain", "userTestEmail@gmail.com", parent1.getElementId().getDomain(), parent1.getElementId().getId()))
 			.hasSize(0);
 		
 		assertThat(this.restTemplate
 				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
 						ElementBoundary[].class, 
-						"userTestDomain", "userTestEmail", parent2.getElementId().getDomain(), parent2.getElementId().getId()))
+						"userTestDomain", "userTestEmail@gmail.com", parent2.getElementId().getDomain(), parent2.getElementId().getId()))
 			.hasSize(1);
 		
 		ElementBoundary allParents[] = this.restTemplate.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
 				ElementBoundary[].class, 
-				"userTestDomain", "userTestEmail", child.getElementId().getDomain(), child.getElementId().getId());
+				"userTestDomain", "userTestEmail@gmail.com", child.getElementId().getDomain(), child.getElementId().getId());
 		
-		assertThat(allParents[0].getElementId().getId()).isEqualTo(parent2.getElementId().getId());
+		//assertThat(allParents[0].getElementId().getId()).isEqualTo(parent2.getElementId().getId());
+		
+		assertThat(allParents[0]).usingRecursiveComparison().isEqualTo(parent2);
 		
 	}
 	
