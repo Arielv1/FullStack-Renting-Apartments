@@ -4,12 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -33,29 +31,23 @@ public class AdminTests {
 	private int port;
 	private RestTemplate restTemplate;
 	private String url;
-	private String url_actions;
 
 	
-	private final static String DELETE_ALL_ELEMENTS_URL =  "admin/elements/TestAdminDomain/TestAdminEmail/";
-	private final static String DELETE_ALL_ACTIONS_URL =  "admin/actions/TestAdminDomain/TestAdminEmail/";
-	private final static String DELETE_ALL_USERS_URL =  "admin/users/TestAdminDomain/TestAdminEmail/";
+	private final static String DELETE_ALL_ELEMENTS_URL =  "admin/elements/TestAdminDomain/tomer32@gmail.com/";
+	private final static String DELETE_ALL_ACTIONS_URL =  "admin/actions/TestAdminDomain/tomer32@gmail.com/";
+	private final static String DELETE_ALL_USERS_URL =  "admin/users/TestAdminDomain/tomer32@gmail.com/";
 	private final static String GET_ALL_ELEMENTS_OF_USER = "elements/{userDomain}/{userEmail}";
 	private final static String GET_ALL_USERS_URL =  "admin/users/{adminDomain}/{adminEmail}";
-	private final static String GET_ALL_ACTIONS_URL =  "admin/actions/TestAdminDomain/TestAdminEmail/";	
+	private final static String GET_ALL_ACTIONS_URL =  "admin/actions/TestAdminDomain/tomer32@gmail.com/";	
 
 	private final static String CREATE_USER =  "users";
 	private final static String CREATE_ACTION =  "actions";
 	private final static String CREATE_ELEMENT =  "elements/{managerDomain}/{managerEmail}";
 
-
-
-
-	
 	
 	@PostConstruct
 	public void init() {
 		this.url = "http://localhost:" + this.port + "/acs/";
-		this.url_actions = "http://localhost:" + this.port + "/acs/actions";
 		this.restTemplate = new RestTemplate();
 	}
 	
@@ -83,9 +75,10 @@ public class AdminTests {
 		ActionBoundary actionInput = new ActionBoundary(new IdBoundary("domain test", "testId"), "PLAYER",
 				new ActionElementBoundary(new IdBoundary("domain element test", "id element test")), new Date(),
 //				null, new Date(),
-				new InvokedByBoundary(new UserIdBoundary("domain user test", "domain user email")), new HashMap<>());
+				new InvokedByBoundary(new UserIdBoundary("domain user test", "tomer32@gmail.com")), new HashMap<>());
 		
-		ActionBoundary action = this.restTemplate.postForObject(this.url_actions, actionInput,ActionBoundary.class);
+		ActionBoundary action = this.restTemplate.postForObject(this.url + CREATE_ACTION, actionInput,ActionBoundary.class);
+		
 		// When i delete all Actions
 		this.restTemplate
 		.delete(this.url + DELETE_ALL_ACTIONS_URL);
@@ -100,10 +93,7 @@ public class AdminTests {
 	public void checkDeleteAllUsers() throws Exception {
 		// Given the database contains an Users
 		// creating user
-//		UserBoundary userInput = new UserBoundary(new UserIdBoundary("test.domain","tomerarnon83@gmail.com"),
-//				new UserNameBoundray("Test", "name"),
-//				UserRole.PLAYER,
-//				":0");
+
 		UserNewDetails userInput = new UserNewDetails("tomer32@gmail.com", 
 				"tomer test", UserRole.ADMIN, ";[");
 		
@@ -141,7 +131,7 @@ public class AdminTests {
 		ElementBoundary output = this.restTemplate.postForObject(this.url + CREATE_ELEMENT , 
 							input,
 							ElementBoundary.class,
-							"managerTestDomain", "managerTestEmail");
+							"managerTestDomain", "tomer32@gmail.com");
 		
 		// When i delete all Elements
 		this.restTemplate
@@ -161,10 +151,7 @@ public class AdminTests {
 	public void checkExportAllUsers() throws Exception {
 		// Given the database contains an Actions
 		// Create user
-//		UserBoundary userInput = new UserBoundary(new UserIdBoundary("test.domain", "tomerarnon83@gmail.com"),
-//				new UserNameBoundray("Test", "name"),
-//				UserRole.PLAYER,
-//				":0");
+
 		UserNewDetails userInput = new UserNewDetails("tomer32@gmail.com", 
 		"tomer test", UserRole.ADMIN, ";[");
 		UserBoundary user = this.restTemplate.postForObject(this.url + CREATE_USER,userInput , UserBoundary.class);
@@ -179,8 +166,6 @@ public class AdminTests {
 		assertThat(result[0])
 		.usingRecursiveComparison().isEqualTo(user);
 
-		
-		
 	}
 	
 	@Test
@@ -189,11 +174,9 @@ public class AdminTests {
 		// create Action
 		ActionBoundary actionInput = new ActionBoundary(new IdBoundary("domain test", "testId"), "PLAYER",
 				new ActionElementBoundary(new IdBoundary("domain element test", "id element test")), new Date(),
-//				null, new Date(),
-				new InvokedByBoundary(new UserIdBoundary("domain user test", "domain user email")), new HashMap<>());
+				new InvokedByBoundary(new UserIdBoundary("domain user test", "tomer32@gmail.com")), new HashMap<>());
 		
-//		Object action = this.restTemplate.postForObject(this.url_actions, actionInput,Object.class);
-		ActionBoundary action = (ActionBoundary) this.restTemplate.postForObject(this.url_actions, actionInput,ActionBoundary.class);
+		ActionBoundary action = (ActionBoundary) this.restTemplate.postForObject(this.url + CREATE_ACTION, actionInput,ActionBoundary.class);
 
 		
 		// When i get all Actions
@@ -204,9 +187,6 @@ public class AdminTests {
 		// Then i get list of the actions
 		assertThat(result)
 		.hasSize(1);
-		System.err.println(result[0]);
-		
-		System.err.println(action);
 
 		assertThat(result[0])
 		.usingRecursiveComparison().isEqualTo(action);
