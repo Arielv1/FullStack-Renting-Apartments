@@ -69,15 +69,6 @@ public class ElementController {
 		
 	}
 	
-	 // DUMMY DELETE METHOD - COPY TO ADMINCONTROLLER OR DELETE IF NEEDED
-	 // Delete (DELETE) all elements
-	@RequestMapping(path = "/acs/elements/admin/{adminDomain}/{adminEmail}",
-			method = RequestMethod.DELETE)
-	public void deleteAllElements(@PathVariable("adminDomain") String adminDomain,
-			 					  @PathVariable("adminEmail") String adminEmail) {
-		this.elementService.deleteAllElements(adminDomain, adminEmail);	
-	}
-	
 	
 		// Bind child to parent
 	@RequestMapping(path = "/acs/elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}/children",
@@ -89,7 +80,7 @@ public class ElementController {
 											  @PathVariable("elementId") String elementId,
 											  @RequestBody IdBoundary childId) {
 			
-		this.elementService.bindChildToParent(elementDomain, elementId, childId);
+		this.elementService.bindChildToParent(managerDomain, managerEmail, elementDomain, elementId, childId);
 		
 	}
 		
@@ -102,7 +93,7 @@ public class ElementController {
 																	  @PathVariable("elementDomain") String elementDomain,
 																	  @PathVariable("elementId") String elementId) {
 
-		return this.elementService.getChildren(elementDomain, elementId)
+		return this.elementService.getChildren(userDomain, userEmail, elementDomain, elementId)
 				.toArray(new ElementBoundary[0]);
 	}
 		
@@ -114,7 +105,7 @@ public class ElementController {
 												  @PathVariable("userEmail") String userEmail,
 												  @PathVariable("elementDomain") String elementDomain,
 												  @PathVariable("elementId") String elementId) {
-		ElementBoundary parent = this.elementService.getParent(elementDomain , elementId);
+		ElementBoundary parent = this.elementService.getParent(userDomain, userEmail, elementDomain , elementId);
 		
 		if(parent != null) {
 			return new ElementBoundary[] {parent};

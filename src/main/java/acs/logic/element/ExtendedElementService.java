@@ -7,7 +7,7 @@ import acs.rest.utils.IdBoundary;
 
 public interface ExtendedElementService extends ElementService{
 	
-	public void bindChildToParent(String elementDomain, String elementId, IdBoundary childId);
-	public Set<ElementBoundary> getChildren(String elementDomain, String elementId);
-	public ElementBoundary getParent (String elementDomain, String elementId);
+	public void bindChildToParent(String managerDomain, String managerEmail, String elementDomain, String elementId, IdBoundary childId);
+	public Set<ElementBoundary> getChildren(String userDomain, String userEmail, String elementDomain, String elementId);
+	public ElementBoundary getParent (String userDomain, String userEmail, String elementDomain, String elementId);
 }
