@@ -1,4 +1,4 @@
-package acs.data;
+package acs.data.users;
 
 
 import javax.persistence.Embedded;
@@ -7,6 +7,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import acs.data.UserIdEntity;
 import acs.data.UserRole;
 
 
