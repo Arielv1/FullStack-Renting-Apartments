@@ -58,14 +58,14 @@ public class DbUserService implements UserService {
 	public UserBoundary createUser(UserBoundary user) {
 		
 		if (!valid.isEmailVaild(user.getUserId().getEmail())) {
-			throw new RuntimeException("Email invaliud!!");
+			throw new RuntimeException("Email invalid!!");
 		}
 		
 		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
-			throw new RuntimeException("Avatar invaliud!!");
+			throw new RuntimeException("Avatar invalid!!");
 		}
 		if (user.getUsername() == null) {
-			throw new RuntimeException("User Name invaliud!!");
+			throw new RuntimeException("User Name invalid!!");
 		}
 		
 		user.setUserId(new UserIdBoundary(this.projectName, user.getUserId().getEmail()));
@@ -143,21 +143,9 @@ public class DbUserService implements UserService {
 			throw new RuntimeException("Email invalid");
 		}
 		
-		UserIdEntity userId = new UserIdEntity(adminDomain, adminEmail);
-		Optional<UserEntity> entityOptional = this.userDao.findById(userId);
-		if (entityOptional.isPresent()) {
-			UserEntity entity = entityOptional.get();
-			if (entity.getRole().equals(UserRole.ADMIN)) {
-
-				return StreamSupport.stream(this.userDao.findAll().spliterator(), false).map(this.convertor::fromEntity)
+		return StreamSupport.stream(this.userDao.findAll().spliterator(), false).map(this.convertor::fromEntity)
 						.collect(Collectors.toList());
-			} else {
-				throw new RuntimeException("admin details invalid");
 
-			}
-		} else {
-			throw new RuntimeException("No such admin details exsite");
-		}
 	}
 
 	@Override
