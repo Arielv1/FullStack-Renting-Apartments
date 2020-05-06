@@ -3,7 +3,6 @@ package acs.rest.users;
 
 import acs.data.UserRole;
 import acs.rest.utils.UserIdBoundary;
-import acs.rest.utils.UserNameBoundray;
 
 /*
  {
@@ -11,8 +10,8 @@ import acs.rest.utils.UserNameBoundray;
  		"domain" : "2020.b@demo",
  		"email" : "tomerarnon@gmail.com"
  	},
- 	"role" : "PLAYER",
  	"userName" : "demo user",
+ 	"role" : "PLAYER",
  	"avatar" : ";-)"
  } 
  * 
@@ -20,15 +19,15 @@ import acs.rest.utils.UserNameBoundray;
 
 public class UserBoundary {
 	private UserIdBoundary userId;
-	private String avatar;
-	private UserNameBoundray username;
+	private String username;
 	private UserRole role;
+	private String avatar;
 
 	public UserBoundary() {
 
 	}
 
-	public UserBoundary(UserIdBoundary userId,  UserNameBoundray username, UserRole role, String avatar) {
+	public UserBoundary(UserIdBoundary userId,  String username, UserRole role, String avatar) {
 		super();
 		setUserId(userId);
 		setUserName(username);
@@ -52,11 +51,11 @@ public class UserBoundary {
 		this.avatar = avatar;
 	}
 
-	public UserNameBoundray getUsername() {
+	public String getUsername() {
 		return username;
 	}
 
-	public void setUserName(UserNameBoundray username) {
+	public void setUserName(String username) {
 		this.username = username;
 	}
 

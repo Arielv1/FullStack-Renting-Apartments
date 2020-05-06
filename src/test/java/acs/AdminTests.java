@@ -25,7 +25,7 @@ import acs.rest.users.UserBoundary;
 import acs.rest.users.UserNewDetails;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
-import acs.rest.utils.UserNameBoundray;
+
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class AdminTests {
@@ -105,7 +105,7 @@ public class AdminTests {
 //				UserRole.PLAYER,
 //				":0");
 		UserNewDetails userInput = new UserNewDetails("tomer32@gmail.com", 
-				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
+				"tomer test", UserRole.ADMIN, ";[");
 		
 		UserBoundary user = this.restTemplate.postForObject(this.url + CREATE_USER, userInput , UserBoundary.class);
 
@@ -166,7 +166,7 @@ public class AdminTests {
 //				UserRole.PLAYER,
 //				":0");
 		UserNewDetails userInput = new UserNewDetails("tomer32@gmail.com", 
-		new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
+		"tomer test", UserRole.ADMIN, ";[");
 		UserBoundary user = this.restTemplate.postForObject(this.url + CREATE_USER,userInput , UserBoundary.class);
 		
 		// When i get all Users

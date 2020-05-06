@@ -1,9 +1,7 @@
 package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.annotation.PostConstruct;
 
@@ -19,7 +17,6 @@ import acs.data.UserRole;
 import acs.rest.users.UserBoundary;
 import acs.rest.users.UserNewDetails;
 import acs.rest.utils.UserIdBoundary;
-import acs.rest.utils.UserNameBoundray;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class UserTests {
@@ -68,7 +65,7 @@ public class UserTests {
 		
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
-				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
+				"tomer test", UserRole.ADMIN, ";[");
 		
 		UserBoundary output = 
 		  this.restTemplate
@@ -90,7 +87,7 @@ public class UserTests {
 		
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails("tomer32@gmail.com", 
-				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
+				"tomer test", UserRole.ADMIN, ";[");
 		
 		UserBoundary output = 
 		  this.restTemplate
@@ -108,12 +105,12 @@ public class UserTests {
 	
 	
 	@Test
-	public void testPostNewUserAndValidateTheDatabseContainsUserWithTheSameIdAndName() throws Exception {
+	public void testPostNewUserAndValidateTheDatabseContainsUserWithTheSameId() throws Exception {
 		// GIVEN server is up
 		
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
-				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
+				"tomer test", UserRole.ADMIN, ";[");
 		
 		UserBoundary userPost =  this.restTemplate
 			.postForObject(
@@ -133,8 +130,6 @@ public class UserTests {
 		assertThat(output.getUserId()).extracting("domain","email")
 		.containsExactly(userPost.getUserId().getDomain(), userPost.getUserId().getEmail());
 		
-		assertThat(output.getUsername()).extracting("first","last")
-		.containsExactly(userPost.getUsername().getFirst(), userPost.getUsername().getLast());
 
 	}
 	
@@ -144,7 +139,7 @@ public class UserTests {
 		// GIVEN server is up
 		
 		// WHEN I POST /samples AND send a message boundary
-		UserNewDetails input = new UserNewDetails("test23@gmail.com", new UserNameBoundray("testy", "test"), 
+		UserNewDetails input = new UserNewDetails("test23@gmail.com", "testy test", 
 				UserRole.MANAGER, ";=}");
 		
 		UserBoundary userPost = this.restTemplate
@@ -175,7 +170,7 @@ public class UserTests {
 	public void testUpdateUserDetsilsActuallyUpdateDatabse() throws Exception{
 		// GIVEN the server is up AND the database contains a message
 		
-		UserNewDetails input = new UserNewDetails("test23@gmail.com", new UserNameBoundray("testy", "test"), 
+		UserNewDetails input = new UserNewDetails("test23@gmail.com", "testy test", 
 				UserRole.MANAGER, ";=}");
 		
 		

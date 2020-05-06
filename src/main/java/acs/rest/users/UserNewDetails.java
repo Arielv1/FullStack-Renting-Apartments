@@ -3,16 +3,13 @@ package acs.rest.users;
 
 
 import acs.data.UserRole;
-import acs.rest.utils.UserNameBoundray;
+
 
 /*
  * {
  * 
  * "email": "tmoer32@gmail.com",
- *  username:{
-  		"first": "tomer",
-  		"last": "arnon"
-  }, 
+ *  "username": "tomer arnon", 
 	"role" : "PLAYER",
 	"avatar": ";-)"
 	
@@ -23,11 +20,11 @@ import acs.rest.utils.UserNameBoundray;
 public class UserNewDetails {
 
 	private String email;
-	private UserNameBoundray username;
+	private String username;
 	private UserRole role;
 	private String avatar;
 
-	public UserNewDetails(String email, UserNameBoundray username, UserRole role, String avatar) {
+	public UserNewDetails(String email, String username, UserRole role, String avatar) {
 		super();
 		setEmail(email);
 		setUsername(username);
@@ -49,11 +46,11 @@ public class UserNewDetails {
 
 	}
 
-	public UserNameBoundray getUsername() {
+	public String getUsername() {
 		return username;
 	}
 
-	public void setUsername(UserNameBoundray username) {
+	public void setUsername(String username) {
 		this.username = username;
 	}
 
