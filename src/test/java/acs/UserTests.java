@@ -95,7 +95,7 @@ public class UserTests {
 					input, 
 					UserBoundary.class);
 		
-		// THEN the server returns status 2xx 
+		// THEN the server returns status 2xx,  
 		// AND retrieves a user with same email as sent to server
 		if (!(output.getUserId().getEmail().equals(input.getEmail()))) {
 			throw new Exception("expected simplar message to input but received: " + output.getUserId().getEmail());
