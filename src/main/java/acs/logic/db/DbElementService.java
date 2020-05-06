@@ -15,6 +15,7 @@ import acs.dal.ElementDao;
 import acs.data.*;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
+import acs.data.elements.LocationEntity;
 import acs.logic.EntityNotFoundException;
 import acs.logic.element.ElementConverter;
 import acs.logic.element.ElementService;
@@ -106,8 +107,21 @@ public class DbElementService implements ExtendedElementService {
 			entity.setActive(false);
 		}
 		
-		entity.setLocation(update.getLocation());
-		
+		if (update.getLocation() != null) {
+			
+			LocationEntity locationEntity = new LocationEntity();
+			
+			if(update.getLocation().getLat() != null) {
+				locationEntity.setLat(update.getLocation().getLat());
+			}
+						
+			if(update.getLocation().getLng() != null) {
+				locationEntity.setLng(update.getLocation().getLng());
+			}
+			
+			entity.setLocation(locationEntity);
+		} 
+
 		entity.setElementAttribues(update.getElementAttribues());
 		
 		update = this.converter.fromEntity(entity);

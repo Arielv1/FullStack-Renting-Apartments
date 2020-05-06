@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import acs.data.*;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
+import acs.data.elements.LocationEntity;
 import acs.rest.element.boundaries.ElementBoundary;
 
 
@@ -96,7 +97,19 @@ public class ElementServiceMockup implements ElementService {
 			entity.setActive(false);
 		}
 		
-		entity.setLocation(update.getLocation());
+		if(update.getLocation() != null) {
+			
+			try {
+				LocationEntity locationToUpdate = new LocationEntity();
+				locationToUpdate.setLat(update.getLocation().getLat());
+				locationToUpdate.setLng(update.getLocation().getLng());
+				entity.setLocation(locationToUpdate);
+			}
+			catch (Exception e) {
+				
+			}
+				
+		}
 		
 		entity.setElementAttribues(update.getElementAttribues());
 		

@@ -63,8 +63,8 @@ public class ActionTests {
 		// WHEN I POST /acs/actions AND send action boundary
 
 		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "Type",
-				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
-				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
+				new ActionElementBoundary(new IdBoundary("ofir", "78")), new Date(),
+				new InvokedByBoundary(new UserIdBoundary("ofir", "ofirco26@gmail.com")), null);
 
 		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
 
@@ -83,8 +83,8 @@ public class ActionTests {
 		// WHEN I POST /acs/actions AND send action boundary
 
 		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "Type",
-				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
-				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
+				new ActionElementBoundary(new IdBoundary("ofir", "78")), new Date(),
+				new InvokedByBoundary(new UserIdBoundary("ofir", "ofirco26@gmail.com")), null);
 
 		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
 
@@ -104,8 +104,8 @@ public class ActionTests {
 		// WHEN I POST /samples AND send a Action boundary
 
 		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "update",
-				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
-				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
+				new ActionElementBoundary(new IdBoundary("ofir", "54")), new Date(),
+				new InvokedByBoundary(new UserIdBoundary("ofir", "ofirco26@gmail.com")), null);
 
 		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
 
@@ -124,8 +124,8 @@ public class ActionTests {
 		// WHEN I POST /samples AND send a Action boundary
 
 		ActionBoundary input = new ActionBoundary(new IdBoundary("ofir", null), "update",
-				new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
-				new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null);
+				new ActionElementBoundary(new IdBoundary("ofir", "54")), new Date(),
+				new InvokedByBoundary(new UserIdBoundary("ofir", "ofirco26@gmail.com")), null);
 
 		ActionBoundary output = this.restTemplate.postForObject(this.url, input, ActionBoundary.class);
 
@@ -148,8 +148,8 @@ public class ActionTests {
 				.mapToObj(n -> "Object #" + n) // Stream<Strings> to Stream <Objects>
 				.map(current -> 				// Initialize each object 
 				new ActionBoundary (new IdBoundary("ofir", null), "update",
-						new ActionElementBoundary(new IdBoundary("ofir", null)), new Date(),
-						new InvokedByBoundary(new UserIdBoundary("ofir", " ")), null))
+						new ActionElementBoundary(new IdBoundary("ofir", "43")), new Date(),
+						new InvokedByBoundary(new UserIdBoundary("ofir", "ofirco26@gmail.com")), null))
 				.map(boundary -> //Invoke POST for each object
 					this.restTemplate.postForObject(this.url, 
 													boundary,
