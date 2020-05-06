@@ -53,7 +53,7 @@ public class ElementEntity {
 	private boolean active;	
 	private Date createdTimestamp;
 	private CreatedByEntity createdBy;
-	private Map <String, Double> location; 
+	private LocationEntity location; 
 	private Map <String, Object> elementAttribues;
 	
 	private ElementEntity parent;
@@ -66,7 +66,7 @@ public class ElementEntity {
 
 
 	public ElementEntity(ElementIdEntity elementId, String type, String name, boolean active, Date createdTimestamp,
-			CreatedByEntity createdBy, Map<String, Double> location, Map<String, Object> elementAttribues) {
+			CreatedByEntity createdBy, LocationEntity location, Map<String, Object> elementAttribues) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -137,14 +137,13 @@ public class ElementEntity {
 		this.createdBy = createdBy;
 	}
 
-	@Convert(converter = MapToJsonConverter.class)
-	@Lob
-	public Map<String, Double> getLocation() {
+	@Embedded
+	public LocationEntity getLocation() {
 		return location;
 	}
 
 	
-	public void setLocation(Map<String, Double> location) {
+	public void setLocation(LocationEntity location) {
 		this.location = location;
 	}
 
