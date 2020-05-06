@@ -6,8 +6,10 @@ import org.springframework.stereotype.Component;
 import acs.data.ElementIdEntity;
 import acs.data.UserIdEntity;
 import acs.data.elements.ElementEntity;
+import acs.data.elements.LocationEntity;
 import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
+import acs.rest.element.boundaries.LocationBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
 
@@ -39,6 +41,7 @@ public class ElementConverter {
 		IdBoundary elementIdBoundary = new IdBoundary();
 		CreatedByBoundary createdByBoundary = new CreatedByBoundary();
 		UserIdBoundary userIdBoundary = new UserIdBoundary();
+		LocationBoundary locationBoundary = new LocationBoundary();
 		
 		if (entity.getElementId() != null) {
 			elementIdBoundary.setDomain(entity.getElementId().getDomain());
@@ -58,13 +61,23 @@ public class ElementConverter {
 			createdByBoundary = null;
 		}
 		
+		if(entity.getLocation() != null) {
+			locationBoundary.setLat(entity.getLocation().getLat());
+			locationBoundary.setLng(entity.getLocation().getLng());
+		}
+		else {
+			//locationBoundary.setLat(0.0);
+			//locationBoundary.setLng(0.0);
+		}
+		
+		
 		return new ElementBoundary(elementIdBoundary,
-				entity.getType().toString(),
+				entity.getType(),
 				entity.getName(),
 				entity.getActive(),
 				entity.getCreatedTimestamp(),
 				createdByBoundary,
-				entity.getLocation(),
+				locationBoundary,
 				entity.getElementAttribues());
 	}
 	
@@ -113,7 +126,30 @@ public class ElementConverter {
 			entity.setCreatedBy(null);
 		}
 		
-		entity.setLocation(boundary.getLocation());
+		if (boundary.getLocation() != null) {
+			
+			LocationEntity locationEntity = new LocationEntity();
+			
+			if(boundary.getLocation().getLat() == null) {
+				locationEntity.setLat(0);
+			}
+			else {
+				locationEntity.setLat(boundary.getLocation().getLat());
+			}
+			
+			if(boundary.getLocation().getLng() == null) {
+				locationEntity.setLng(0);
+			}
+			else {
+				locationEntity.setLng(boundary.getLocation().getLng());
+			}
+			
+			entity.setLocation(locationEntity);
+		} 
+		else {
+			//TODO default location - subject to change
+			entity.setLocation(new LocationEntity(0, 0));
+		}
 		
 		entity.setElementAttribues(boundary.getElementAttribues());
 		
