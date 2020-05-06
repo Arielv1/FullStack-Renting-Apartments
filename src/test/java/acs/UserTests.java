@@ -111,7 +111,7 @@ public class UserTests {
 	public void testPostNewUserAndValidateTheDatabseContainsUserWithTheSameIdAndName() throws Exception {
 		// GIVEN server is up
 		
-		// WHEN I POST /samples AND send a user boundary
+		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
 				new UserNameBoundray("tomer", "test"), UserRole.ADMIN, ";[");
 		
