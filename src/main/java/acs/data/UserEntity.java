@@ -26,9 +26,10 @@ import acs.data.UserRole;
 @javax.persistence.Entity
 @Table(name = "USERS")
 public class UserEntity {
+	
 	private UserIdEntity userId;
-	private String username;
 	private UserRole role;
+	private String username;
 	private String avatar;
 
 	public UserEntity() {

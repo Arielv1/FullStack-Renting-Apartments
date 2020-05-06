@@ -14,8 +14,8 @@ public class UserConvertor {
 	public UserBoundary fromEntity(UserEntity entity) {
 		UserBoundary boundray;
 		UserIdBoundary userId = new UserIdBoundary(entity.getUserId().getDomain(), entity.getUserId().getEmail());
-		 boundray = new UserBoundary(userId, entity.getUsername(), 
-				entity.getRole(), entity.getAvatar());
+		 boundray = new UserBoundary(userId, entity.getRole(), entity.getUsername(), 
+				 entity.getAvatar());
 		
 		return boundray;
 		

@@ -19,15 +19,15 @@ import acs.rest.utils.UserIdBoundary;
 
 public class UserBoundary {
 	private UserIdBoundary userId;
-	private String username;
 	private UserRole role;
+	private String username;
 	private String avatar;
 
 	public UserBoundary() {
 
 	}
 
-	public UserBoundary(UserIdBoundary userId,  String username, UserRole role, String avatar) {
+	public UserBoundary(UserIdBoundary userId, UserRole role, String username, String avatar) {
 		super();
 		setUserId(userId);
 		setUserName(username);

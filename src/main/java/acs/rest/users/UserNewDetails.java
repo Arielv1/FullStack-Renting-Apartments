@@ -20,15 +20,15 @@ import acs.data.UserRole;
 public class UserNewDetails {
 
 	private String email;
-	private String username;
 	private UserRole role;
+	private String username;
 	private String avatar;
 
-	public UserNewDetails(String email, String username, UserRole role, String avatar) {
+	public UserNewDetails(String email, UserRole role, String username,  String avatar) {
 		super();
 		setEmail(email);
-		setUsername(username);
 		setRole(role);
+		setUsername(username);
 		setAvatar(avatar);
 	}
 

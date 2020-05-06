@@ -105,7 +105,7 @@ public class AdminTests {
 //				UserRole.PLAYER,
 //				":0");
 		UserNewDetails userInput = new UserNewDetails("tomer32@gmail.com", 
-				"tomer test", UserRole.ADMIN, ";[");
+				UserRole.ADMIN, "tomer test",  ";[");
 		
 		UserBoundary user = this.restTemplate.postForObject(this.url + CREATE_USER, userInput , UserBoundary.class);
 
@@ -166,7 +166,7 @@ public class AdminTests {
 //				UserRole.PLAYER,
 //				":0");
 		UserNewDetails userInput = new UserNewDetails("tomer32@gmail.com", 
-		"tomer test", UserRole.ADMIN, ";[");
+				UserRole.ADMIN, "tomer test",  ";[");
 		UserBoundary user = this.restTemplate.postForObject(this.url + CREATE_USER,userInput , UserBoundary.class);
 		
 		// When i get all Users

@@ -1,7 +1,6 @@
 package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.annotation.PostConstruct;
 
@@ -65,7 +64,7 @@ public class UserTests {
 		
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
-				"tomer test", UserRole.ADMIN, ";[");
+				UserRole.ADMIN, "tomer test",  ";[");
 		
 		UserBoundary output = 
 		  this.restTemplate
@@ -87,7 +86,7 @@ public class UserTests {
 		
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails("tomer32@gmail.com", 
-				"tomer test", UserRole.ADMIN, ";[");
+				UserRole.ADMIN, "tomer test",  ";[");
 		
 		UserBoundary output = 
 		  this.restTemplate
@@ -110,7 +109,7 @@ public class UserTests {
 		
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails( "tomer32@gmail.com", 
-				"tomer test", UserRole.ADMIN, ";[");
+				UserRole.ADMIN, "tomer test",  ";[");
 		
 		UserBoundary userPost =  this.restTemplate
 			.postForObject(
@@ -139,8 +138,8 @@ public class UserTests {
 		// GIVEN server is up
 		
 		// WHEN I POST /samples AND send a message boundary
-		UserNewDetails input = new UserNewDetails("test23@gmail.com", "testy test", 
-				UserRole.MANAGER, ";=}");
+		UserNewDetails input = new UserNewDetails("test23@gmail.com", UserRole.MANAGER, "testy test", 
+				 ";=}");
 		
 		UserBoundary userPost = this.restTemplate
 			.postForObject(
@@ -170,8 +169,8 @@ public class UserTests {
 	public void testUpdateUserDetsilsActuallyUpdateDatabse() throws Exception{
 		// GIVEN the server is up AND the database contains a message
 		
-		UserNewDetails input = new UserNewDetails("test23@gmail.com", "testy test", 
-				UserRole.MANAGER, ";=}");
+		UserNewDetails input = new UserNewDetails("test23@gmail.com", UserRole.MANAGER, "testy test", 
+				 ";=}");
 		
 		
 		UserBoundary inputUser = this.restTemplate.postForObject(this.url, input, UserBoundary.class);
