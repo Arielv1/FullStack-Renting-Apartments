@@ -18,6 +18,7 @@ import acs.rest.utils.IdBoundary;
  		"elementId":{
  			"domain":"2020b.demo",
  			"id":"54"
+ 			}
  	},
  	"createdTimestamp":"2020-03-01T15:03:55.121+0000",
  	"invokedBy":{
@@ -41,15 +42,14 @@ public class ActionBoundary {
 	private ActionElementBoundary element;
 	private Date createdTimestamp;
 	private InvokedByBoundary invokedBy;
-	private Map <String, Object> actionAttributes;
+	private Map<String, Object> actionAttributes;
 
-	
 	public ActionBoundary() {
 
 	}
 
 	public ActionBoundary(IdBoundary actionId, String type, ActionElementBoundary element, Date createdTimestamp,
-			InvokedByBoundary invokedBy,Map <String, Object> actionAttributes) {
+			InvokedByBoundary invokedBy, Map<String, Object> actionAttributes) {
 		super();
 		this.actionId = actionId;
 		this.type = type;
@@ -109,9 +109,8 @@ public class ActionBoundary {
 
 	@Override
 	public String toString() {
-		return "ActionBoundary [actionId=" + actionId + ", type=" + type + ", element=" + element
-				+ ", createdTimestamp=" + createdTimestamp + ", invokedBy=" + invokedBy + ", actionAttributes="
-				+ actionAttributes + "]";
+		return "ActionBoundary [actionId=" + actionId + ",type=" + type + ",element=" + element + ",createdTimestamp="
+				+ createdTimestamp + ",invokedBy=" + invokedBy + ",actionAttributes=" + actionAttributes + "]";
 	}
 
 }

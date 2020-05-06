@@ -51,16 +51,6 @@ public class ActionConverter {
 	public ActionEntity toEntity(ActionBoundary boundary) {
 		ActionEntity entity = new ActionEntity();
 
-		if (boundary.getActionId() != null) {
-			ActionIdEntity actionIdEntity = new ActionIdEntity();
-			actionIdEntity.setDomain(boundary.getActionId().getDomain());
-			actionIdEntity.setId(boundary.getActionId().getId());
-			entity.setActionId(actionIdEntity);
-		} else {
-			throw new RuntimeException("ActionBoundary invalid id");
-			// create default action id 
-		}
-
 		if (boundary.getType() != null) {
 			entity.setType(boundary.getType());
 		} else {

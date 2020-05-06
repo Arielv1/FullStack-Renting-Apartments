@@ -34,11 +34,13 @@ public class DbActionService implements ActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private ActionConverter converter;
+	private ValidEmail valid;
 
 	@Autowired
-	public DbActionService(ActionDao actionDao, ActionConverter converter) {
+	public DbActionService(ActionDao actionDao, ActionConverter converter, ValidEmail valid) {
 		this.actionDao = actionDao;
 		this.converter = converter;
+		this.valid = valid;
 	}
 
 	// inject value from configuration or use default value
@@ -56,8 +58,11 @@ public class DbActionService implements ActionService {
 	@Override
 	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
-		if (action.getType() == null) {
+		if(action.getType() == null) {
 			throw new RuntimeException("Type can not be null");
+		}
+		if (!valid.isEmailVaild(action.getInvokedBy().getUserId().getEmail())) {
+			throw new RuntimeException("Invalid Email");
 		}
 
 		String id = UUID.randomUUID().toString();
