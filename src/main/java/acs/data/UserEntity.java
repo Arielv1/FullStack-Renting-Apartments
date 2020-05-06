@@ -27,15 +27,15 @@ import acs.data.UserRole;
 @Table(name = "USERS")
 public class UserEntity {
 	private UserIdEntity userId;
-	private String avatar;
-	private UserNameEntity username;
+	private String username;
 	private UserRole role;
+	private String avatar;
 
 	public UserEntity() {
 
 	}
 
-	public UserEntity(UserIdEntity userId,  UserNameEntity username, UserRole role, String avatar) {
+	public UserEntity(UserIdEntity userId,  String username, UserRole role, String avatar) {
 		super();
 		this.userId = userId;
 		this.username = username;
@@ -61,12 +61,12 @@ public class UserEntity {
 		this.avatar = avatar;
 	}
 
-	@Embedded
-	public UserNameEntity getUsername() {
+	//@Embedded
+	public String getUsername() {
 		return username;
 	}
 
-	public void setUsername(UserNameEntity username) {
+	public void setUsername(String username) {
 		this.username = username;
 	}
 
