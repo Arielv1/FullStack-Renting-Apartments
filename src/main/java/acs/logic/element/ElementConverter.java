@@ -130,19 +130,15 @@ public class ElementConverter {
 			
 			LocationEntity locationEntity = new LocationEntity();
 			
-			if(boundary.getLocation().getLat() == null) {
-				locationEntity.setLat(0);
-			}
-			else {
+			if(boundary.getLocation().getLat() != null) {
 				locationEntity.setLat(boundary.getLocation().getLat());
 			}
+		
 			
-			if(boundary.getLocation().getLng() == null) {
-				locationEntity.setLng(0);
-			}
-			else {
+			if(boundary.getLocation().getLng() != null) {
 				locationEntity.setLng(boundary.getLocation().getLng());
 			}
+
 			
 			entity.setLocation(locationEntity);
 		} 

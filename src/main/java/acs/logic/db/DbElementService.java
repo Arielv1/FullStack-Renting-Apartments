@@ -9,10 +9,11 @@ import java.util.stream.StreamSupport;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ElementDao;
-import acs.data.*;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
 import acs.data.elements.LocationEntity;
@@ -20,7 +21,6 @@ import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserIdEntity;
 import acs.logic.EntityNotFoundException;
 import acs.logic.element.ElementConverter;
-import acs.logic.element.ElementService;
 import acs.logic.element.ExtendedElementService;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
@@ -138,6 +138,17 @@ public class DbElementService implements ExtendedElementService {
 				.map(this.converter :: fromEntity)
 				.collect(Collectors.toList());
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> getAll(String userDomain, String userEmail,int page, int size) {
+		return this.elementDao.findAll(
+				PageRequest.of(page, size, Direction.ASC, "elementId")) // paginate according to page and size
+				.getContent() 	//List<ElementEntity>
+				.stream() 	// Stream<ElementEntity>
+				.map(this.converter::fromEntity)	 //Stream<ElementBoundary>
+				.collect(Collectors.toList());
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -147,7 +158,7 @@ public class DbElementService implements ExtendedElementService {
 	
 		return this.converter.fromEntity(
 				  this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
-				 .orElseThrow(() -> new EntityNotFoundException("DB No Element With ID" + elementDomain + "!" + elementId))
+				 .orElseThrow(() -> new EntityNotFoundException("DB No Element With ID " + elementDomain + "!" + elementId))
 				 );
 	}
 	
@@ -172,7 +183,7 @@ public class DbElementService implements ExtendedElementService {
 								.orElseThrow(() -> new EntityNotFoundException("DB No Parent With ID" + elementDomain + "!" + elementId));
 		
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(childId.getDomain(), childId.getId()))
-								.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID" + elementDomain + "!" + elementId));
+								.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID" + childId.getDomain() + "!" + childId.getId()));
 		
 		if(parent.getElementId().equals(child.getElementId())) {
 			throw new RuntimeException("Parent and Child share Id - Cannot Bind Element To Itself");
@@ -181,34 +192,71 @@ public class DbElementService implements ExtendedElementService {
 		parent.addChild(child);
 		this.elementDao.save(parent);
 	}
-
+		
+		// Get all children elements from parentId
 	@Override
 	@Transactional(readOnly = true)
-	public Set<ElementBoundary> getChildren(String userDomain, String userEmail, String elementDomain , String elementId) {
+	public Set<ElementBoundary> getChildren(String userDomain, String userEmail, String elementDomain , String elementId, int page,int size) {
 		
-		ElementEntity parent = this.elementDao.findById(new ElementIdEntity (elementDomain , elementId))
-								.orElseThrow(() -> new EntityNotFoundException("DB No Parent With ID" + elementDomain + "!" + elementId));
+		ElementEntity parent = this.elementDao.findById(new ElementIdEntity (elementDomain, elementId))
+		.orElseThrow(() -> new EntityNotFoundException("DB No Parent With ID" + elementDomain + "!" + elementId));
 		
-		
-		return parent.getChildren()
-					.stream()
-					.map(this.converter::fromEntity)
-					.collect(Collectors.toSet());
+		List <ElementEntity> children = this.elementDao.findAllChildrenByParent_ElementId(parent.getElementId(),
+																		   PageRequest.of(page, size,Direction.ASC, "elementId"));
+	
+		return children.stream()
+				.map(this.converter::fromEntity)
+				.collect(Collectors.toSet());
 	}
-
+		
+		// Get parent elemnt from childId
 	@Override
 	@Transactional(readOnly = true)
-	public ElementBoundary getParent(String userDomain, String userEmail, String elementDomain , String elementId) {
+	public Set<ElementBoundary> getParent(String userDomain, String userEmail, String elementDomain , String elementId, int page,int size) {
 		
 		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain , elementId))
-				.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID" + elementDomain + "!" + elementId));
+				.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID " + elementDomain + "!" + elementId));
 		
-		if(child.getParent() != null) {
-			return this.converter.fromEntity(child.getParent());
-		}
-		else {
-			return null;
-		}
+		
+		return this.elementDao.findAllParentsByChildren_ElementId
+				(child.getElementId(), PageRequest.of(page, size, Direction.ASC, "elementId"))
+				.stream()
+				.map(this.converter::fromEntity)
+				.collect(Collectors.toSet());	
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> searchElementsByName(String userDomain, String userEmail, String name, int page, int size) {
+		
+		//TODO - check user role / email
+		
+		List <ElementEntity> results = this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.ASC, "elementId"));
+			
+		return results.stream()  // Stream <ElementEntity>
+				.map(this.converter::fromEntity)  // Stream <ElementBoundary>
+				.collect(Collectors.toList()); // List <ElementBoundary>
 		
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> searchElementsByType(String userDomain, String userEmail, String type, int page, int size) {
+		
+		//TODO - check user role / email
+		
+		List <ElementEntity> results = this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "elementId"));
+			
+		return results.stream()  // Stream <ElementEntity>
+				.map(this.converter::fromEntity)  // Stream <ElementBoundary>
+				.collect(Collectors.toList()); // List <ElementBoundary>
+	}
+
+	@Override
+	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng,
+			double distance, int page, int size) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }
