@@ -14,6 +14,7 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 			@Param("name") String name,
 			Pageable pageable); 
 	
+	// select * where type is ?
 	public List<ElementEntity> findAllByType(
 			@Param("type") String type,
 			Pageable pageable); 
@@ -25,5 +26,5 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 	public List<ElementEntity> findAllParentsByChildren_ElementId(
 			@Param("parentId") ElementIdEntity parentId, 
 			Pageable pageable); 
-	
+	 
 }
