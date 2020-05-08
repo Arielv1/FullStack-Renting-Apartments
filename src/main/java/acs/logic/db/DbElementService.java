@@ -253,10 +253,18 @@ public class DbElementService implements ExtendedElementService {
 	}
 
 	@Override
-	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng,
-			double distance, int page, int size) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	@Transactional(readOnly = true)
+//	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng,
+//			double distance, int page, int size) {
+	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat_start, double lat_end,
+	double lng_start,double lng_end, int page, int size) {
+		
+		
+		List <ElementEntity> results = this.elementDao.findAllBylocationLatBetweenAndLocationLngBetween(lat_start,lat_end,lng_start,lng_end, PageRequest.of(page, size, Direction.ASC, "elementId"));
+		
+		return results.stream()  // Stream <ElementEntity>
+				.map(this.converter::fromEntity)  // Stream <ElementBoundary>
+				.collect(Collectors.toList());	
+		}
 	
 }

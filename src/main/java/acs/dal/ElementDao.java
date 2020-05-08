@@ -7,7 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import acs.data.elements.ElementEntity;
-import acs.data.utils.ElementIdEntity;												
+import acs.data.utils.ElementIdEntity;											
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity>{
 	
 	public List<ElementEntity> findAllByName(
@@ -25,6 +25,15 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 	
 	public List<ElementEntity> findAllParentsByChildren_ElementId(
 			@Param("parentId") ElementIdEntity parentId, 
-			Pageable pageable); 
+			Pageable pageable);
+	
+	
+	// select * where lat+
+	public List<ElementEntity> findAllBylocationLatBetweenAndLocationLngBetween(
+			@Param("lat1") Double lat1,
+			@Param("lat2") Double lat2,
+			@Param("lng1") Double lng1,
+			@Param("lng2") Double lng2,
+			Pageable pageable);
 	 
 }

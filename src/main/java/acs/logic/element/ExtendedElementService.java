@@ -16,7 +16,10 @@ public interface ExtendedElementService extends ElementService{
 	public List<ElementBoundary> searchElementsByName(String userDomain, String userEmail, String name, int page, int size);
 	public List<ElementBoundary> searchElementsByType(String userDomain, String userEmail, String type, int page, int size);
 	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail,
-														  double lat, double lng, double distance , int page, int size);
+			  double lat_start, double lat_end, double lng_start ,double lng_end , int page, int size);
+
+//	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail,
+//														  double lat, double lng, double distance , int page, int size);
 	
 
 }
