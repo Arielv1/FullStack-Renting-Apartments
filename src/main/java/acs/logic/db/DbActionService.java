@@ -14,6 +14,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +28,12 @@ import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserIdEntity;
 import acs.logic.action.ActionConverter;
 import acs.logic.action.ActionService;
+import acs.logic.action.ExtendedActionService;
 import acs.rest.action.ActionBoundary;
 import acs.rest.utils.ValidEmail;
 
 @Service
-public class DbActionService implements ActionService {
+public class DbActionService implements ExtendedActionService {
 	private String projectName;
 	private ActionDao actionDao;
 	private ActionConverter converter;
@@ -91,6 +94,20 @@ public class DbActionService implements ActionService {
 				.map(this.converter::fromEntity)// Stream<ActionBoundary>
 				.collect(Collectors.toList()); // List<ActionBoundary>
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail, int page, int size) {
+		return this.actionDao.findAll(
+				// use pagination base on size & page and sort by ID in ascending order
+				PageRequest.of(page, size, Direction.ASC, "actionId"))
+				.getContent() // List<ActionEntity>
+				.stream() // Stream<ActionEntity>
+				.map(this.converter::fromEntity) //Stream <ActionBoundary>
+				.collect(Collectors.toList());
+	}
+
+	
 
 	@Override
 	@Transactional
