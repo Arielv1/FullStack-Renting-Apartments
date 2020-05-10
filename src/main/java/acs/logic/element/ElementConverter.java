@@ -78,7 +78,7 @@ public class ElementConverter {
 				entity.getCreatedTimestamp(),
 				createdByBoundary,
 				locationBoundary,
-				entity.getElementAttribues());
+				entity.getElementAttributes());
 	}
 	
 	public ElementEntity toEntity (ElementBoundary boundary) {
@@ -147,7 +147,7 @@ public class ElementConverter {
 			entity.setLocation(new LocationEntity(0, 0));
 		}
 		
-		entity.setElementAttribues(boundary.getElementAttribues());
+		entity.setElementAttributes(boundary.getElementAttributes());
 		
 		return entity;
 	}

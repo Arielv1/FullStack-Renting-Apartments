@@ -113,7 +113,7 @@ public class ElementServiceMockup implements ElementService {
 				
 		}
 		
-		entity.setElementAttribues(update.getElementAttribues());
+		entity.setElementAttributes(update.getElementAttributes());
 		
 		update = this.converter.fromEntity(entity);
 		

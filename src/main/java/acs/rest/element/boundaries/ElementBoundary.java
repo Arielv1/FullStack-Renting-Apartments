@@ -23,7 +23,7 @@ import acs.rest.utils.IdBoundary;
     "location": {
         "lat": "00.00"
     },
-    "elementAttribues": {
+    "elementAttributes": {
         "demoAttribute": "demoValue"
     }
  */
@@ -35,7 +35,7 @@ public class ElementBoundary {
 	private Date createdTimestamp;
 	private CreatedByBoundary createdBy;
 	private LocationBoundary location; 
-	private Map <String, Object> elementAttribues;
+	private Map <String, Object> elementAttributes;
 	
 	
 	public ElementBoundary() {	
@@ -43,7 +43,7 @@ public class ElementBoundary {
 
 
 	public ElementBoundary(IdBoundary elementId, String type, String name, Boolean active, Date createdTimestamp,
-			CreatedByBoundary createdBy,LocationBoundary location, Map<String, Object> elementAttribues) {
+			CreatedByBoundary createdBy,LocationBoundary location, Map<String, Object> elementAttributes) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -52,7 +52,7 @@ public class ElementBoundary {
 		this.createdTimestamp = createdTimestamp;
 		this.createdBy = createdBy;
 		this.location = location;
-		this.elementAttribues = elementAttribues;
+		this.elementAttributes = elementAttributes;
 	}
 
 
@@ -126,13 +126,13 @@ public class ElementBoundary {
 	}
 
 
-	public Map<String, Object> getElementAttribues() {
-		return elementAttribues;
+	public Map<String, Object> getElementAttributes() {
+		return elementAttributes;
 	}
 
 
-	public void setElementAttribues(Map<String, Object> elementAttribues) {
-		this.elementAttribues = elementAttribues;
+	public void setElementAttributes(Map<String, Object> elementAttributes) {
+		this.elementAttributes = elementAttributes;
 	}
 
 
@@ -140,7 +140,7 @@ public class ElementBoundary {
 	public String toString() {
 		return "ElementBoundary [elementId=" + elementId + ", type=" + type + ", name=" + name + ", active=" + active
 				+ ", createdTimestamp=" + createdTimestamp + ", createdBy=" + createdBy + ", location=" + location
-				+ ", elementAttribues=" + elementAttribues + "]";
+				+ ", elementAttributes=" + elementAttributes + "]";
 	}
 	
 	

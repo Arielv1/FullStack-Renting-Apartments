@@ -38,7 +38,7 @@ import acs.rest.element.boundaries.CreatedByBoundary;
     "location": {
         "lat": "00.00"
     },
-    "elementAttribues": {
+    "elementAttributes": {
         "demoAttribute": "demoValue"
     }
  */
@@ -54,7 +54,7 @@ public class ElementEntity {
 	private Date createdTimestamp;
 	private CreatedByEntity createdBy;
 	private LocationEntity location; 
-	private Map <String, Object> elementAttribues;
+	private Map <String, Object> elementAttributes;
 	
 	private ElementEntity parent;
 	private Set<ElementEntity> children;
@@ -66,7 +66,7 @@ public class ElementEntity {
 
 
 	public ElementEntity(ElementIdEntity elementId, String type, String name, boolean active, Date createdTimestamp,
-			CreatedByEntity createdBy, LocationEntity location, Map<String, Object> elementAttribues) {
+			CreatedByEntity createdBy, LocationEntity location, Map<String, Object> elementAttributes) {
 		super();
 		this.elementId = elementId;
 		this.type = type;
@@ -75,12 +75,11 @@ public class ElementEntity {
 		this.createdTimestamp = createdTimestamp;
 		this.createdBy = createdBy;
 		this.location = location;
-		this.elementAttribues = elementAttribues;
+		this.elementAttributes = elementAttributes;
 		this.children = new HashSet<>();
 	}
 	
-	@Id
-	@Embedded
+	@EmbeddedId
 	public ElementIdEntity getElementId() {
 		return elementId;
 	}
@@ -149,12 +148,12 @@ public class ElementEntity {
 
 	@Convert(converter = MapToJsonConverter.class)
 	@Lob
-	public Map<String, Object> getElementAttribues() {
-		return elementAttribues;
+	public Map<String, Object> getElementAttributes() {
+		return elementAttributes;
 	}
 
-	public void setElementAttribues(Map<String, Object> elementAttribues) {
-		this.elementAttribues = elementAttribues;
+	public void setElementAttributes(Map<String, Object> elementAttributes) {
+		this.elementAttributes = elementAttributes;
 	}
 	
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -185,7 +184,7 @@ public class ElementEntity {
 	public String toString() {
 		return "ElementBoundary [elementId=" + elementId + ", type=" + type + ", name=" + name + ", active=" + active
 				+ ", createdTimestamp=" + createdTimestamp + ", createdBy=" + createdBy + ", location=" + location
-				+ ", elementAttribues=" + elementAttribues + "]";
+				+ ", elementAttributes=" + elementAttributes + "]";
 	}
 
 }

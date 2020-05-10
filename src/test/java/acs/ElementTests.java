@@ -43,7 +43,6 @@ public class ElementTests {
 	private final static String POST_URL = "elements/{managerDomain}/{managerEmail}/";
 	private final static String UPDATE_URL = "elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}";
 	
-	
 	// TODO - change url when delete is implemented
 	private final static String DELETE_ALL_URL =  "admin/elements/TestAdminDomain/adminEmail@gmail.com/";
 	
@@ -134,7 +133,7 @@ public class ElementTests {
 																ElementBoundary.class,
 																"userTestDomain", "userTestEmail@gmail.com");
 		
-		assertThat(resultElementObject.getElementAttribues().equals(newElementObject.getElementAttribues()));
+		assertThat(resultElementObject.getElementAttributes().equals(newElementObject.getElementAttributes()));
 	}
 	
 	@Test
@@ -540,6 +539,65 @@ public class ElementTests {
 		//assertThat(allParents[0].getElementId().getId()).isEqualTo(parent2.getElementId().getId());
 		
 		assertThat(allParents[0]).usingRecursiveComparison().isEqualTo(parent2);
+		
+	}
+	
+	
+	@Test
+	public void testCreateThreeElementsOneWithSpecialNameInvokeSearchByNameAndConfirmThatOnlyOneReturned() throws Exception{
+		
+		List <ElementBoundary> dbContent = IntStream.range(0, 5) //Stream <Integer> with size of 5 (0,1,2,3,4)
+		.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
+		.map(current -> 				// Initialize each object 
+		new ElementBoundary (null,
+							"INFO", 
+							"Name #" + current, 
+							 true,
+							new Date(), 
+							null, 
+							null,
+							null))
+		.map(boundary -> //Invoke POST for each object
+			this.restTemplate.postForObject(this.url + POST_URL, 
+											boundary,
+											ElementBoundary.class,
+											"managerDomain","managerTestDomain@gmail.com"))
+		.collect(Collectors.toList());
+							
+		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL + "search/byName/{name}", 
+																ElementBoundary[].class,
+																"userEmail", "userDomain", "Name #2");
+		
+		assertThat(result).hasSize(1);
+		
+	}
+	
+	@Test
+	public void testCreateThreeElementsOneWithSpecialTypeInvokeSearchByNameAndConfirmThatOnlyOneReturned() throws Exception{
+		
+		List <ElementBoundary> dbContent = IntStream.range(0, 5) //Stream <Integer> with size of 5 (0,1,2,3,4)
+		.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
+		.map(current -> 				// Initialize each object 
+		new ElementBoundary (null,
+							"INFO #"  + current, 
+							"NAME", 
+							 true,
+							new Date(), 
+							null, 
+							null,
+							null))
+		.map(boundary -> //Invoke POST for each object
+			this.restTemplate.postForObject(this.url + POST_URL, 
+											boundary,
+											ElementBoundary.class,
+											"managerDomain","managerTestDomain@gmail.com"))
+		.collect(Collectors.toList());
+							
+		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL + "search/byType/{name}", 
+																ElementBoundary[].class,
+																"userEmail", "userDomain", "INFO #2");
+		
+		assertThat(result).hasSize(1);
 		
 	}
 	

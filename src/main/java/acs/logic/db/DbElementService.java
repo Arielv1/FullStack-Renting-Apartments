@@ -9,9 +9,11 @@ import java.util.stream.StreamSupport;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ElementDao;
 import acs.data.elements.CreatedByEntity;
@@ -25,8 +27,9 @@ import acs.logic.element.ExtendedElementService;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.ValidEmail;
+@Configuration
+@EnableTransactionManagement
 
-@Service
 public class DbElementService implements ExtendedElementService {
 
 	private String projectName;
@@ -120,7 +123,7 @@ public class DbElementService implements ExtendedElementService {
 			entity.setLocation(locationEntity);
 		} 
 
-		entity.setElementAttribues(update.getElementAttribues());
+		entity.setElementAttributes(update.getElementAttributes());
 		
 		update = this.converter.fromEntity(entity);
 		
@@ -256,9 +259,12 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 //	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng,
 //			double distance, int page, int size) {
-	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat_start, double lat_end,
-	double lng_start,double lng_end, int page, int size) {
+	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng, double distance , int page, int size) {
 		
+		double lat_start = lat -distance;
+		double lat_end = lat +distance;
+		double lng_start = lng -distance; 
+		double lng_end = lng +distance;
 		
 		List <ElementEntity> results = this.elementDao.findAllBylocationLatBetweenAndLocationLngBetween(lat_start,lat_end,lng_start,lng_end, PageRequest.of(page, size, Direction.ASC, "elementId"));
 		

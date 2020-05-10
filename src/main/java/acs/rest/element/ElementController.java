@@ -169,7 +169,7 @@ public class ElementController {
 	}
 	
 	
-		// TODO - Get all elements , filtered by distance from lat and lng - TODO 
+		// Get all elements , filtered by distance from lat and lng 
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/search/near/{lat}/{lng}/{distance}",
 			method = RequestMethod.GET,		
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -179,19 +179,11 @@ public class ElementController {
 										   @PathVariable("lat") Double lat,  @PathVariable("lng") Double lng,
 										   @PathVariable("distance") Double distance){
 		
-		System.err.println("\n" + lat + " " + lng + " " + distance);
-		
 		varifyPageAndSize(page, size);
-		double lat_start = lat -distance;
-		double lat_end = lat +distance;
-		double lng_start = lng -distance; 
-		double lng_end = lng +distance;
-		System.err.println("\n" + lat_start + " " + lat_end + " " + lng_start + " " + lng_end);
-
-		return this.elementService.searchElementsByLocation(userDomain, userEmail, lat_start, lat_end, lng_start,lng_end, page, size)
+		
+		return this.elementService.searchElementsByLocation(userDomain, userEmail, lat, lng, distance, page, size)
 				.stream().toArray(i -> new ElementBoundary[i]);
-//		return this.elementService.searchElementsByLocation(userDomain, userEmail, lat, lng, distance, page, size)
-//				.stream().toArray(i -> new ElementBoundary[i]);
+
 	}
 	
 }
