@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ElementDao;
+import acs.dal.UserDao;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
 import acs.data.elements.LocationEntity;
@@ -27,13 +28,15 @@ import acs.logic.element.ExtendedElementService;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.ValidEmail;
-@Configuration
-@EnableTransactionManagement
 
+@Service
 public class DbElementService implements ExtendedElementService {
 
 	private String projectName;
+	
 	private ElementDao elementDao;
+	private UserDao userDao;
+	
 	private ElementConverter converter;
 	private ValidEmail valid;
 	
@@ -43,9 +46,10 @@ public class DbElementService implements ExtendedElementService {
 	}
 	
 	@Autowired
-	public DbElementService(ElementDao elementDao, ElementConverter converter, ValidEmail valid) {
+	public DbElementService(ElementDao elementDao, UserDao userDao, ElementConverter converter, ValidEmail valid) {
 		this.converter = converter;
 		this.elementDao = elementDao;
+		this.userDao = userDao;
 		this.valid = valid;
 	}
 	
@@ -59,6 +63,9 @@ public class DbElementService implements ExtendedElementService {
 	@Override
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary element) {
+		
+		
+		System.err.println(this.userDao.findAll());
 		
 		if (!valid.isEmailVaild(managerEmail)) {
 			throw new RuntimeException("Element Post - Invalid Manager Email");
