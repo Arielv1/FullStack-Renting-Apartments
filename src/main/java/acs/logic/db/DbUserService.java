@@ -10,19 +10,21 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import acs.dal.UserDao;
 import acs.data.users.UserEntity;
 import acs.data.utils.UserIdEntity;
+import acs.logic.user.ExtentedUserService;
 import acs.logic.user.UserConvertor;
-import acs.logic.user.UserService;
 import acs.rest.users.UserBoundary;
 import acs.rest.utils.UserIdBoundary;
 import acs.rest.utils.ValidEmail;
 
 @Service
-public class DbUserService implements UserService {
+public class DbUserService implements ExtentedUserService {
 
 	private String projectName;
 	private UserDao userDao;
@@ -144,6 +146,22 @@ public class DbUserService implements UserService {
 						.collect(Collectors.toList());
 
 	}
+	
+	@Override
+	@Transactional
+	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail, int page, int size) {
+		
+		if (!valid.isEmailVaild(adminEmail)) {
+			throw new RuntimeException("Email invalid");
+		}
+		return this.userDao.findAll(
+				// use pagination base on size & page and sort by ID in 
+				PageRequest.of(page, size, Direction.ASC, "userId"))
+				.getContent() // List<userBoudary>
+				.stream() // Stream<userBoudary>
+				.map(this.convertor::fromEntity) //Stream <userBoudary>
+				.collect(Collectors.toList());
+	}
 
 	@Override
 	@Transactional
@@ -170,5 +188,9 @@ public class DbUserService implements UserService {
 		 */
 
 	}
+
+
+
+	
 
 }

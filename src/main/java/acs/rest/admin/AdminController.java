@@ -14,6 +14,7 @@ import acs.logic.db.DbActionService;
 import acs.logic.db.DbElementService;
 import acs.logic.db.DbUserService;
 import acs.logic.element.ElementService;
+import acs.logic.user.ExtentedUserService;
 import acs.logic.user.UserService;
 import acs.rest.action.ActionBoundary;
 import acs.rest.users.UserBoundary;
@@ -25,16 +26,15 @@ import acs.rest.users.UserBoundary;
 public class AdminController {
 
 	// ask if should i change to extended Element service
-	private UserService userService;
+	private ExtentedUserService dbUserService;
 	private ElementService dbElementeService;
 //	private ActionService actionService;
-
 	private ExtendedActionService actionService;
 
 	@Autowired
-	public AdminController(UserService userService, ElementService dbElementeService,
+	public AdminController(ExtentedUserService dbUserService, ElementService dbElementeService,
 			ExtendedActionService actionService) {
-		this.userService = userService;
+		this.dbUserService = dbUserService;
 		this.dbElementeService = dbElementeService;
 		this.actionService = actionService;
 	}
@@ -46,7 +46,7 @@ public class AdminController {
 			@PathVariable("adminEmail") String adminEmail
 
 	) {
-		this.userService.deleteAllUsers(adminDomain, adminEmail);
+		this.dbUserService.deleteAllUsers(adminDomain, adminEmail);
 
 	}
 
@@ -70,10 +70,18 @@ public class AdminController {
 //	 Export all users
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
-	public UserBoundary[] exports_AllUsers(@PathVariable("adminDomain") String adminDomain,
+	public UserBoundary[] exports_AllUsers(@RequestParam(name = "size", required = false, defaultValue = "10") int size,
+			@RequestParam(name = "page", required = false, defaultValue = "10") int page, 
+			@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
+		if(size <= 0) {
+			throw new RuntimeException("Page size must be positive");
+		}
+		if(page < 0) {
+			throw new RuntimeException("Page number must be zero or higher");
+		}
+		return this.dbUserService.getAllUsers(adminDomain, adminEmail, page, size).toArray(new UserBoundary[0]);
 
-		return this.userService.getAllUsers(adminDomain, adminEmail).toArray(new UserBoundary[0]);
 	}
 
 	// Export all actions

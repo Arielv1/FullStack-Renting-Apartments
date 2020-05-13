@@ -10,5 +10,6 @@ public interface UserService {
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update);
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail);
 	public void deleteAllUsers(String adminDomain, String adminEmail);
+	
 
 }
