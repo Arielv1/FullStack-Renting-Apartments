@@ -27,6 +27,20 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 			@Param("parentId") ElementIdEntity parentId, 
 			Pageable pageable);
 	
+	public List<ElementEntity> findAllByActive(
+			@Param("active") boolean active, 
+			Pageable pageable);
+	
+	public List<ElementEntity> findAllByNameAndActive(
+			@Param("name") String name,
+			@Param("active") boolean active, 
+			Pageable pageable);
+	
+	public List<ElementEntity> findAllByTypeAndActive(
+			@Param("type") String name,
+			@Param("active") boolean active, 
+			Pageable pageable);
+	
 	
 	// select * where lat+
 	public List<ElementEntity> findAllBylocationLatBetweenAndLocationLngBetween(
@@ -34,6 +48,14 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 			@Param("lat2") Double lat2,
 			@Param("lng1") Double lng1,
 			@Param("lng2") Double lng2,
+			Pageable pageable);
+	
+	public List<ElementEntity> findAllBylocationLatBetweenAndLocationLngBetweenAndActive(
+			@Param("lat1") Double lat1,
+			@Param("lat2") Double lat2,
+			@Param("lng1") Double lng1,
+			@Param("lng2") Double lng2,
+			@Param("active") boolean active, 
 			Pageable pageable);
 	 
 }
