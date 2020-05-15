@@ -9,22 +9,24 @@ import java.util.stream.StreamSupport;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import acs.dal.ElementDao;
 import acs.dal.UserDao;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
 import acs.data.elements.LocationEntity;
+import acs.data.users.UserEntity;
 import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserIdEntity;
-import acs.logic.EntityNotFoundException;
+import acs.data.utils.UserRole;
 import acs.logic.element.ElementConverter;
 import acs.logic.element.ExtendedElementService;
+import acs.logic.exceptions.EntityNotFoundException;
+import acs.logic.exceptions.ForbiddenAccessException;
+import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.ValidEmail;
@@ -60,17 +62,26 @@ public class DbElementService implements ExtendedElementService {
 		
 	}
 	
+	private UserEntity retrieveUserFromDb (String domain, String email) {
+		return this.userDao.findById(new UserIdEntity (domain, email)).orElseThrow(
+				() -> new EntityNotFoundException("No User Exists With Domain " + domain + " Email " + email));
+	}
+	
+	private ElementEntity retrieveElementFromDb (String domain, String id) {
+		return this.elementDao.findById(new ElementIdEntity(domain, id)).orElseThrow(
+				() -> new EntityNotFoundException("DB No Element With Id " + domain + "!" + id));
+	}
+	
 	@Override
 	@Transactional
 	public ElementBoundary create(String managerDomain, String managerEmail, ElementBoundary element) {
 		
+		UserEntity manager = retrieveUserFromDb(managerDomain, managerEmail);
 		
-		System.err.println(this.userDao.findAll());
-		
-		if (!valid.isEmailVaild(managerEmail)) {
-			throw new RuntimeException("Element Post - Invalid Manager Email");
+		if (manager.getRole() == null || !manager.getRole().equals(UserRole.MANAGER)) {
+			throw new ForbiddenActionException("User Has No Permission To Create Elements");
 		}
-		
+				
 		ElementEntity entity = this.converter.toEntity(element);
 		
 		String id = UUID.randomUUID().toString();
@@ -90,10 +101,14 @@ public class DbElementService implements ExtendedElementService {
 	public ElementBoundary update(String managerDomain, String managerEmail, String elementDomain, String elementId,
 			ElementBoundary update) {
 		
-		ElementEntity entity = this.elementDao.findById(new ElementIdEntity(elementDomain, elementId)).orElseThrow(
-				() -> new EntityNotFoundException("DB No Element With Id " + elementDomain + "!" + elementId));
-	
-	
+		UserEntity manager = retrieveUserFromDb(managerDomain, managerEmail);
+		
+		if (manager.getRole() == null || !manager.getRole().equals(UserRole.MANAGER)) {
+			throw new ForbiddenActionException("User Has No Permission To Update Elements");
+		}
+		
+		ElementEntity entity = retrieveElementFromDb(elementDomain, elementId);
+		
 		if(update.getType() != null  && !update.getType().trim().isEmpty()) {
 			entity.setType(update.getType()); 
 		}
@@ -152,12 +167,28 @@ public class DbElementService implements ExtendedElementService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> getAll(String userDomain, String userEmail,int page, int size) {
-		return this.elementDao.findAll(
-				PageRequest.of(page, size, Direction.ASC, "elementId")) // paginate according to page and size
-				.getContent() 	//List<ElementEntity>
-				.stream() 	// Stream<ElementEntity>
-				.map(this.converter::fromEntity)	 //Stream<ElementBoundary>
-				.collect(Collectors.toList());
+		
+		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
+			
+		if(user.getRole().equals(UserRole.MANAGER)) {
+			return this.elementDao.findAll(
+					PageRequest.of(page, size, Direction.ASC, "elementId")) // paginate according to page and size
+					.getContent() 	//List<ElementEntity>
+					.stream() 	// Stream<ElementEntity>
+					.map(this.converter::fromEntity)	 //Stream<ElementBoundary>
+					.collect(Collectors.toList());
+		}
+		else {
+			if (user.getRole().equals(UserRole.PLAYER)) {
+				return this.elementDao.findAllByActive(true, PageRequest.of(page, size, Direction.ASC, "elementId")) // List<ElementEntity>
+						.stream() // Stream <ElementEntity>
+						.map(this.converter::fromEntity) // Stream <ElementBoundary>
+						.collect(Collectors.toList()); // List <ElementBoundary>
+			}
+			else { // user role must be admin by process of elimination 
+				throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
+			}
+		}
 	}
 
 	@Override
@@ -165,11 +196,16 @@ public class DbElementService implements ExtendedElementService {
 	public ElementBoundary getSpecificElement(String userDomain, String userEmail, String elementDomain, String elementId) {
 		// invoke select database
 		
-	
-		return this.converter.fromEntity(
-				  this.elementDao.findById(new ElementIdEntity(elementDomain, elementId))
-				 .orElseThrow(() -> new EntityNotFoundException("DB No Element With ID " + elementDomain + "!" + elementId))
-				 );
+		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
+		
+		ElementEntity element = retrieveElementFromDb(elementDomain, elementId);
+		
+		if(user.getRole().equals(UserRole.MANAGER) || (user.getRole().equals(UserRole.PLAYER) && element.getActive())) {
+			return this.converter.fromEntity(element);		
+		}
+		else {
+			throw new ForbiddenAccessException("User Doesn't Have Access To Get This Element");
+		}
 	}
 	
 	
@@ -185,16 +221,20 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional
 	public void bindChildToParent(String managerDomain, String managerEmail, String elementDomain , String elementId, IdBoundary childId) {
 		
-		if(childId == null) {
-			throw new EntityNotFoundException("Child Element Isn't Initialized");
+		UserEntity user = retrieveUserFromDb(elementDomain, managerEmail);
+		
+		if(!user.getRole().equals(UserRole.MANAGER)) {
+			throw new ForbiddenActionException("User Doesn't Have Permission To Bind Elements");
 		}
 		
-		ElementEntity parent = this.elementDao.findById(new ElementIdEntity (elementDomain, elementId))
-								.orElseThrow(() -> new EntityNotFoundException("DB No Parent With ID" + elementDomain + "!" + elementId));
+		if(childId == null) {
+			throw new EntityNotFoundException("Child ElementId Isn't Initialized");
+		}
 		
-		ElementEntity child = this.elementDao.findById(new ElementIdEntity(childId.getDomain(), childId.getId()))
-								.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID" + childId.getDomain() + "!" + childId.getId()));
-		
+		ElementEntity parent = retrieveElementFromDb(elementDomain, elementId);
+				
+		ElementEntity child =  retrieveElementFromDb(childId.getDomain(), childId.getId());
+						
 		if(parent.getElementId().equals(child.getElementId())) {
 			throw new RuntimeException("Parent and Child share Id - Cannot Bind Element To Itself");
 		}
@@ -208,8 +248,10 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getChildren(String userDomain, String userEmail, String elementDomain , String elementId, int page,int size) {
 		
-		ElementEntity parent = this.elementDao.findById(new ElementIdEntity (elementDomain, elementId))
-		.orElseThrow(() -> new EntityNotFoundException("DB No Parent With ID" + elementDomain + "!" + elementId));
+		//TODO - check user role and return different elements accordingly 
+		
+		
+		ElementEntity parent = retrieveElementFromDb(elementDomain, elementId);
 		
 		List <ElementEntity> children = this.elementDao.findAllChildrenByParent_ElementId(parent.getElementId(),
 																		   PageRequest.of(page, size,Direction.ASC, "elementId"));
@@ -224,9 +266,9 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getParent(String userDomain, String userEmail, String elementDomain , String elementId, int page,int size) {
 		
-		ElementEntity child = this.elementDao.findById(new ElementIdEntity(elementDomain , elementId))
-				.orElseThrow(() -> new EntityNotFoundException("DB No Child With ID " + elementDomain + "!" + elementId));
+		//TODO - check user role and return different elements accordingly
 		
+		ElementEntity child = retrieveElementFromDb(elementDomain, elementId);
 		
 		return this.elementDao.findAllParentsByChildren_ElementId
 				(child.getElementId(), PageRequest.of(page, size, Direction.ASC, "elementId"))
@@ -239,24 +281,49 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> searchElementsByName(String userDomain, String userEmail, String name, int page, int size) {
 		
-		//TODO - check user role / email
+		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
 		
-		List <ElementEntity> results = this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.ASC, "elementId"));
+		List <ElementEntity> results;
+		if(user.getRole().equals(UserRole.MANAGER)) {
+			results = this.elementDao.findAllByName(name, PageRequest.of(page, size, Direction.ASC, "elementId"));
+		}
+		else {
+			if (user.getRole().equals(UserRole.PLAYER)) {
+				results =  this.elementDao.findAllByNameAndActive(name, true, PageRequest.of(page, size, Direction.ASC, "elementId"));
+			}
+			else {
+				// user role must be admin by process of elimination 
+				throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
+			}
+		}
 			
 		return results.stream()  // Stream <ElementEntity>
 				.map(this.converter::fromEntity)  // Stream <ElementBoundary>
 				.collect(Collectors.toList()); // List <ElementBoundary>
-		
 	}
+	
 	
 	@Override
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> searchElementsByType(String userDomain, String userEmail, String type, int page, int size) {
 		
-		//TODO - check user role / email
+		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
 		
-		List <ElementEntity> results = this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "elementId"));
-			
+		List <ElementEntity> results;
+		
+		if(user.getRole().equals(UserRole.MANAGER)) {
+			results = this.elementDao.findAllByType(type, PageRequest.of(page, size, Direction.ASC, "elementId"));
+		}
+		else {
+			if (user.getRole().equals(UserRole.PLAYER)) {
+				results =  this.elementDao.findAllByTypeAndActive(type, true, PageRequest.of(page, size, Direction.ASC, "elementId"));
+			}
+			else {
+				// user role must be admin by process of elimination 
+				throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
+			}
+		}
+		
 		return results.stream()  // Stream <ElementEntity>
 				.map(this.converter::fromEntity)  // Stream <ElementBoundary>
 				.collect(Collectors.toList()); // List <ElementBoundary>
@@ -264,20 +331,43 @@ public class DbElementService implements ExtendedElementService {
 
 	@Override
 	@Transactional(readOnly = true)
-//	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng,
-//			double distance, int page, int size) {
 	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng, double distance , int page, int size) {
 		
-		double lat_start = lat -distance;
-		double lat_end = lat +distance;
-		double lng_start = lng -distance; 
-		double lng_end = lng +distance;
+		//TODO - check user role / email and return different elements accordingly
+		
+		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
+		
+		double lat_start = lat - distance;
+		double lat_end = lat + distance;
+		double lng_start = lng - distance; 
+		double lng_end = lng + distance;
 		
 		List <ElementEntity> results = this.elementDao.findAllBylocationLatBetweenAndLocationLngBetween(lat_start,lat_end,lng_start,lng_end, PageRequest.of(page, size, Direction.ASC, "elementId"));
 		
+		if(user.getRole().equals(UserRole.MANAGER)) {
+			results = this.elementDao.findAllBylocationLatBetweenAndLocationLngBetween(lat_start,
+																					   lat_end,
+																					   lng_start,lng_end,
+																					   PageRequest.of(page, size, Direction.ASC, "elementId"));
+		}
+		else {
+			if (user.getRole().equals(UserRole.PLAYER)) {
+				results =  this.elementDao.findAllBylocationLatBetweenAndLocationLngBetweenAndActive(lat_start,
+																									lat_end,
+																									lng_start,
+																									lng_end,
+																									true,
+																									PageRequest.of(page, size, Direction.ASC, "elementId"));
+			}
+			else {
+				// user role must be admin by process of elimination 
+				throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
+			}
+		}
+		
 		return results.stream()  // Stream <ElementEntity>
 				.map(this.converter::fromEntity)  // Stream <ElementBoundary>
-				.collect(Collectors.toList());	
+				.collect(Collectors.toList());	// List <ElementBoundary>
 		}
 	
 }
