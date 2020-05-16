@@ -28,8 +28,16 @@ import org.springframework.web.client.RestTemplate;
 
 import acs.data.elements.ElementEntity;
 import acs.data.utils.ElementIdEntity;
+import acs.data.utils.UserRole;
+import acs.logic.exceptions.ForbiddenAccessException;
+import acs.logic.exceptions.ForbiddenActionException;
+import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
+import acs.rest.element.boundaries.LocationBoundary;
+import acs.rest.users.UserBoundary;
+import acs.rest.users.UserNewDetails;
 import acs.rest.utils.IdBoundary;
+import acs.rest.utils.UserIdBoundary;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -40,17 +48,50 @@ public class ElementTests {
 	private String url;
 	
 	private final static String GET_URL = "elements/{userDomain}/{userEmail}/";
+	private final static String GET_URL_SPECIFIC = "elements/{userDomain}/{userEmail}/{elementDomain}/{elementId}";
 	private final static String POST_URL = "elements/{managerDomain}/{managerEmail}/";
 	private final static String UPDATE_URL = "elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}";
 	
 	// TODO - change url when delete is implemented
-	private final static String DELETE_ALL_URL =  "admin/elements/TestAdminDomain/adminEmail@gmail.com/";
+	private final static String DELETE_ALL_URL_ELEMENTS =  "admin/elements/{adminDomain}/{adminEmail}";
+	private final static String DELETE_ALL_URL_USERS =  "admin/users/{adminDomain}/{AdminEmail}";
 	
+	private UserBoundary player;
+	private UserBoundary manager;
+	private UserBoundary admin;
+	
+	private CreatedByBoundary createdByPlayer;
+	private CreatedByBoundary createdByManager;
+	private CreatedByBoundary createdByAdmin;
 	
 	@PostConstruct
 	public void init() {
 		this.url = "http://localhost:" + this.port + "/acs/";
 		this.restTemplate = new RestTemplate();
+		
+		this.player = this.restTemplate.postForObject(this.url + "/users",  
+					 new UserNewDetails("p@gmail.com", UserRole.PLAYER, "player", ":_"),
+		  			UserBoundary.class);
+		
+		
+		this.manager = this.restTemplate.postForObject(this.url + "/users",  
+				new UserNewDetails("m@gmail.com", UserRole.MANAGER, "manager", ":/"),
+		  			UserBoundary.class);
+		
+		this.admin =  this.restTemplate.postForObject(this.url + "/users",  
+				new UserNewDetails("a@gmail.com",  UserRole.ADMIN, "admin", ":*"),
+	  			UserBoundary.class);
+		
+		this.createdByPlayer = new CreatedByBoundary(this.player.getUserId());
+		this.createdByManager = new CreatedByBoundary(this.manager.getUserId());
+		this.createdByAdmin = new CreatedByBoundary(this.admin.getUserId());
+		
+		
+	}
+
+	@BeforeEach
+	public void setUsers() {
+		
 	}
 	
 	@LocalServerPort
@@ -60,7 +101,8 @@ public class ElementTests {
 	
 	@AfterEach
 	public void teardown() {
-		this.restTemplate.delete(this.url + DELETE_ALL_URL);
+		this.restTemplate.delete(this.url + DELETE_ALL_URL_ELEMENTS ,this.admin.getUserId().getDomain() , this.admin.getUserId().getEmail());
+		this.restTemplate.delete(this.url + DELETE_ALL_URL_USERS ,this.admin.getUserId().getDomain() , this.admin.getUserId().getEmail());
 	}
 	
 	
@@ -85,19 +127,33 @@ public class ElementTests {
 													"testName", 
 													true,
 													new Date(), 
-													null, 
+													createdByManager, 
 													null ,
 													null);
 		
 		ElementBoundary output = this.restTemplate.postForObject(this.url + POST_URL , 
 																input,
 																ElementBoundary.class,
-																"managerTestDomain", "managerTest@gmail.com");
+																createdByManager.getUserId().getDomain(), createdByManager.getUserId().getEmail());
 		
 		assertEquals(output.getName(), input.getName());
 	}
 	
-	
+	@Test
+	public void testAttemptToCreateNewElementAsUserAndAdminExpectForExceptionsForBoth() throws Exception {
+
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.postForObject(this.url + POST_URL, 
+										new ElementBoundary(null,"INFO","testName",	true,new Date(),createdByPlayer,null ,null),
+										ElementBoundary.class,
+										player.getUserId().getDomain(), player.getUserId().getEmail()));
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.postForObject(this.url + POST_URL, 
+										new ElementBoundary(null,"INFO","testName",	true,new Date(),createdByAdmin,null ,null),
+										ElementBoundary.class,
+										admin.getUserId().getDomain(), admin.getUserId().getEmail()));
+	}
 
 	@Test
 	public void testGetSpecificElementWithSpecificAttributesInDatabaseAndValidateObjectReturnedByDatabase() throws Exception{
@@ -122,18 +178,57 @@ public class ElementTests {
 									"Name", 
 									true,
 									new Date(), 
-									null, 
+									createdByManager, 
 									null,
 									elementAttributes),
 							ElementBoundary.class,
-							"managerTestDomain", "managerTest@gmail.com");
+							manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		
 		ElementBoundary resultElementObject = this.restTemplate.getForObject(this.url + GET_URL + elementIdToURL(newElementObject.getElementId()),
 																ElementBoundary.class,
-																"userTestDomain", "userTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		assertThat(resultElementObject.getElementAttributes().equals(newElementObject.getElementAttributes()));
+	}
+	
+	@Test
+	public void testPlayerAndAdminAttempsToCreateNewElementCheckForForbiddenAccessException() throws Exception {
+		
+		//GIVEN - server is up  
+		//WHEN - admin and player attempt to create new elemnt
+		//THEN  - server returns an exception
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.postForObject(this.url + POST_URL, 
+										new ElementBoundary(null,"INFO","testName",	true,new Date(),createdByPlayer,null ,null),
+										ElementBoundary.class,
+										player.getUserId().getDomain(), player.getUserId().getEmail()));
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.postForObject(this.url + POST_URL, 
+										new ElementBoundary(null,"INFO","testName",	true,new Date(),createdByAdmin,null ,null),
+										ElementBoundary.class,
+										admin.getUserId().getDomain(), admin.getUserId().getEmail()));
+		
+	}
+	
+	@Test	
+	public void testCreateElementWithFalseActiveThenCheckForExceptionWhenPlayerAttemptsToGetIt() throws Exception {
+		// GIVEN - server is up and contains an element with active=false
+		//WHEN - player attempts to get that element
+		//THEN - server returns an exception
+		
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL, 
+										new ElementBoundary(null,"INFO","testName",	false , new Date(),createdByPlayer,null ,null),				
+										ElementBoundary.class, 
+										manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.getForObject(this.url + GET_URL_SPECIFIC , 
+										ElementBoundary.class,
+										admin.getUserId().getDomain(), admin.getUserId().getEmail(), element.getElementId().getDomain(), element.getElementId().getId()) );
+		
 	}
 	
 	@Test
@@ -151,26 +246,26 @@ public class ElementTests {
 									"Name", 
 									 true,
 									new Date(), 
-									null, 
+									createdByManager, 
 									null,
 									null))
 				.map(boundary -> //Invoke POST for each object
 					this.restTemplate.postForObject(this.url + POST_URL, 
 													boundary,
 													ElementBoundary.class,
-													"managerDomain","managerTestDomain@gmail.com"))
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
 				.collect(Collectors.toList());
 		
 		// Confirm database size == 5
 		assertEquals(dbContent.size(), 5);
 		
 		// Delete all elements from database
-		this.restTemplate.delete(this.url + DELETE_ALL_URL);
+		this.restTemplate.delete(this.url + DELETE_ALL_URL_ELEMENTS , this.admin.getUserId().getDomain() , this.admin.getUserId().getEmail());
 		
 		// Retrieve all elements from database
 		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL,
 																  ElementBoundary[].class, 
-																  "userTestDomain", "userTestEmail@gmail.com");
+																  manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		// Confirm that the database is empty yet is not null
 		assertThat(result).isNotNull().isEmpty();
@@ -189,12 +284,12 @@ public class ElementTests {
 																					"NameTest4", 
 																					false,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTest@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		// Creating the new elementId to update
 		IdBoundary newElementId = new IdBoundary("testDomain", "testId");
@@ -205,13 +300,13 @@ public class ElementTests {
 		//Invoke the UPDATE method
 		this.restTemplate.put(this.url + UPDATE_URL,
 							  element,
-							  "managerTestDomain", "managerTest@gmail.com",  orgElementId.getDomain(),orgElementId.getId());
+							  manager.getUserId().getDomain(), manager.getUserId().getEmail(),  orgElementId.getDomain(),orgElementId.getId());
 		
 		
 		// Retrieve the entire database content
 		ElementBoundary database[] = this.restTemplate.getForObject(this.url + GET_URL, 
 																	ElementBoundary[].class, 
-																	"userTestDomain", "userTestEmail@gmail.com");
+																	manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		// Check that the databases' old key was kept 
 		assertThat(database[0].getElementId()).isNotEqualTo(element.getElementId());
@@ -229,12 +324,12 @@ public class ElementTests {
 																						"NameTest4", 
 																						false,
 																						new Date(), 
-																						null, 
+																						createdByManager, 
 																						null,
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail@gmail.com");
+																	manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		String newName = null;
 		element.setName(newName);
 		try {
@@ -245,6 +340,41 @@ public class ElementTests {
 		}
 		catch (RuntimeException e) {
 		}
+	}
+	
+	@Test
+	public void testManagerCreatesNewElementAdminAndPlayerAttemptToUpdateItCheckForReturnedException() throws Exception {
+		
+		//GIVEN - server is up and contains an element
+		// WHEN - player or admin attemps to update that element
+		// THEN - server throws an exception
+		
+		ElementBoundary element = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null,
+									"INFO", 
+									"NameTest4", 
+									false,
+									new Date(), 
+									createdByManager, 
+									null,
+									null
+									),
+				ElementBoundary.class,
+				manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		String newName = "new_name";
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.put(this.url + UPDATE_URL , 
+										ElementBoundary.class,
+										newName,
+										admin.getUserId().getDomain(), admin.getUserId().getEmail(), element.getElementId().getDomain(), element.getElementId().getId()) );
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.put(this.url + UPDATE_URL , 
+										ElementBoundary.class,
+										newName,
+										player.getUserId().getDomain(), player.getUserId().getEmail(), element.getElementId().getDomain(), element.getElementId().getId()) );
 	}
 	
 	@Test
@@ -259,12 +389,12 @@ public class ElementTests {
 																						"NameTest4", 
 																						false,
 																						new Date(), 
-																						null, 
+																						createdByManager, 
 																						null,
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail@gmail.com");
+																	manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		String newName = "     ";
 		element.setName(newName);
 		try {
@@ -278,6 +408,41 @@ public class ElementTests {
 	}
 	
 	@Test
+	public void testCreateThreeActiveElementsAnotherTwoWithFalseCheckThatManagerGetAllReturnsFiveElementsPlayerWithThree() throws Exception {
+		
+		//GIVEN - Server with 5 elements - 3 with active=true, 2 with active=false
+		//WHEN - manager and player invoke get all method
+		//THEN - verify that manager has 5 elements and player has 3
+		
+		List <ElementBoundary> activeElements = IntStream.range(0, 5) //Stream <Integer> with size of 5 (0,1,2,3,4)
+		.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
+		.map(current -> 				// Initialize each object 
+		new ElementBoundary (null,
+							"JustAType", 
+							"Name #" + current, 
+							(current % 2 == 0),
+							new Date(), 
+							createdByManager, 
+							null,
+							null))
+		.map(boundary -> //Invoke POST for each object
+			this.restTemplate.postForObject(this.url + POST_URL, 
+											boundary,
+											ElementBoundary.class,
+											manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+		.collect(Collectors.toList());
+
+		
+				assertThat(this.restTemplate.getForObject(this.url + GET_URL,
+				ElementBoundary[].class, 
+				manager.getUserId().getDomain(), manager.getUserId().getEmail())).hasSize(5);
+		
+		assertThat(this.restTemplate.getForObject(this.url + GET_URL,
+				ElementBoundary[].class, 
+				player.getUserId().getDomain(), player.getUserId().getEmail())).hasSize(3);
+	}
+	
+	@Test
 	public void testCreateNewElementThenUpdateItWithNullTypeExpectAndCheckForRuntimeException() throws Exception{
 		//GIVEN - An element in the database
 		//WHEN - Attempt to set the elements' type to 'null'
@@ -288,12 +453,12 @@ public class ElementTests {
 																						"NameTest4", 
 																						false,
 																						new Date(), 
-																						null, 
+																						createdByManager, 
 																						null,
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail@gmail.com");
+																	manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		String newType = null;
 		element.setType(newType);
 		try {
@@ -317,12 +482,12 @@ public class ElementTests {
 																						"NameTest4", 
 																						false,
 																						new Date(), 
-																						null, 
+																						createdByManager, 
 																						null,
 																						null
 																						),
 																	ElementBoundary.class,
-																	"managerTestDomain", "managerTestEmail@gmail.com");
+																	manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		String newType = "   ";
 		element.setName(newType);
 		try {
@@ -349,12 +514,12 @@ public class ElementTests {
 																					"Parent", 
 																					true,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		ElementBoundary child1 = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -367,7 +532,7 @@ public class ElementTests {
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		ElementBoundary child2 = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -375,23 +540,23 @@ public class ElementTests {
 																					"Child #2", 
 																					true,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		Stream.of(child1, child2)
 		.map(ElementBoundary::getElementId)
 		.forEach(childIdBoundary->
 			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
 					childIdBoundary,
-					"TestManagerDomain", "TestManagerEmail@gmail.com", parent.getElementId().getDomain(), parent.getElementId().getId()));
+					manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()));
 		
 		assertThat(this.restTemplate
 				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
 						ElementBoundary[].class, 
-						"userTestDomain", "userTestEmail@gmail.com", parent.getElementId().getDomain(), parent.getElementId().getId()))
+						manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()))
 			.hasSize(2)
 			.usingRecursiveFieldByFieldElementComparator()
 			.containsExactlyInAnyOrder(child1, child2);
@@ -409,12 +574,12 @@ public class ElementTests {
 									"BindingElement", 
 									true,
 									new Date(), 
-									null, 
+									createdByManager, 
 									null,
 									null
 									),
 				ElementBoundary.class,
-				"managerTestDomain", "managerTestEmail@gmail.com");
+				manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		String domain = element.getElementId().getDomain();
 		String id = element.getElementId().getId();
@@ -422,7 +587,7 @@ public class ElementTests {
 		assertThrows(RuntimeException.class, ()->
 		this.restTemplate.put(this.url + UPDATE_URL + "/children", 
 				  new IdBoundary(domain, id), 
-				  "TestManagerDomain", "TestManagerEmail@gmail.com", domain, id));
+				  manager.getUserId().getDomain(), manager.getUserId().getEmail(), domain, id));
 	}
 	
 	@Test
@@ -437,12 +602,12 @@ public class ElementTests {
 																					"Parent", 
 																					true,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 
 		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -450,23 +615,53 @@ public class ElementTests {
 																					"Child", 
 																					true,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 	
 		this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
 				child.getElementId(),
-				"TestManagerDomain", "TestManagerEmail@gmail.com", parent.getElementId().getDomain(), parent.getElementId().getId());
+				manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId());
 		
 		ElementBoundary allParents[] = this.restTemplate.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
 				ElementBoundary[].class, 
-				"userTestDomain", "userTestEmail@gmail.com", child.getElementId().getDomain(), child.getElementId().getId());
+				manager.getUserId().getDomain(), manager.getUserId().getEmail(), child.getElementId().getDomain(), child.getElementId().getId());
 		
 		assertThat(allParents[0].getElementId().getId()).isEqualTo(parent.getElementId().getId());
 		
+	}
+	
+	@Test
+	public void testCreateTwoElementsPlayerAndAdminAttemptToInvokeBindMethodConfirmReturnedException() throws Exception {
+		
+		//GIVEN - Server with child element and parent element
+		// WHEN - admin or player attempt to bind child to parent
+		// THEN - Server throws an exception
+		
+		ElementBoundary parent = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null, "parentType",	"Parent",	true,	new Date(),	createdByManager,null,	null),
+				ElementBoundary.class,
+				manager.getUserId().getDomain(), manager.getUserId().getEmail());
+
+		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
+						new ElementBoundary(null,"childType","Child",true,	new Date(),createdByManager,null,null),
+						ElementBoundary.class,
+						manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		assertThrows(RuntimeException.class, ()-> 
+		this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+			child.getElementId(),
+			player.getUserId().getDomain(), player.getUserId().getEmail(), 
+				parent.getElementId().getDomain(), parent.getElementId().getId()));
+		
+		assertThrows(RuntimeException.class, ()-> 
+		this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+			child.getElementId(),
+			admin.getUserId().getDomain(), admin.getUserId().getEmail(), 
+				parent.getElementId().getDomain(), parent.getElementId().getId()));
 	}
 	
 	@Test
@@ -480,12 +675,12 @@ public class ElementTests {
 																					"Parent #1", 
 																					true,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 
 		ElementBoundary parent2 = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -493,12 +688,12 @@ public class ElementTests {
 																					"Parent #2", 
 																					true,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
 																new ElementBoundary(null,
@@ -506,37 +701,36 @@ public class ElementTests {
 																					"Child", 
 																					true,
 																					new Date(), 
-																					null, 
+																					createdByManager, 
 																					null,
 																					null
 																					),
 																ElementBoundary.class,
-																"managerTestDomain", "managerTestEmail@gmail.com");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		Stream.of(parent1, parent2)
 		.map(ElementBoundary::getElementId)
 		.forEach(parentIdBoundary->
 			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
 					child.getElementId(),
-					"TestManagerDomain", "TestManagerEmail@gmail.com", parentIdBoundary.getDomain(), parentIdBoundary.getId()));
+					manager.getUserId().getDomain(), manager.getUserId().getEmail(), parentIdBoundary.getDomain(), parentIdBoundary.getId()));
 		
 		assertThat(this.restTemplate
 				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
 						ElementBoundary[].class, 
-						"userTestDomain", "userTestEmail@gmail.com", parent1.getElementId().getDomain(), parent1.getElementId().getId()))
+						manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent1.getElementId().getDomain(), parent1.getElementId().getId()))
 			.hasSize(0);
 		
 		assertThat(this.restTemplate
 				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
 						ElementBoundary[].class, 
-						"userTestDomain", "userTestEmail@gmail.com", parent2.getElementId().getDomain(), parent2.getElementId().getId()))
+						manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent2.getElementId().getDomain(), parent2.getElementId().getId()))
 			.hasSize(1);
 		
 		ElementBoundary allParents[] = this.restTemplate.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
 				ElementBoundary[].class, 
-				"userTestDomain", "userTestEmail@gmail.com", child.getElementId().getDomain(), child.getElementId().getId());
+				manager.getUserId().getDomain(), manager.getUserId().getEmail(), child.getElementId().getDomain(), child.getElementId().getId());
 		
-		//assertThat(allParents[0].getElementId().getId()).isEqualTo(parent2.getElementId().getId());
 		
 		assertThat(allParents[0]).usingRecursiveComparison().isEqualTo(parent2);
 		
@@ -544,7 +738,11 @@ public class ElementTests {
 	
 	
 	@Test
-	public void testCreateThreeElementsOneWithSpecialNameInvokeSearchByNameAndConfirmThatOnlyOneReturned() throws Exception{
+	public void testCreateFiveElementsOneWithSpecialNameInvokeSearchByNameAndConfirmThatOnlyOneReturned() throws Exception{
+		
+		//GIVEN - Server contains 5 elements
+		// WHEN - search by name is invoked on a special name that appears once
+		//THEN - a single element is returned
 		
 		List <ElementBoundary> dbContent = IntStream.range(0, 5) //Stream <Integer> with size of 5 (0,1,2,3,4)
 		.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
@@ -554,19 +752,19 @@ public class ElementTests {
 							"Name #" + current, 
 							 true,
 							new Date(), 
-							null, 
+							createdByManager, 
 							null,
 							null))
 		.map(boundary -> //Invoke POST for each object
 			this.restTemplate.postForObject(this.url + POST_URL, 
 											boundary,
 											ElementBoundary.class,
-											"managerDomain","managerTestDomain@gmail.com"))
+											manager.getUserId().getDomain(), manager.getUserId().getEmail()))
 		.collect(Collectors.toList());
 							
 		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL + "search/byName/{name}", 
 																ElementBoundary[].class,
-																"userEmail", "userDomain", "Name #2");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail(), "Name #2");
 		
 		assertThat(result).hasSize(1);
 		
@@ -574,6 +772,9 @@ public class ElementTests {
 	
 	@Test
 	public void testCreateThreeElementsOneWithSpecialTypeInvokeSearchByNameAndConfirmThatOnlyOneReturned() throws Exception{
+		//GIVEN - Server contains 5 elements
+		// WHEN - search by name is invoked on a special type that appears once
+		//THEN - a single element is returned
 		
 		List <ElementBoundary> dbContent = IntStream.range(0, 5) //Stream <Integer> with size of 5 (0,1,2,3,4)
 		.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
@@ -583,22 +784,211 @@ public class ElementTests {
 							"NAME", 
 							 true,
 							new Date(), 
-							null, 
+							createdByManager, 
 							null,
 							null))
 		.map(boundary -> //Invoke POST for each object
 			this.restTemplate.postForObject(this.url + POST_URL, 
 											boundary,
 											ElementBoundary.class,
-											"managerDomain","managerTestDomain@gmail.com"))
+											manager.getUserId().getDomain(), manager.getUserId().getEmail()))
 		.collect(Collectors.toList());
 							
-		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL + "search/byType/{name}", 
+		ElementBoundary result[] = this.restTemplate.getForObject(this.url + GET_URL + "search/byType/{type}", 
 																ElementBoundary[].class,
-																"userEmail", "userDomain", "INFO #2");
+																manager.getUserId().getDomain(), manager.getUserId().getEmail(), "INFO #2");
 		
 		assertThat(result).hasSize(1);
 		
 	}
 	
+	@Test
+	public void testCreateFourElementsWithLatLngIsIndexTimesTenThenInvokeSearchNearOfLatLngTwentyFiveWithDistanceTenExpectTwoResults() throws Exception {
+		
+		// GIVE - Server with 4 elements with lat lng (0,0) (10,10), (20,20) (30,30)
+		// WHEN - Search near is invoked with lat/lng = 25, distance = 5
+		//THEN - Output is 2 elements
+		
+		List <ElementBoundary> dbContent = IntStream.range(0, 4) //Stream <Integer> with size of 5 (0,1,2,3,4)
+				.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
+				.map(current -> 				// Initialize each object 
+				new ElementBoundary (null,
+									"INFO", 
+									"NAME", 
+									 true,
+									new Date(), 
+									createdByManager, 
+									new LocationBoundary(current * 10.0, current * 10.0),
+									null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class,
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+				.collect(Collectors.toList());
+		
+		System.err.println("\n\n" + dbContent.size()+"\n\n");
+		
+		assertThat(this.restTemplate.getForObject(this.url + GET_URL + "/search/near/{lat}/{lng}/{distance}", 
+												  ElementBoundary[].class, 
+												  manager.getUserId().getDomain(), manager.getUserId().getEmail(),
+												  25, 25, 10)
+				).hasSize(2);
+		
+	}
+	
+	@Test
+	public void testCreatedParentWithTrueActiveBindTwoChildElementsOneWithFalseActiveOneWithTrueGetAllAsPlayerAndManagerConfirmPlayerHasOneChildAndManagerTwo() throws Exception {
+		
+		//GIVEN - Server with 1 parent elements with active=true, 2 children elements one with active=false the other with active=true
+		// 			bound to parent
+		//	WHEN - player and manager invoke get children method 
+		// THEN - confirm that parent has 2 elements and that player has 1 server returns 2xx ok
+		ElementBoundary parent = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null, "parentType",	"Parent #1", true, new Date(),	createdByManager, null,	null),
+				ElementBoundary.class,
+				manager.getUserId().getDomain(), manager.getUserId().getEmail());
+
+		ElementBoundary child1 = this.restTemplate.postForObject(this.url + POST_URL,
+						new ElementBoundary(null, "childType",	"Child #1", true, new Date(),	createdByManager, null,	null),
+						ElementBoundary.class,
+						manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		ElementBoundary child2 = this.restTemplate.postForObject(this.url + POST_URL,
+						new ElementBoundary(null, "childType",	"Child #2", false, new Date(),	createdByManager, null,	null),
+						ElementBoundary.class,
+						manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		Stream.of(child1, child2)
+		.map(ElementBoundary::getElementId)
+		.forEach(childIdBoundary->
+			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+					childIdBoundary,
+					manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()));
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
+						ElementBoundary[].class, 
+						manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()))
+			.hasSize(2);
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
+						ElementBoundary[].class, 
+						player.getUserId().getDomain(), player.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()))
+			.hasSize(1);
+			
+	}
+	
+	@Test
+	public void testBindTwoChildrenOneWithFalseActiveOtherWithTrueToParentWithFalseActiveInvokeGetAllWithPlayerAndManagerConfirmPlayerHasZeroElementsManagerTwo() throws Exception{
+		
+		//GIVEN - server contains parent with 'active=false' and two child elements bound to it, one with 'active=false'
+		//				and another with 'active=true'
+		//WHEN	- manager and player invoke get all children method
+		//THEN - manager gets both children and player has none.
+		
+		ElementBoundary parent = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null, "parentType",	"Parent #1", false, new Date(),	createdByManager, null,	null),
+				ElementBoundary.class,
+				manager.getUserId().getDomain(), manager.getUserId().getEmail());
+
+		ElementBoundary child1 = this.restTemplate.postForObject(this.url + POST_URL,
+						new ElementBoundary(null, "childType",	"Child #1", true, new Date(),	createdByManager, null,	null),
+						ElementBoundary.class,
+						manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		ElementBoundary child2 = this.restTemplate.postForObject(this.url + POST_URL,
+						new ElementBoundary(null, "childType",	"Child #2", false, new Date(),	createdByManager, null,	null),
+						ElementBoundary.class,
+						manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		Stream.of(child1, child2)
+		.map(ElementBoundary::getElementId)
+		.forEach(childIdBoundary->
+			this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+					childIdBoundary,
+					manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()));
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
+						ElementBoundary[].class, 
+						manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()))
+			.hasSize(2);
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/children", 
+						ElementBoundary[].class, 
+						player.getUserId().getDomain(), player.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId()))
+			.hasSize(0);
+	}
+	
+	@Test
+	public void testPlyaerAndMangerGetParentsWhenBoundChildWithTrueActiveToParentWithFalseActiveMangerGetsTheParentPlayerDoesnt() throws Exception {
+		
+		//GIVEN - server where parent with 'active=false' with child that has 'active=true' bounded to it
+		// WHEN - player and manager invoke get parents
+		// THEN - player gets 0 elements , manager gets 1
+		
+		ElementBoundary parent = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null, "parentType",	"Parent #1", false, new Date(),	createdByManager, null,	null),
+				ElementBoundary.class,
+				manager.getUserId().getDomain(), manager.getUserId().getEmail());
+
+		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
+						new ElementBoundary(null, "childType",	"Child", true, new Date(),	createdByManager, null,	null),
+						ElementBoundary.class,
+						manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+				child.getElementId(),
+				manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId());
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
+						ElementBoundary[].class, 
+						manager.getUserId().getDomain(), manager.getUserId().getEmail(), child.getElementId().getDomain(), child.getElementId().getId()))
+			.hasSize(1);
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
+						ElementBoundary[].class, 
+						player.getUserId().getDomain(), player.getUserId().getEmail(), child.getElementId().getDomain(), child.getElementId().getId()))
+			.hasSize(0);
+	}	
+	
+	@Test
+	public void testPlyaerAndMangerGetParentsWhenBoundChildWithFalseActiveToParentWithTrueActiveMangerGetsTheParentPlayerDoesnt() throws Exception {
+		
+		//GIVEN - server where parent with 'active=true' with child that has 'active=false' bounded to it
+		// WHEN - player and manager invoke get parents
+		// THEN - player gets 0 elements , manager gets 1
+		
+		ElementBoundary parent = this.restTemplate.postForObject(this.url + POST_URL,
+				new ElementBoundary(null, "parentType",	"Parent #1", true, new Date(),	createdByManager, null,	null),
+				ElementBoundary.class,
+				manager.getUserId().getDomain(), manager.getUserId().getEmail());
+
+		ElementBoundary child = this.restTemplate.postForObject(this.url + POST_URL,
+						new ElementBoundary(null, "childType",	"Child", false, new Date(),	createdByManager, null,	null),
+						ElementBoundary.class,
+						manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
+		this.restTemplate.put(this.url + POST_URL + "/{elementDomain}/{elementId}/children", 
+				child.getElementId(),
+				manager.getUserId().getDomain(), manager.getUserId().getEmail(), parent.getElementId().getDomain(), parent.getElementId().getId());
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
+						ElementBoundary[].class, 
+						manager.getUserId().getDomain(), manager.getUserId().getEmail(), child.getElementId().getDomain(), child.getElementId().getId()))
+			.hasSize(1);
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "/{elementDomain}/{elementId}/parents", 
+						ElementBoundary[].class, 
+						player.getUserId().getDomain(), player.getUserId().getEmail(), child.getElementId().getDomain(), child.getElementId().getId()))
+			.hasSize(0);
+	}
 }
+
