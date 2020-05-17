@@ -2,6 +2,7 @@ package acs.data.users;
 
 
 import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
@@ -45,8 +46,8 @@ public class UserEntity {
 		this.avatar = avatar;
 	}
 
-	@Id
-	@Embedded
+	
+	@EmbeddedId
 	public UserIdEntity getUserId() {
 		return userId;
 	}

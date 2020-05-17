@@ -10,12 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import acs.logic.action.ActionService;
 import acs.logic.action.ExtendedActionService;
-import acs.logic.db.DbActionService;
-import acs.logic.db.DbElementService;
-import acs.logic.db.DbUserService;
 import acs.logic.element.ElementService;
 import acs.logic.user.ExtentedUserService;
-import acs.logic.user.UserService;
 import acs.rest.action.ActionBoundary;
 import acs.rest.users.UserBoundary;
 
@@ -25,6 +21,9 @@ import acs.rest.users.UserBoundary;
 @RestController
 public class AdminController {
 
+	private final String DEFAULT_PAGE_SIZE = "10";
+	private final String DEFAULT_PAGE_NUM = "0";
+	
 	// ask if should i change to extended Element service
 	private ExtentedUserService dbUserService;
 	private ElementService dbElementeService;
@@ -70,8 +69,8 @@ public class AdminController {
 //	 Export all users
 	@RequestMapping(path = "/acs/admin/users/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 
-	public UserBoundary[] exports_AllUsers(@RequestParam(name = "size", required = false, defaultValue = "10") int size,
-			@RequestParam(name = "page", required = false, defaultValue = "10") int page, 
+	public UserBoundary[] exports_AllUsers(@RequestParam(name = "size", required = false, defaultValue = DEFAULT_PAGE_SIZE) int size,
+			@RequestParam(name = "page", required = false, defaultValue = DEFAULT_PAGE_NUM) int page, 
 			@PathVariable("adminDomain") String adminDomain,
 			@PathVariable("adminEmail") String adminEmail) {
 		if(size <= 0) {
@@ -87,8 +86,8 @@ public class AdminController {
 	// Export all actions
 	@RequestMapping(path = "/acs/admin/actions/{adminDomain}/{adminEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ActionBoundary[] exports_AllActions(
-			@RequestParam(name = "size", required = false, defaultValue = "10") int size,
-			@RequestParam(name = "page", required = false, defaultValue = "10") int page,
+			@RequestParam(name = "size", required = false, defaultValue = DEFAULT_PAGE_SIZE) int size,
+			@RequestParam(name = "page", required = false, defaultValue = DEFAULT_PAGE_NUM) int page,
 			@PathVariable("adminDomain") String adminDomain, @PathVariable("adminEmail") String adminEmail) {
 		if (size <= 0) {
 			throw new RuntimeException("Page size must be positive");
