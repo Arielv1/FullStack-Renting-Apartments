@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
-import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 
@@ -116,7 +115,7 @@ public class UserTests {
 	public void testPostNewUserTheDatabaseContainsUserWithTheSameRole() throws Exception {
 		// GIVEN server is up
 
-		// WHEN I POST /samples AND send a message boundary
+		// WHEN I POST /samples AND send a user boundary
 		UserNewDetails input = new UserNewDetails("test23@gmail.com", UserRole.MANAGER, "testy test", ";=}");
 
 		UserBoundary userPost = this.restTemplate.postForObject(this.url, input, UserBoundary.class);
@@ -132,7 +131,7 @@ public class UserTests {
 
 	@Test
 	public void testUpdateUserDetsilsActuallyUpdateDatabse() throws Exception {
-		// GIVEN the server is up AND the database contains a message
+		// GIVEN the server is up AND the database contains a user
 
 		UserNewDetails input = new UserNewDetails("test23@gmail.com", UserRole.MANAGER, "testy test", ";=}");
 
