@@ -10,36 +10,58 @@ import acs.data.elements.ElementEntity;
 import acs.data.utils.ElementIdEntity;											
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity>{
 	
+	// select * where name is ?
 	public List<ElementEntity> findAllByName(
 			@Param("name") String name,
 			Pageable pageable); 
+	
+	// select * where name is ? and active is ?
+	public List<ElementEntity> findAllByNameAndActive(
+			@Param("name") String name,
+			@Param("active") boolean active, 
+			Pageable pageable);
 	
 	// select * where type is ?
 	public List<ElementEntity> findAllByType(
 			@Param("type") String type,
 			Pageable pageable); 
 	
-	public List<ElementEntity> findAllChildrenByParent_ElementId(
-			@Param("parentId") ElementIdEntity parentId, 
-			Pageable pageable);
-	
-	public List<ElementEntity> findAllParentsByChildren_ElementId(
-			@Param("parentId") ElementIdEntity parentId, 
-			Pageable pageable);
-	
-	public List<ElementEntity> findAllByActive(
-			@Param("active") boolean active, 
-			Pageable pageable);
-	
-	public List<ElementEntity> findAllByNameAndActive(
-			@Param("name") String name,
-			@Param("active") boolean active, 
-			Pageable pageable);
-	
+	// select * where type is ? and active is ?
 	public List<ElementEntity> findAllByTypeAndActive(
 			@Param("type") String name,
 			@Param("active") boolean active, 
 			Pageable pageable);
+	
+	// select * where parentId is ?
+	public List<ElementEntity> findAllChildrenByParent_ElementId(
+			@Param("parentId") ElementIdEntity parentId, 
+			Pageable pageable);
+	
+	// select * where parentId is and active is ?
+		public List<ElementEntity> findAllChildrenByParent_ElementIdAndActive(
+				@Param("parentId") ElementIdEntity parentId, 
+				@Param("active") boolean active, 
+				Pageable pageable);
+	
+	// select * where childId is ?
+	public List<ElementEntity> findAllParentsByChildren_ElementId(
+			@Param("parentId") ElementIdEntity parentId, 
+			Pageable pageable);
+	
+	// select * where childId is ? and active is true
+	public List<ElementEntity> findAllParentsByChildren_ElementIdAndActive(
+			@Param("parentId") ElementIdEntity parentId, 
+			@Param("active") boolean active, 
+			Pageable pageable);
+	
+	// select * where active is ?
+	public List<ElementEntity> findAllByActive(
+			@Param("active") boolean active, 
+			Pageable pageable);
+	
+	
+	
+	
 	
 	
 	// select * where lat+

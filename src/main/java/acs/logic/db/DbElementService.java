@@ -1,6 +1,8 @@
 package acs.logic.db;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -78,7 +80,8 @@ public class DbElementService implements ExtendedElementService {
 		
 		UserEntity manager = retrieveUserFromDb(managerDomain, managerEmail);
 		
-		if (manager.getRole() == null || !manager.getRole().equals(UserRole.MANAGER)) {
+		if (!manager.getRole().equals(UserRole.MANAGER)) {
+			//only a manager should have access to this action
 			throw new ForbiddenActionException("User Has No Permission To Create Elements");
 		}
 				
@@ -103,7 +106,8 @@ public class DbElementService implements ExtendedElementService {
 		
 		UserEntity manager = retrieveUserFromDb(managerDomain, managerEmail);
 		
-		if (manager.getRole() == null || !manager.getRole().equals(UserRole.MANAGER)) {
+		if (!manager.getRole().equals(UserRole.MANAGER)) {
+			//only a manager should have access to this action
 			throw new ForbiddenActionException("User Has No Permission To Update Elements");
 		}
 		
@@ -171,6 +175,7 @@ public class DbElementService implements ExtendedElementService {
 		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
 			
 		if(user.getRole().equals(UserRole.MANAGER)) {
+			// if manager -> regulat find all 
 			return this.elementDao.findAll(
 					PageRequest.of(page, size, Direction.ASC, "elementId")) // paginate according to page and size
 					.getContent() 	//List<ElementEntity>
@@ -179,6 +184,7 @@ public class DbElementService implements ExtendedElementService {
 					.collect(Collectors.toList());
 		}
 		else {
+			// if player -> find all with 'active is true'
 			if (user.getRole().equals(UserRole.PLAYER)) {
 				return this.elementDao.findAllByActive(true, PageRequest.of(page, size, Direction.ASC, "elementId")) // List<ElementEntity>
 						.stream() // Stream <ElementEntity>
@@ -201,9 +207,11 @@ public class DbElementService implements ExtendedElementService {
 		ElementEntity element = retrieveElementFromDb(elementDomain, elementId);
 		
 		if(user.getRole().equals(UserRole.MANAGER) || (user.getRole().equals(UserRole.PLAYER) && element.getActive())) {
+			// manager has access to all elements , player can only get 'active is true' elements
 			return this.converter.fromEntity(element);		
 		}
 		else {
+			// role is admin or player is trying to access 'active = false' element
 			throw new ForbiddenAccessException("User Doesn't Have Access To Get This Element");
 		}
 	}
@@ -213,7 +221,13 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional
 	public void deleteAllElements(String adminDomain, String adminEmail) {
 		//Invoke delete database
-	
+		
+		UserEntity user = retrieveUserFromDb(adminDomain, adminEmail);
+		
+		if(!user.getRole().equals(UserRole.ADMIN)) {
+			throw new ForbiddenAccessException("User Isn't Allowed To Delete");
+		}
+		
 		this.elementDao.deleteAll();
 	}
 
@@ -248,14 +262,30 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getChildren(String userDomain, String userEmail, String elementDomain , String elementId, int page,int size) {
 		
-		//TODO - check user role and return different elements accordingly 
-		
+		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
 		
 		ElementEntity parent = retrieveElementFromDb(elementDomain, elementId);
 		
-		List <ElementEntity> children = this.elementDao.findAllChildrenByParent_ElementId(parent.getElementId(),
-																		   PageRequest.of(page, size,Direction.ASC, "elementId"));
-	
+		List <ElementEntity> children;
+		
+		if(user.getRole().equals(UserRole.MANAGER)) { // if manager -> no checks required
+			children = this.elementDao.findAllChildrenByParent_ElementId(parent.getElementId(),
+					   PageRequest.of(page, size,Direction.ASC, "elementId"));
+		}
+		else if (user.getRole().equals(UserRole.PLAYER)) { 
+			if(parent.getActive()) { // if player and 'active' parent is true - search 'active' children
+				children = this.elementDao.findAllChildrenByParent_ElementIdAndActive(parent.getElementId(), true,
+						   PageRequest.of(page, size,Direction.ASC, "elementId"));
+			}
+			else { // when player and active is false return empty list
+				children = new ArrayList<ElementEntity>();
+			}
+			
+		}
+		else { // role is admin - doesn't have permission for this action
+			throw new ForbiddenActionException("User Doesn't Have Permission To Get Children Elements");
+		}
+		
 		return children.stream()
 				.map(this.converter::fromEntity)
 				.collect(Collectors.toSet());
@@ -266,15 +296,38 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 	public Set<ElementBoundary> getParent(String userDomain, String userEmail, String elementDomain , String elementId, int page,int size) {
 		
-		//TODO - check user role and return different elements accordingly
-		
+		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
+				
 		ElementEntity child = retrieveElementFromDb(elementDomain, elementId);
 		
-		return this.elementDao.findAllParentsByChildren_ElementId
-				(child.getElementId(), PageRequest.of(page, size, Direction.ASC, "elementId"))
-				.stream()
-				.map(this.converter::fromEntity)
-				.collect(Collectors.toSet());	
+		List<ElementEntity> parents;
+		
+		if(user.getRole().equals(UserRole.MANAGER)) {
+			// if manager , no need to do any checks
+			parents = this.elementDao.findAllParentsByChildren_ElementId(child.getElementId(), PageRequest.of(page, size, Direction.ASC, "elementId"));
+		}
+		else {
+			if(user.getRole().equals(UserRole.PLAYER)) {
+				if(child.getActive()) {
+					// child's 'active' attribute is true - player can access this method 
+					parents = this.elementDao.findAllParentsByChildren_ElementIdAndActive(child.getElementId(), 
+																						true, 
+																						PageRequest.of(page, size, Direction.ASC, "elementId"));
+				} 
+				else {
+					// if child's 'active' attribute is false - return empty set
+					parents = new ArrayList<ElementEntity>();
+				}
+			}
+			else { // admin doesn't have access to this action
+				throw new ForbiddenActionException("User Doesn't Have Permission To Get Parents of Element");
+			}
+		}
+		
+		
+		return parents.stream()
+					  .map(this.converter::fromEntity)
+					  .collect(Collectors.toSet());	
 	}
 	
 	@Override
