@@ -2,7 +2,6 @@ package acs.logic.db;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,7 +26,7 @@ import acs.data.utils.UserRole;
 import acs.logic.element.ElementConverter;
 import acs.logic.element.ExtendedElementService;
 import acs.logic.exceptions.EntityNotFoundException;
-import acs.logic.exceptions.ForbiddenAccessException;
+import acs.logic.exceptions.PageNotFound;
 import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
@@ -212,7 +211,7 @@ public class DbElementService implements ExtendedElementService {
 		}
 		else {
 			// role is admin or player is trying to access 'active = false' element
-			throw new ForbiddenAccessException("User Doesn't Have Access To Get This Element");
+			throw new PageNotFound("User Doesn't Have Access To Get This Element");
 		}
 	}
 	
@@ -225,7 +224,7 @@ public class DbElementService implements ExtendedElementService {
 		UserEntity user = retrieveUserFromDb(adminDomain, adminEmail);
 		
 		if(!user.getRole().equals(UserRole.ADMIN)) {
-			throw new ForbiddenAccessException("User Isn't Allowed To Delete");
+			throw new PageNotFound("User Isn't Allowed To Delete");
 		}
 		
 		this.elementDao.deleteAll();
