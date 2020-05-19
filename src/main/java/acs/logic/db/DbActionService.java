@@ -20,9 +20,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import acs.dal.ActionDao;
+import acs.dal.ElementDao;
+import acs.dal.UserDao;
 import acs.data.actions.ActionElementEntity;
 import acs.data.actions.ActionEntity;
 import acs.data.actions.InvokedByEntity;
+import acs.data.elements.ElementEntity;
+import acs.data.users.UserEntity;
 import acs.data.utils.ActionIdEntity;
 import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserIdEntity;
@@ -30,6 +34,7 @@ import acs.data.utils.UserRole;
 import acs.logic.action.ActionConverter;
 import acs.logic.action.ActionService;
 import acs.logic.action.ExtendedActionService;
+import acs.logic.exceptions.EntityNotFoundException;
 import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.action.ActionBoundary;
 import acs.rest.utils.ValidEmail;
@@ -38,12 +43,17 @@ import acs.rest.utils.ValidEmail;
 public class DbActionService implements ExtendedActionService {
 	private String projectName;
 	private ActionDao actionDao;
+	private UserDao userDao;
+	private ElementDao elementDao;
 	private ActionConverter converter;
 	private ValidEmail valid;
 
 	@Autowired
-	public DbActionService(ActionDao actionDao, ActionConverter converter, ValidEmail valid) {
+	public DbActionService(ActionDao actionDao, UserDao userDao, ElementDao elementDao, ActionConverter converter,
+			ValidEmail valid) {
 		this.actionDao = actionDao;
+		this.userDao = userDao;
+		this.elementDao = elementDao;
 		this.converter = converter;
 		this.valid = valid;
 	}
@@ -60,18 +70,38 @@ public class DbActionService implements ExtendedActionService {
 		System.err.println("project name: " + this.projectName);
 	}
 
+	private UserEntity retrieveUserInfoFromDb(String domain, String email) {
+		return this.userDao.findById(new UserIdEntity(domain, email)).orElseThrow(
+				() -> new EntityNotFoundException("No User Exists With Domain " + domain + " Email " + email));
+	}
+
+	private ElementEntity retrieveElementInfoFromDb(String domain, String id) {
+		return this.elementDao.findById(new ElementIdEntity(domain, id))
+				.orElseThrow(() -> new EntityNotFoundException("DB No Element With Id " + domain + "!" + id));
+	}
+
 	@Override
 	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
-//
-//		if (equals(UserRole.MANAGER)) {
-//			
-		// האם אפשר להשתמש ב403 - כלומר אסור
-//			throw new RuntimeException("Manager Has No Permission To Invoke Actions");
-//		}
-		
-		
-		
+		String id;
+		ActionEntity entity;
+		ElementEntity elementEntity;
+		// Search the user that invoked the action in Db
+		UserEntity player = retrieveUserInfoFromDb(action.getInvokedBy().getUserId().getDomain(),
+				action.getInvokedBy().getUserId().getEmail());
+
+		if (!player.getRole().equals(UserRole.PLAYER)) {
+			throw new ForbiddenActionException("Only Player Has Permission To Invoke Actions");
+		}
+
+		elementEntity = retrieveElementInfoFromDb(action.getElement().getElementId().getDomain(),
+				action.getElement().getElementId().getId());
+
+		// check if element is active
+		if (!elementEntity.getActive()) {
+			throw new ForbiddenActionException("Action must be active");
+		}
+
 		if (action.getType() == null) {
 			throw new RuntimeException("Type can not be null");
 		}
@@ -79,9 +109,9 @@ public class DbActionService implements ExtendedActionService {
 			throw new RuntimeException("Invalid Email");
 		}
 
-		String id = UUID.randomUUID().toString();
+		id = UUID.randomUUID().toString();
 
-		ActionEntity entity = this.converter.toEntity(action);
+		entity = this.converter.toEntity(action);
 
 		entity.setActionId(new ActionIdEntity(this.projectName, id));
 
