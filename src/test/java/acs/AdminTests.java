@@ -73,8 +73,10 @@ public class AdminTests {
 	public void teardown() {
 		this.restTemplate.delete(this.url + DELETE_ALL_ELEMENTS_URL, this.admin.getUserId().getDomain(),
 				this.admin.getUserId().getEmail());
+		
 		this.restTemplate.delete(this.url + DELETE_ALL_ACTIONS_URL, this.admin.getUserId().getDomain(),
 				this.admin.getUserId().getEmail());
+		
 		this.restTemplate.delete(this.url + DELETE_ALL_USERS_URL, this.admin.getUserId().getDomain(),
 				this.admin.getUserId().getEmail());
 
@@ -87,30 +89,31 @@ public class AdminTests {
 
 	@Test
 	public void checkDeleteAllActions() throws Exception {
-		ElementBoundary input = new ElementBoundary(null, "INFO", "testName", true, new Date(),
-				new CreatedByBoundary(manager.getUserId()), null, null);
-		
-		ElementBoundary output = this.restTemplate.postForObject(this.url + CREATE_ELEMENT , 
-																input,
-																ElementBoundary.class,
-																manager.getUserId().getDomain(), manager.getUserId().getEmail());
+				
+		ElementBoundary input = this.restTemplate.postForObject(this.url + CREATE_ELEMENT , 
+				new ElementBoundary(null, "INFO", "testName", true, new Date(),
+						new CreatedByBoundary(manager.getUserId()), null, null),
+								ElementBoundary.class,
+								manager.getUserId().getDomain(), manager.getUserId().getEmail());
 		
 		// Given the database contains an Actions
 		ActionBoundary actionInput = new ActionBoundary(new IdBoundary("domain test", "testId"), "update",
-				new ActionElementBoundary(new IdBoundary(input.getCreatedBy().getUserId().getDomain(),
-						input.getCreatedBy().getUserId().getEmail())),
+				new ActionElementBoundary(new IdBoundary(input.getElementId().getDomain(),
+						input.getElementId().getId())),
 				new Date(),
 //				null, new Date(),
 				new InvokedByBoundary(
 						new UserIdBoundary(this.player.getUserId().getDomain(), this.player.getUserId().getEmail())),
 				new HashMap<>());
 
-		ActionBoundary action = this.restTemplate.postForObject(this.url + CREATE_ACTION, actionInput,
-				ActionBoundary.class);
+		ActionBoundary action = this.restTemplate.postForObject(this.url + CREATE_ACTION, 
+				actionInput,
+				ActionBoundary.class,
+				this.admin.getUserId().getDomain(), this.admin.getUserId().getEmail());
 
 		// When i delete all Actions
-		this.restTemplate.delete(this.url + DELETE_ALL_ACTIONS_URL, this.admin.getUserId().getDomain(),
-				this.admin.getUserId().getEmail());
+		this.restTemplate.delete(this.url + DELETE_ALL_ACTIONS_URL, 
+				this.admin.getUserId().getDomain(),	this.admin.getUserId().getEmail());
 		
 		// Then i get no actions when i check it again
 		ActionBoundary[] result = this.restTemplate.getForObject(this.url + GET_ALL_ACTIONS_URL, ActionBoundary[].class,
@@ -139,7 +142,7 @@ public class AdminTests {
 				new UserNewDetails("a@gmail.com", UserRole.ADMIN, "admin", ":*"), UserBoundary.class);
 
 	}
-
+	
 	@Test
 	public void checkDeleteAllElements() throws Exception {
 		// Given the database contains an Elements
@@ -184,16 +187,21 @@ public class AdminTests {
 	@Test
 	public void checkExportAllActions() throws Exception {
 		// Given the database contains an Actions
+		
+		// create element
+		ElementBoundary element = this.restTemplate.postForObject(this.url + CREATE_ELEMENT, 
+				 new ElementBoundary(null, "INFO", "testName", true, new Date(), null, null, null),
+				ElementBoundary.class, manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
 		// create Action
-		ActionBoundary actionInput = new ActionBoundary(new IdBoundary("domain test", "testId"), "PLAYER",
-				new ActionElementBoundary(new IdBoundary("domain element test", "id element test")), new Date(),
-				new InvokedByBoundary(this.player.getUserId()), new HashMap<>());
-
-		ActionBoundary action = (ActionBoundary) this.restTemplate.postForObject(this.url + CREATE_ACTION,
-				new ActionBoundary(new IdBoundary("domain test", "testId"), "PLAYER",
-						new ActionElementBoundary(new IdBoundary("domain element test", "id element test")), new Date(),
-						new InvokedByBoundary(this.player.getUserId()), new HashMap<>()),
-				ActionBoundary.class, player.getUserId().getDomain(), player.getUserId().getEmail());
+		ActionBoundary action = this.restTemplate.postForObject(this.url + CREATE_ACTION,
+				new ActionBoundary(new IdBoundary("ofir", null), "update",
+						new ActionElementBoundary(new IdBoundary(
+								element.getElementId().getDomain(), element.getElementId().getId())),
+						new Date(),
+						new InvokedByBoundary(new UserIdBoundary(player.getUserId().getDomain(), player.getUserId().getEmail())),
+						null), 
+				ActionBoundary.class);
 
 		// When i get all Actions
 
@@ -210,12 +218,19 @@ public class AdminTests {
 	public void checkExportAllActionsWithPagination() throws Exception {
 		// GIVEN the server is up
 		// AND the database contains 20 actions
-
+		
+		//create element
+		ElementBoundary element = this.restTemplate.postForObject(this.url + CREATE_ELEMENT, 
+				 new ElementBoundary(null, "INFO", "testName", true, new Date(), null, null, null),
+				ElementBoundary.class, manager.getUserId().getDomain(), manager.getUserId().getEmail());
+		
 		IntStream.range(0, 20).mapToObj(n -> "Object #" + n) // Stream<Strings> to Stream <Objects>
 				.map(current -> // Initialize each object
 				new ActionBoundary(new IdBoundary("ofir", null), "update",
-						new ActionElementBoundary(new IdBoundary("ofir", "43")), new Date(),
-						new InvokedByBoundary(new UserIdBoundary("ofir", "ofirco26@gmail.com")), null))
+						new ActionElementBoundary(new IdBoundary(
+								element.getElementId().getDomain(), element.getElementId().getId())),
+						new Date(),
+						new InvokedByBoundary(new UserIdBoundary(player.getUserId().getDomain(), player.getUserId().getEmail())), null))
 				.forEach(boundary -> // Invoke POST for each object
 				this.restTemplate.postForObject("http://localhost:" + this.port + "/acs/actions", boundary,
 						ActionBoundary.class));
