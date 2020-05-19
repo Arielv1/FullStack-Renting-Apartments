@@ -29,7 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import acs.data.elements.ElementEntity;
 import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserRole;
-import acs.logic.exceptions.ForbiddenAccessException;
+import acs.logic.exceptions.PageNotFound;
 import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
@@ -989,6 +989,82 @@ public class ElementTests {
 						ElementBoundary[].class, 
 						player.getUserId().getDomain(), player.getUserId().getEmail(), child.getElementId().getDomain(), child.getElementId().getId()))
 			.hasSize(0);
+	}
+	
+	@Test
+	public void testCreateTwelveElementsUsingPaginationTestWithSizeIsEightThatPageZeroHasEightElementsAndPageOneHasFour() throws Exception {
+		//GIVEN - Server contains 12 elements
+		//WHEN - Manager invokes get all method using pagination size=10,page=0 and then size=10,page=1 
+		//THEN - Receives 10 elements for the first invocation and then 2 for the second invocation
+		
+		List <ElementBoundary> dbContent = IntStream.range(1, 13) //Stream <Integer> with size of 12
+				.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
+				.map(current -> 				// Initialize each object 
+				new ElementBoundary (null,
+									"JustAType", 
+									"Name", 
+									 true,
+									new Date(), 
+									createdByManager, 
+									null,
+									null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class,
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+				.collect(Collectors.toList());
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "?size={size}&page={page}", 
+						ElementBoundary[].class, 
+						player.getUserId().getDomain(), player.getUserId().getEmail(), 8, 0))
+			.hasSize(8);
+		
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_URL + "?size={size}&page={page}", 
+						ElementBoundary[].class, 
+						player.getUserId().getDomain(), player.getUserId().getEmail(), 8, 1))
+			.hasSize(4);
+		
+	}
+	
+	@Test
+	public void testRecieveInvalidSizeAndPageParametersCheckForException() throws Exception {
+		//GIVEN - Server contains some elements
+		//WHEN - Get all is invokes with negative size or negative page values
+		//THEN - Server throws exception 
+		
+		List <ElementBoundary> dbContent = IntStream.range(1, 20) //Stream <Integer> with size of 12
+				.mapToObj(n -> n) // Stream<Strings> to Stream <Objects>
+				.map(current -> 				// Initialize each object 
+				new ElementBoundary (null,
+									"JustAType", 
+									"Name", 
+									 true,
+									new Date(), 
+									createdByManager, 
+									null,
+									null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class,
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+				.collect(Collectors.toList());
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.postForObject(this.url + GET_URL + "?size={size}&page={page}", 
+										new ElementBoundary(null,"INFO","testName",	true,new Date(),createdByPlayer,null ,null),
+										ElementBoundary.class,
+										player.getUserId().getDomain(), player.getUserId().getEmail(), -1, 1));
+		
+		assertThrows(RuntimeException.class, ()->
+		this.restTemplate.postForObject(this.url + GET_URL + "?size={size}&page={page}", 
+										new ElementBoundary(null,"INFO","testName",	true,new Date(),createdByPlayer,null ,null),
+										ElementBoundary.class,
+										player.getUserId().getDomain(), player.getUserId().getEmail(), 1, -1));
 	}
 }
 
