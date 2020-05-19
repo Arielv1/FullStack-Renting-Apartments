@@ -1,5 +1,7 @@
 package acs;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ import acs.rest.users.UserBoundary;
 import acs.rest.users.UserNewDetails;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class testuser {
+public class UserTestPagenation {
 
 	private int port;
 	private RestTemplate restTemplate;
@@ -45,14 +47,30 @@ public class testuser {
 	}
 
 	@Test
-	public void checkExportAllWithPagination2() throws Exception {
+	public void checkExportAllUsersWithPagination() throws Exception {
+		// WHEN the server is up
+		// AND the data base contain 20 users
 
+		
 		List<UserBoundary> users = new ArrayList<>();
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 0; i < 20; i++) {
 			users.add(this.restTemplate.postForObject(this.url + "/users",
-					new UserNewDetails("x" + i + "@gmail.com", UserRole.PLAYER, "x test" + i, ";["),
+					new UserNewDetails("x" + i + "@gmail.com", UserRole.PLAYER, "x test " + i, ";["),
 					UserBoundary.class));
+			
+			
+			
 		}
+		// THEN the data base retrieve 10 users in the second page
+		UserBoundary[] getUsers = this.restTemplate.getForObject(this.url + "/admin/users/{domain}/{email}"
+		+"?size={size}&page={page}", UserBoundary[].class, "domain.test", "tomer40@gmail.com", 10,1);
+		
+		assertThat(getUsers).hasSize(10);
+		
+		
+	
+
+		
 	}
 
 }
