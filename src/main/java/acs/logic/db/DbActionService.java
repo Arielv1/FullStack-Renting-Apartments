@@ -26,9 +26,11 @@ import acs.data.actions.InvokedByEntity;
 import acs.data.utils.ActionIdEntity;
 import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserIdEntity;
+import acs.data.utils.UserRole;
 import acs.logic.action.ActionConverter;
 import acs.logic.action.ActionService;
 import acs.logic.action.ExtendedActionService;
+import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.action.ActionBoundary;
 import acs.rest.utils.ValidEmail;
 
@@ -61,7 +63,16 @@ public class DbActionService implements ExtendedActionService {
 	@Override
 	@Transactional // (readOnly = false)
 	public Object invokeAction(ActionBoundary action) {
-		if(action.getType() == null) {
+//
+//		if (equals(UserRole.MANAGER)) {
+//			
+		// האם אפשר להשתמש ב403 - כלומר אסור
+//			throw new RuntimeException("Manager Has No Permission To Invoke Actions");
+//		}
+		
+		
+		
+		if (action.getType() == null) {
 			throw new RuntimeException("Type can not be null");
 		}
 		if (!valid.isEmailVaild(action.getInvokedBy().getUserId().getEmail())) {
@@ -94,20 +105,17 @@ public class DbActionService implements ExtendedActionService {
 				.map(this.converter::fromEntity)// Stream<ActionBoundary>
 				.collect(Collectors.toList()); // List<ActionBoundary>
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail, int page, int size) {
 		return this.actionDao.findAll(
 				// use pagination base on size & page and sort by ID in ascending order
-				PageRequest.of(page, size, Direction.ASC, "actionId"))
-				.getContent() // List<ActionEntity>
+				PageRequest.of(page, size, Direction.ASC, "actionId")).getContent() // List<ActionEntity>
 				.stream() // Stream<ActionEntity>
-				.map(this.converter::fromEntity) //Stream <ActionBoundary>
+				.map(this.converter::fromEntity) // Stream <ActionBoundary>
 				.collect(Collectors.toList());
 	}
-
-	
 
 	@Override
 	@Transactional
