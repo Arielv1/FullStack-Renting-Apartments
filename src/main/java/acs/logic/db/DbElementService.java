@@ -41,19 +41,18 @@ public class DbElementService implements ExtendedElementService {
 	private UserDao userDao;
 	
 	private ElementConverter converter;
-	private ValidEmail valid;
-	
+		
 	@Value("${spring.application.name:ofir.cohen}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
 	
 	@Autowired
-	public DbElementService(ElementDao elementDao, UserDao userDao, ElementConverter converter, ValidEmail valid) {
+	public DbElementService(ElementDao elementDao, UserDao userDao, ElementConverter converter) {
 		this.converter = converter;
 		this.elementDao = elementDao;
 		this.userDao = userDao;
-		this.valid = valid;
+		
 	}
 	
 	@PostConstruct
