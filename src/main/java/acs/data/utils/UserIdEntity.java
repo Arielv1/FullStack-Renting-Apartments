@@ -18,8 +18,6 @@ public class UserIdEntity implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	@Column(name = "USER_DOMAIN", insertable = false, updatable = false)
 	private String domain;
 	private String email;
 	
@@ -32,7 +30,7 @@ public class UserIdEntity implements Serializable{
 		this.email = email;
 	}
 	
-	@Column(name = "USER_DOMAIN")
+	@Column(name = "USER_DOMAIN",insertable = false, updatable = false)
 	public String getDomain() {
 		return domain;
 	}
