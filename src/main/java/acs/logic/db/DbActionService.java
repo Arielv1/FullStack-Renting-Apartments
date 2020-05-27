@@ -139,6 +139,11 @@ public class DbActionService implements ExtendedActionService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ActionBoundary> getAllActions(String adminDomain, String adminEmail, int page, int size) {
+		UserEntity admin = retrieveUserInfoFromDb(adminDomain, adminEmail);
+		
+		if (!admin.getRole().equals(UserRole.ADMIN)) {
+			throw new ForbiddenActionException("Only Admin Has Permission To get all Actions");
+		}
 		return this.actionDao.findAll(
 				// use pagination base on size & page and sort by ID in ascending order
 				PageRequest.of(page, size, Direction.ASC, "actionId")).getContent() // List<ActionEntity>
@@ -150,6 +155,12 @@ public class DbActionService implements ExtendedActionService {
 	@Override
 	@Transactional
 	public void deleteAllActions(String adminDomain, String adminEmail) {
+		UserEntity admin = retrieveUserInfoFromDb(adminDomain, adminEmail);
+
+		if (!admin.getRole().equals(UserRole.ADMIN)) {
+			throw new ForbiddenActionException("Only Admin Has Permission To delete Actions");
+		}
+
 		// INVOKE DELETE DATABASE: DELETE
 		this.actionDao.deleteAll(); // DELETE
 
