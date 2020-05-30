@@ -31,6 +31,9 @@ import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserRole;
 import acs.logic.exceptions.PageNotFound;
 import acs.logic.exceptions.ForbiddenActionException;
+import acs.rest.action.ActionBoundary;
+import acs.rest.action.boundaries.ActionElementBoundary;
+import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.element.boundaries.LocationBoundary;
@@ -52,7 +55,6 @@ public class ElementTests {
 	private final static String POST_URL = "elements/{managerDomain}/{managerEmail}/";
 	private final static String UPDATE_URL = "elements/{managerDomain}/{managerEmail}/{elementDomain}/{elementId}";
 	
-	// TODO - change url when delete is implemented
 	private final static String DELETE_ALL_URL_ELEMENTS =  "admin/elements/{adminDomain}/{adminEmail}";
 	private final static String DELETE_ALL_URL_USERS =  "admin/users/{adminDomain}/{AdminEmail}";
 	
@@ -1065,6 +1067,126 @@ public class ElementTests {
 										new ElementBoundary(null,"INFO","testName",	true,new Date(),createdByPlayer,null ,null),
 										ElementBoundary.class,
 										player.getUserId().getDomain(), player.getUserId().getEmail(), 1, -1));
+	}
+	
+	@Test
+	public void testCreateTwoElementsWithBuildingTypeSixWithApartmentInvokeFindAllByTypeAndNameConfirmReturnedSizeTwoAndSix() throws Exception {
+		
+		//GIVEN - Server is up and contains 8 elements , 6 are apartments and 2 are buildings
+		//WHEN - Search by type and name where type is apartment and name is shelmo and then search where type is building
+		//THEN - Return 6 elements and 2 elements
+		
+		ElementBoundary dbContent[] = IntStream.range(0, 2) 
+				.mapToObj(n -> n)
+				.map(current -> 				
+				new ElementBoundary (null,"Building", "Shelmo",  true,	new Date(), new CreatedByBoundary(this.manager.getUserId()), 
+									null,
+									null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class,
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+				.collect(Collectors.toList())
+				.toArray(new ElementBoundary[0]);
+						
+		ElementBoundary dbContent2[] = IntStream.range(2, 8) 
+				.mapToObj(n -> n) 
+				.map(current -> 				
+				new ElementBoundary (null,
+									"Apartment", 
+									"Shelmo", 
+									 true,
+									new Date(), 
+									new CreatedByBoundary(this.manager.getUserId()), 
+									null,
+									null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class,
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+				.collect(Collectors.toList())
+				.toArray(new ElementBoundary[0]);
+		
+		
+		
+		assertThat(this.restTemplate.getForObject(this.url + GET_URL,
+				  ElementBoundary[].class, 
+				  manager.getUserId().getDomain(), manager.getUserId().getEmail())).hasSize(8);
+		
+		Map<String, Object> actionAttributes = new HashMap<String, Object>();
+		actionAttributes.put("name", "Shelmo");
+		actionAttributes.put("type", "Apartment");
+		
+		assertThat(this.restTemplate.postForObject(this.url + "actions",
+				new ActionBoundary(new IdBoundary("ofir", null), "searchElementsByNameAndType",
+						null,new Date(), new InvokedByBoundary(new UserIdBoundary(this.player.getUserId().getDomain(), this.player.getUserId().getEmail())), 
+						actionAttributes),
+				  ElementBoundary[].class, 
+				  manager.getUserId().getDomain(), manager.getUserId().getEmail())).hasSize(6);
+		
+		
+		actionAttributes.put("type", "Building");
+		assertThat(this.restTemplate.postForObject(this.url + "actions",
+				new ActionBoundary(new IdBoundary("ofir", null), "searchElementsByNameAndType",
+						null,new Date(), new InvokedByBoundary(new UserIdBoundary(this.player.getUserId().getDomain(), this.player.getUserId().getEmail())), 
+						actionAttributes),
+				  ElementBoundary[].class, 
+				  manager.getUserId().getDomain(), manager.getUserId().getEmail())).hasSize(2);
+	}
+	
+	@Test
+	public void testCreateElementsWithTwoManagerInvokeSearchElementsByCreatorAndVerifyTheReturnedSize() throws Exception {
+		//GIVEN - Two managers , one created 2 elements, other created 5
+		//WHEN - Search all elements by the user of created them
+		//THEN - return 2 elements for the first manager, 5 for the second
+		UserBoundary manager2 = this.restTemplate.postForObject(this.url + "/users",  
+				new UserNewDetails("m2@gmail.com", UserRole.MANAGER, "manager2", ":/"),
+		  			UserBoundary.class);
+		
+		ElementBoundary dbContent[] = IntStream.range(0, 2) 
+				.mapToObj(n -> n)
+				.map(current -> 				
+				new ElementBoundary (null,"Building", "Shelmo",  true,	new Date(), new CreatedByBoundary(this.manager.getUserId()), 
+									null,null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class,
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+				.collect(Collectors.toList())
+				.toArray(new ElementBoundary[0]);
+						
+		ElementBoundary dbContent2[] = IntStream.range(2, 7) 
+				.mapToObj(n -> n) 
+				.map(current -> 				
+				new ElementBoundary (null,"Apartment", "Shelmo",  true,new Date(), new CreatedByBoundary(manager2.getUserId()), 
+									null, null))
+				.map(boundary -> //Invoke POST for each object
+					this.restTemplate.postForObject(this.url + POST_URL, 
+													boundary,
+													ElementBoundary.class,
+													manager2.getUserId().getDomain(), manager2.getUserId().getEmail()))
+				.collect(Collectors.toList())
+				.toArray(new ElementBoundary[0]);
+	
+		assertThat(this.restTemplate.getForObject(this.url + GET_URL,
+				  ElementBoundary[].class, 
+				  manager.getUserId().getDomain(), manager.getUserId().getEmail())).hasSize(7);
+		
+		
+		assertThat(this.restTemplate.postForObject(this.url + "actions",
+				new ActionBoundary(new IdBoundary("ofir", null), "searchElementsOfUser",
+						null,new Date(), new InvokedByBoundary(new UserIdBoundary(manager2.getUserId().getDomain(), manager2.getUserId().getEmail())), 
+						null),
+				  ElementBoundary[].class)).hasSize(5);
+		
+		assertThat(this.restTemplate.postForObject(this.url + "actions",
+				new ActionBoundary(new IdBoundary("ofir", null), "searchElementsOfUser",
+						null,new Date(), new InvokedByBoundary(new UserIdBoundary(manager.getUserId().getDomain(), manager.getUserId().getEmail())), 
+						null),
+				  ElementBoundary[].class)).hasSize(2);
 	}
 }
 

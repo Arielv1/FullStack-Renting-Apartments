@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
 import acs.data.utils.ElementIdEntity;											
 public interface ElementDao extends PagingAndSortingRepository<ElementEntity, ElementIdEntity>{
@@ -37,7 +38,7 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 			@Param("parentId") ElementIdEntity parentId, 
 			Pageable pageable);
 	
-	// select * where parentId is and active is ?
+	// select * where parentId is ? and active is ?
 		public List<ElementEntity> findAllChildrenByParent_ElementIdAndActive(
 				@Param("parentId") ElementIdEntity parentId, 
 				@Param("active") boolean active, 
@@ -60,10 +61,6 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 			Pageable pageable);
 	
 	
-	
-	
-	
-	
 	// select * where lat+
 	public List<ElementEntity> findAllBylocationLatBetweenAndLocationLngBetween(
 			@Param("lat1") Double lat1,
@@ -79,5 +76,29 @@ public interface ElementDao extends PagingAndSortingRepository<ElementEntity, El
 			@Param("lng2") Double lng2,
 			@Param("active") boolean active, 
 			Pageable pageable);
-	 
+	
+	// select * where created by is ?
+		public List<ElementEntity> findAllByCreatedBy(
+				@Param("createdBy") CreatedByEntity createdBy,
+				Pageable pageable);
+		
+	// select * where created by is ? and active is ?
+	public List<ElementEntity> findAllByCreatedByAndActive(
+			@Param("createdBy") CreatedByEntity createdBy,
+			@Param("active") boolean active, 
+			Pageable pageable);
+	
+	// select * where name is ? and type is ?
+	public List<ElementEntity> findAllByNameAndType(
+			@Param("name") String name,
+			@Param("type") String type, 
+			Pageable pageable);
+	
+	// select * where name is ? and type is ? and active is ?
+	public List<ElementEntity> findAllByNameAndTypeAndActive(
+			@Param("name") String name,
+			@Param("type") String type,
+			@Param("active") boolean active, 
+			Pageable pageable);
+	
 }

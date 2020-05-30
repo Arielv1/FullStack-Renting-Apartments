@@ -83,9 +83,7 @@ public class ElementController {
 										  	@PathVariable("userEmail") String userEmail) {
 		
 		varifyPageAndSize(page, size);
-		
-		return this.elementService.getAll(userDomain, userEmail, page, size).stream().toArray(i -> new ElementBoundary[i]);
-		
+		return this.elementService.getAll(userDomain, userEmail, page, size).toArray(new ElementBoundary[0]);
 	}
 	
 	
@@ -133,8 +131,7 @@ public class ElementController {
 		varifyPageAndSize(page, size);
 		
 		ElementBoundary[] parents = this.elementService.getParent(userDomain, userEmail, elementDomain , elementId, page, size)
-												.stream()
-												.toArray(i -> new ElementBoundary[i]);
+									.toArray(new ElementBoundary[0]);
 		
 		return parents;
 	}
@@ -151,8 +148,7 @@ public class ElementController {
 		varifyPageAndSize(page, size);
 		
 		return this.elementService.searchElementsByName(userDomain, userEmail, name, page, size)
-				.stream().toArray(i -> new ElementBoundary[i]);
-	}
+				.toArray(new ElementBoundary[0]);	}
 	
 		// Get all elements , filtered by type
 	@RequestMapping(path = "/acs/elements/{userDomain}/{userEmail}/search/byType/{type}",
@@ -167,7 +163,7 @@ public class ElementController {
 		varifyPageAndSize(page, size);
 		
 		return this.elementService.searchElementsByType(userDomain, userEmail, type, page, size)
-				.stream().toArray(i -> new ElementBoundary[i]);
+				.toArray(new ElementBoundary[0]);
 	}
 	
 	
@@ -184,7 +180,7 @@ public class ElementController {
 		varifyPageAndSize(page, size);
 		
 		return this.elementService.searchElementsByLocation(userDomain, userEmail, lat, lng, distance, page, size)
-				.stream().toArray(i -> new ElementBoundary[i]);
+				.toArray(new ElementBoundary[0]);
 
 	}
 	

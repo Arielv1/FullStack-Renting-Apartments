@@ -30,6 +30,7 @@ import acs.logic.exceptions.PageNotFound;
 import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
+import acs.rest.utils.UserIdBoundary;
 import acs.rest.utils.ValidEmail;
 
 @Service
@@ -65,6 +66,11 @@ public class DbElementService implements ExtendedElementService {
 	private UserEntity retrieveUserFromDb (String domain, String email) {
 		return this.userDao.findById(new UserIdEntity (domain, email)).orElseThrow(
 				() -> new EntityNotFoundException("No User Exists With Domain " + domain + " Email " + email));
+	}
+	
+	private UserEntity retrieveUserFromDb (UserIdBoundary userId) {
+		return this.userDao.findById(new UserIdEntity(userId.getDomain(), userId.getEmail())).orElseThrow(
+				() -> new EntityNotFoundException("No User Exists With Domain " + userId.getDomain() + " Email " + userId.getEmail()));
 	}
 	
 	private ElementEntity retrieveElementFromDb (String domain, String id) {
@@ -206,6 +212,9 @@ public class DbElementService implements ExtendedElementService {
 		
 		if(user.getRole().equals(UserRole.MANAGER) || (user.getRole().equals(UserRole.PLAYER) && element.getActive())) {
 			// manager has access to all elements , player can only get 'active is true' elements
+			
+			System.err.println("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL\n" + this.converter.fromEntity(element));
+			
 			return this.converter.fromEntity(element);		
 		}
 		else {
@@ -384,10 +393,10 @@ public class DbElementService implements ExtendedElementService {
 	@Transactional(readOnly = true)
 	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng, double distance , int page, int size) {
 		
-		//TODO - check user role / email and return different elements accordingly
-		
+		// Checks if user is in the database
 		UserEntity user = retrieveUserFromDb(userDomain, userEmail);
 		
+		// Set max/min distance for the lng/lat
 		double lat_start = lat - distance;
 		double lat_end = lat + distance;
 		double lng_start = lng - distance; 
@@ -420,5 +429,78 @@ public class DbElementService implements ExtendedElementService {
 				.map(this.converter::fromEntity)  // Stream <ElementBoundary>
 				.collect(Collectors.toList());	// List <ElementBoundary>
 		}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> searchAllElementsOfUser(UserIdBoundary userId, int page, int size) {
+		// Check if user exists
+		UserEntity user = retrieveUserFromDb(userId);
+		
+		// Gets all elements of that user
+		List <ElementEntity> results;
+		
+		// Gets all elements that were created by user
+		if (user.getRole().equals(UserRole.MANAGER)) {
+			results = this.elementDao.findAllByCreatedBy(
+					new CreatedByEntity(new UserIdEntity(userId.getDomain(), userId.getEmail())),
+					PageRequest.of(page, size, Direction.ASC, "elementId"));
+		}
+		else if (user.getRole().equals(UserRole.PLAYER)) {
+			results = this.elementDao.findAllByCreatedByAndActive(
+					new CreatedByEntity(new UserIdEntity(userId.getDomain(), userId.getEmail())), true,
+					PageRequest.of(page, size, Direction.ASC, "elementId"));
+		}
+		else {
+			throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
+		}
+		
+		return results.stream()
+				.map(this.converter::fromEntity)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ElementBoundary> searchElementsByNameAndType(UserIdBoundary userId, String name, String type, int page, int size) {
+		// Check if user exists
+		UserEntity user = retrieveUserFromDb(userId);
+		
+		List <ElementEntity> results;	
+		
+		// Gets all elements with a specific name and type
+		if(user.getRole().equals(UserRole.PLAYER)) {
+			results = this.elementDao.findAllByNameAndTypeAndActive(
+					name, type, true, PageRequest.of(page, size, Direction.ASC, "elementId"));
+		}
+		else if (user.getRole().equals(UserRole.MANAGER)) {
+			results = this.elementDao.findAllByNameAndType(
+					name, type, PageRequest.of(page, size, Direction.ASC, "elementId"));			
+		}
+		else {
+			throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
+		}
+		
+		return results.stream()
+				.map(this.converter::fromEntity)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional
+	public void deleteSpecificElement(UserIdBoundary userId, IdBoundary element) {
+		
+		// Check if user exists
+		UserEntity user = retrieveUserFromDb(userId);
+		
+		if(!user.getRole().equals(UserRole.ADMIN)) {
+			throw new PageNotFound("User Isn't Allowed To Delete");
+		}
+		
+		// Check if element exists
+		ElementEntity entity = retrieveElementFromDb(element.getDomain(), element.getId());
+		
+		// Deletes the element
+		this.elementDao.delete(entity);
+	}
 	
 }

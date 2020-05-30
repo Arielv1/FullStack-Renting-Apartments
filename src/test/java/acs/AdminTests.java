@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
@@ -134,12 +136,13 @@ public class AdminTests {
 
 		// this deletes the admin users too , so we needed to re-enter another admin for
 		// the @aftereach to work - ariel
-
-		assertThat(this.restTemplate.getForObject(this.url + GET_ALL_USERS_URL, UserBoundary[].class, "TestAdminDomain",
-				"tomer32@gmail.com")).hasSize(0);
-
-		this.admin = this.restTemplate.postForObject(this.url + CREATE_USER,
-				new UserNewDetails("a@gmail.com", UserRole.ADMIN, "admin", ":*"), UserBoundary.class);
+		
+		this.admin =  this.restTemplate.postForObject(this.url + CREATE_USER,  
+				new UserNewDetails("a@gmail.com",  UserRole.ADMIN, "admin", ":*"),
+	 			UserBoundary.class);
+		
+		assertThat(this.restTemplate.getForObject(this.url + GET_ALL_USERS_URL, UserBoundary[].class, 
+				this.admin.getUserId().getDomain(),this.admin.getUserId().getEmail())).hasSize(1);
 
 	}
 	
@@ -158,13 +161,56 @@ public class AdminTests {
 
 		// getting elements again
 		ElementBoundary[] result = this.restTemplate.getForObject(this.url + GET_ALL_ELEMENTS_OF_USER,
-				ElementBoundary[].class, manager.getUserId().getDomain(), manager.getUserId().getEmail());
+				ElementBoundary[].class, this.manager.getUserId().getDomain(), this.manager.getUserId().getEmail());
 
 		// Then i get no Elements when i check it again
 		assertThat(result).isEmpty();
 
 	}
-
+	
+	
+	@Test
+	public void testCreateFiveElementsDeleteOneConfirmThatDatabaseHasFourElements() throws Exception {
+		
+		//GIVEN - Server contains 5 elements
+		//WHEN - Delete specific is invoke to delete the first element
+		//THEN - Server removes the 1st element from the database
+		
+		ElementBoundary dbContent[] = IntStream.range(0, 5) 
+				.mapToObj(n -> n)
+				.map(current -> 				
+				new ElementBoundary (null,"DELETE","NAME", true,new Date(),	new CreatedByBoundary(this.manager.getUserId()),null,null))
+				.map(boundary -> 
+					this.restTemplate.postForObject(this.url + CREATE_ELEMENT, 
+													boundary,
+													ElementBoundary.class,
+													manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+				.collect(Collectors.toList())
+				.toArray(new ElementBoundary[0]);
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_ALL_ELEMENTS_OF_USER, 
+						ElementBoundary[].class, 
+						manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+			.hasSize(5);
+		
+		
+		this.restTemplate.postForObject(this.url + CREATE_ACTION, 
+				new ActionBoundary(new IdBoundary("ofir", null), "deleteSpecific",
+						new ActionElementBoundary(new IdBoundary(
+								dbContent[0].getElementId().getDomain(), dbContent[0].getElementId().getId())),
+						new Date(),
+						new InvokedByBoundary(new UserIdBoundary(admin.getUserId().getDomain(), admin.getUserId().getEmail())),
+						null),
+				ActionBoundary.class);
+		
+		assertThat(this.restTemplate
+				.getForObject(this.url + GET_ALL_ELEMENTS_OF_USER, 
+						ElementBoundary[].class, 
+						manager.getUserId().getDomain(), manager.getUserId().getEmail()))
+			.hasSize(4);
+	}
+	
 	@Test
 	public void checkExportAllUsers() throws Exception {
 		// Given the database contains an Actions
@@ -175,7 +221,7 @@ public class AdminTests {
 
 		// When i get all Users
 		UserBoundary[] result = this.restTemplate.getForObject(this.url + GET_ALL_USERS_URL, UserBoundary[].class,
-				"TestAdminDomain", "tomer32@gmail.com");
+				this.admin.getUserId().getDomain(), this.admin.getUserId().getEmail());
 
 		// Then i check if has same size as i create and check if they equals
 		assertThat(result).hasSize(4);
@@ -191,7 +237,7 @@ public class AdminTests {
 		// create element
 		ElementBoundary element = this.restTemplate.postForObject(this.url + CREATE_ELEMENT, 
 				 new ElementBoundary(null, "INFO", "testName", true, new Date(), null, null, null),
-				ElementBoundary.class, manager.getUserId().getDomain(), manager.getUserId().getEmail());
+				ElementBoundary.class, this.manager.getUserId().getDomain(), this.manager.getUserId().getEmail());
 		
 		// create Action
 		ActionBoundary action = this.restTemplate.postForObject(this.url + CREATE_ACTION,
@@ -199,14 +245,14 @@ public class AdminTests {
 						new ActionElementBoundary(new IdBoundary(
 								element.getElementId().getDomain(), element.getElementId().getId())),
 						new Date(),
-						new InvokedByBoundary(new UserIdBoundary(player.getUserId().getDomain(), player.getUserId().getEmail())),
+						new InvokedByBoundary(new UserIdBoundary(this.player.getUserId().getDomain(), this.player.getUserId().getEmail())),
 						null), 
 				ActionBoundary.class);
 
 		// When i get all Actions
 
 		ActionBoundary[] result = this.restTemplate.getForObject(this.url + GET_ALL_ACTIONS_URL, ActionBoundary[].class,
-				"TestAdminDomain", "tomer32@gmail.com");
+				this.admin.getUserId().getDomain(), this.admin.getUserId().getEmail());
 
 		// Then i get list of the actions
 		assertThat(result).hasSize(1);
@@ -222,7 +268,7 @@ public class AdminTests {
 		//create element
 		ElementBoundary element = this.restTemplate.postForObject(this.url + CREATE_ELEMENT, 
 				 new ElementBoundary(null, "INFO", "testName", true, new Date(), null, null, null),
-				ElementBoundary.class, manager.getUserId().getDomain(), manager.getUserId().getEmail());
+				ElementBoundary.class, this.manager.getUserId().getDomain(), this.manager.getUserId().getEmail());
 		
 		IntStream.range(0, 20).mapToObj(n -> "Object #" + n) // Stream<Strings> to Stream <Objects>
 				.map(current -> // Initialize each object
@@ -230,7 +276,7 @@ public class AdminTests {
 						new ActionElementBoundary(new IdBoundary(
 								element.getElementId().getDomain(), element.getElementId().getId())),
 						new Date(),
-						new InvokedByBoundary(new UserIdBoundary(player.getUserId().getDomain(), player.getUserId().getEmail())), null))
+						new InvokedByBoundary(new UserIdBoundary(this.player.getUserId().getDomain(), this.player.getUserId().getEmail())), null))
 				.forEach(boundary -> // Invoke POST for each object
 				this.restTemplate.postForObject("http://localhost:" + this.port + "/acs/actions", boundary,
 						ActionBoundary.class));
@@ -253,7 +299,7 @@ public class AdminTests {
 		//create element
 		ElementBoundary element = this.restTemplate.postForObject(this.url + CREATE_ELEMENT, 
 				 new ElementBoundary(null, "INFO", "testName", true, new Date(), null, null, null),
-				ElementBoundary.class, manager.getUserId().getDomain(), manager.getUserId().getEmail());
+				ElementBoundary.class, this.manager.getUserId().getDomain(), this.manager.getUserId().getEmail());
 		
 		IntStream.range(0, 20).mapToObj(n -> "Object #" + n) // Stream<Strings> to Stream <Objects>
 				.map(current -> // Initialize each object
@@ -261,7 +307,7 @@ public class AdminTests {
 						new ActionElementBoundary(new IdBoundary(
 								element.getElementId().getDomain(), element.getElementId().getId())),
 						new Date(),
-						new InvokedByBoundary(new UserIdBoundary(player.getUserId().getDomain(), player.getUserId().getEmail())), null))
+						new InvokedByBoundary(new UserIdBoundary(this.player.getUserId().getDomain(), this.player.getUserId().getEmail())), null))
 				.forEach(boundary -> // Invoke POST for each object
 				this.restTemplate.postForObject("http://localhost:" + this.port + "/acs/actions", boundary,
 						ActionBoundary.class));
@@ -269,7 +315,7 @@ public class AdminTests {
 		// WHEN GET samples/byMessagePattern/?size=6&page=3
 		ActionBoundary[] actualResults = this.restTemplate.getForObject(
 				this.url + GET_ALL_ACTIONS_URL + "?size={size}&page={page}", ActionBoundary[].class,
-				admin.getUserId().getDomain(), admin.getUserId().getEmail(), 10, 2);
+				this.admin.getUserId().getDomain(), this.admin.getUserId().getEmail(), 10, 2);
 
 		// THEN the result contains 2 results
 		assertThat(actualResults).hasSize(0);
@@ -283,7 +329,7 @@ public class AdminTests {
 		//create element
 		ElementBoundary element = this.restTemplate.postForObject(this.url + CREATE_ELEMENT, 
 				 new ElementBoundary(null, "INFO", "testName", true, new Date(), null, null, null),
-				ElementBoundary.class, manager.getUserId().getDomain(), manager.getUserId().getEmail());
+				ElementBoundary.class, this.manager.getUserId().getDomain(), this.manager.getUserId().getEmail());
 		
 		IntStream.range(0, 2).mapToObj(n -> "Object #" + n) // Stream<Strings> to Stream <Objects>
 				.map(current -> // Initialize each object
@@ -299,7 +345,7 @@ public class AdminTests {
 		// WHEN GET samples/byMessagePattern/?size=6&page=3
 		ActionBoundary[] actualResults = this.restTemplate.getForObject(
 				this.url + GET_ALL_ACTIONS_URL + "?size={size}&page={page}", ActionBoundary[].class,
-				admin.getUserId().getDomain(), admin.getUserId().getEmail(), 3, 0);
+				this.admin.getUserId().getDomain(), this.admin.getUserId().getEmail(), 3, 0);
 
 		// THEN the result contains 2 results
 		assertThat(actualResults).hasSize(2);

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
+import acs.rest.utils.UserIdBoundary;
 
 public interface ExtendedElementService extends ElementService{
 	
@@ -17,5 +18,7 @@ public interface ExtendedElementService extends ElementService{
 	public List<ElementBoundary> searchElementsByType(String userDomain, String userEmail, String type, int page, int size);
 	public List<ElementBoundary> searchElementsByLocation(String userDomain, String userEmail, double lat, double lng, double distance , int page, int size);
 
-
+	public List<ElementBoundary> searchAllElementsOfUser(UserIdBoundary userId, int page, int size);
+	public List<ElementBoundary> searchElementsByNameAndType(UserIdBoundary userId, String name, String type, int page, int size);
+	public void deleteSpecificElement(UserIdBoundary user , IdBoundary element);
 }
