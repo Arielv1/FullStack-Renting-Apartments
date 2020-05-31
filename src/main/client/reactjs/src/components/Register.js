@@ -1,23 +1,12 @@
-// import React, {Component , useContext} from 'react';
-import React, {useState} from 'react';
+import React from 'react';
 import axios from 'axios';
-import {Route, Redirect , browserHistory} from 'react-router';
 import {Card, Form, Button, Col} from 'react-bootstrap';
-import Select from 'react-select';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlusSquare,faSign} from '@fortawesome/free-solid-svg-icons';
-// import MyToast from './MyToast';
-// import { UserContext } from './UserContext';
-// import { PageContext } from "./PageContextProvider";
 
 
 
-const optionsBoolean = [
-    {value:'True', label: 'True'},
-    {value:'False', label: 'False'},
-];
-
- class Register extends React.Component {
+export default class Register extends React.Component {
 
     constructor(props)
     {
@@ -32,8 +21,6 @@ const optionsBoolean = [
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        // this.handleChangeSelect = this.handleChangeSelect.bind(this);
-
 
     }
 
@@ -42,16 +29,7 @@ const optionsBoolean = [
           [event.target.name]: event.target.value
         });
       }
-
-    //   handleChangeSelect(e) {
-    //     let {name, value} = e.target;
-    //     this.setState({
-    //       [name]: value,
-        
-    //     });
-        
-    //     }
-      
+     
     handleSubmit(event) {
         const user = {
            email: this.state.email,
@@ -124,34 +102,7 @@ const optionsBoolean = [
                             <option value="ADMIN">Admin</option>
                             <option value="MANAGER">Manager</option>
                             <option value="PLAYER">Player</option>
-                            </select>
-                            {/* <Form.Control required/> */}
-                                {/* <Select
-                                name="role"
-                                options={optionsBoolean}
-                                className={"bg-dark text-white"}
-                                onChange={this.handleChange}
-
-                                /> */}
-                                 {/* <option selected>Open this select menu</option>
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                                <option value="3">Option 3</option>
-                                <option value="4">Option 4</option>
-                                <option value="5">Option 5</option> */}
-                            {/* <Form.Control required
-                                type="select" name="role"
-                                value={role}
-                                onChange={this.handleChange}
-                                className={"bg-dark text-white"}
-                                placeholder="Enter User Role " />
-                                <select class="mdb-select md-form colorful-select dropdown-primary">
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                                <option value="3">Option 3</option>
-                                <option value="4">Option 4</option>
-                                <option value="5">Option 5</option>
-                                </select> */}
+                            </select>צ
                         </Form.Group>
                         <Form.Group as={Col} controlId="formGridAvatar">
                             <Form.Label>Avatar</Form.Label>
@@ -179,33 +130,3 @@ const optionsBoolean = [
 
 
 }
-export default Register;
-
-
-{/* <div>
-<LoginForm/>
-<div style={{"display":this.state.show ? "block" : "none"}}>
-<MyToast show = {this.state.show} message = {this.state.method === "put" ? "Login Successfully." : "Login Failed."} type = {"info"}/>
-</div>
-
-<form onSubmit={this.handleSubmit}>
- <input
-   type="email"
-   name="email"
-   placeholder="email"
-   value={this.state.email}
-   onChange={this.handleChange}
-   required
- />
-
- <input
-   type="text"
-   name="domain"
-   placeholder="domain"
-   value={this.state.domain}
-   onChange={this.handleChange}
-   required
- />
- <button type="submit">Login</button>
-</form>
-</div> */}

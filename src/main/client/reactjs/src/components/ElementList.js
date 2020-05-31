@@ -93,22 +93,6 @@ export default class ElementList extends Component {
             });
     };
 
-    // deleteElement = (elementId) => {
-    //     // there is no delete in our Rest so i will not check it...
-    //     // axios.delete("http://localhost:8081/rest/books/"+elementId)
-    //         .then(response => {
-    //             if(response.data != null) {
-    //                 this.setState({"show":true});
-    //                 setTimeout(() => this.setState({"show":false}), 3000);
-    //                 this.setState({
-    //                     elements: this.state.elements.filter(element => elementId !== elementId)
-    //                 });
-    //             } else {
-    //                 this.setState({"show":false});
-    //             }
-    //         });
-    // };
-
     render(){
         const {elements, currentPage} = this.state;
         const pageNumCss = {
