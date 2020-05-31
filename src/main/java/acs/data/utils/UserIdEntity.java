@@ -30,7 +30,7 @@ public class UserIdEntity implements Serializable{
 		this.email = email;
 	}
 	
-	@Column(name = "USER_DOMAIN",insertable = false, updatable = false)
+	@Column(name = "USER_DOMAIN")
 	public String getDomain() {
 		return domain;
 	}
