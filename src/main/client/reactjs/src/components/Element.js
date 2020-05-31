@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {Card, Form, Button, Col} from 'react-bootstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faSave, faPlusSquare, faUndo, faList, faEdit} from '@fortawesome/free-solid-svg-icons';
-
+import {faSave, faPlusSquare, faUndo, faEdit} from '@fortawesome/free-solid-svg-icons';
 import MyToast from './MyToast';
 import axios from 'axios';
 
@@ -41,7 +40,7 @@ export default class Element extends Component {
             this.findBookById(elementIDomain,elementIDID);
         }
         else {
-            alert("no element Id");
+            console.log("no element Id");
         }
     }
 
@@ -73,11 +72,12 @@ export default class Element extends Component {
         const element = {
             elementId: this.state.elementId,
             domain: "2020B.Ofir.Cohen",
-            email: this.createdBy,
-            userId: {"domain":  this.domain , "email": this.email},
+            email: this.state.createdBy,
+            userId: {"domain":  "2020B.Ofir.Cohen", "email": this.state.email},
             type: this.state.type,
             name: this.state.name,
-            active: true,
+            active: this.state.active,
+            // createdBy: this.state.userId,
             createdBy: this.userId,
             location: {"lat":this.state.location , "lng":1.1},
             attributes: this.state.attributes
@@ -106,13 +106,13 @@ export default class Element extends Component {
         event.preventDefault();
         const element = {
             domain: "2020B.Ofir.Cohen",
-            email: this.createdBy,
-            userId: {"domain":  this.domain , "email": this.email},
+            email: this.state.createdBy,
+            userId: {"domain":  "2020B.Ofir.Cohen" , "email": this.state.email},
 
 
             type: this.state.type,
             name: this.state.name,
-            active: true,
+            active: this.state.active,
             createdBy: this.userId,
             location: {"lat":this.state.location , "lng":1.1},
             attributes: this.state.attributes
@@ -127,6 +127,8 @@ export default class Element extends Component {
                     this.setState({"show":false});
                 }
             });
+
+            
     }
 
     elementChange(event) {

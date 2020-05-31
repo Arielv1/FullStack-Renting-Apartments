@@ -7,10 +7,7 @@ import axios from 'axios';
 import MyToast from './MyToast';
 import {Link} from 'react-router-dom';
 
-
-
-
-export default class ElementList extends Component {
+export default class BuildingsList extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -20,13 +17,11 @@ export default class ElementList extends Component {
         };
     }
     componentDidMount(){
-        this.findAllElements(this.state.currentPage);
+        this.findAllBuildings(this.state.currentPage);
     }
 
-    findAllElements(currentPage){
-        console.log(currentPage);
-        console.log(this.state.currentPage);
-        axios.get("/acs/elements/2020b.ofir.cohen/m@gmail.com?page="+currentPage+"&size="+this.state.elementsPerPage)
+    findAllBuildings(currentPage){
+        axios.get("/acs/elements/2020b.ofir.cohen/m@gmail.com/search/byType/Building?page="+currentPage+"&size="+this.state.elementsPerPage)
             .then(response => response.data)
             .then((data) => {
                 console.log(data);
@@ -39,8 +34,7 @@ export default class ElementList extends Component {
 
     changePage = event => {
         let targetPage = parseInt(event.target.value);
-        this.findAllElements(targetPage);
-        // this.state.currentPage = targetPage;
+        this.findAllBuildings(targetPage);
         this.setState({
             [event.target.name]: targetPage
         });
@@ -51,63 +45,57 @@ export default class ElementList extends Component {
         this.setState({
             currentPage: 0
         });
-        this.findAllElements(0);
+        this.findAllBuildings(0);
 
     };
 
     prevPage = () => {
         if(this.state.currentPage > 0) {
-            this.findAllElements(this.state.currentPage -1);
+            this.findAllBuildings(this.state.currentPage -1);
             this.setState({
                 currentPage: this.state.currentPage -1
             });
         }
     };
 
-    // lastPage = () => {
-    //     let condition = Math.ceil(this.state.totalElements / this.state.elementsPerPage);
-    //     if(this.state.currentPage < condition) {
-    //         this.findAllElements(condition);
-    //     }
-    // };
-
     nextPage = () => {
         this.setState({
             currentPage: this.state.currentPage +1
         });
-        this.findAllElements(this.state.currentPage + 1);
+        this.findAllBuildings(this.state.currentPage + 1);
     };
 
-    deleteAllElement = () => {
-        axios.delete("/acs/admin/elements/2020b.ofir.cohen/a@gmail.com")
+    deleteBuilding = (element) => {
+        console.log("deletApartment called");
+        console.log(element);
+        const action = 
+        {
+            type:"deleteSpecific",
+            element: {
+                "elementId":{
+                    "domain":"2020b.ofir.cohen",
+                    "id":element.elementId.id
+                    }
+            },
+            invokedBy: { "userId":{
+                "domain": "2020b.ofir.cohen",
+                "email": "a@gmail.com"
+            }}
+        }
+        console.log(action);
+        axios.post("acs/actions",action)
             .then(response => {
                 if(response.data != null) {
                     this.setState({"show":true});
                     setTimeout(() => this.setState({"show":false}), 3000);
                     this.setState({
-                        elements: ""
+                        elements: this.state.elements.filter(elementis => elementis.elementId.id !== element.elementId.id)
                     });
                 } else {
                     this.setState({"show":false});
                 }
             });
     };
-
-    // deleteElement = (elementId) => {
-    //     // there is no delete in our Rest so i will not check it...
-    //     // axios.delete("http://localhost:8081/rest/books/"+elementId)
-    //         .then(response => {
-    //             if(response.data != null) {
-    //                 this.setState({"show":true});
-    //                 setTimeout(() => this.setState({"show":false}), 3000);
-    //                 this.setState({
-    //                     elements: this.state.elements.filter(element => elementId !== elementId)
-    //                 });
-    //             } else {
-    //                 this.setState({"show":false});
-    //             }
-    //         });
-    // };
 
     render(){
         const {elements, currentPage} = this.state;
@@ -122,56 +110,43 @@ export default class ElementList extends Component {
         return (
             <div>
                 <div style={{"display":this.state.show ? "block" : "none"}}>
-                <MyToast show = {this.state.show} message = {"Element Deleted Successfully."} type = {"danger"}/>
+                <MyToast show = {this.state.show} message = {"Building Deleted Successfully."} type = {"danger"}/>
                 </div>
                 <Card className={"border border-dark bg-dark text-white"}>
-                <Card.Header><FontAwesomeIcon icon={faList}/>Element List</Card.Header>
+                <Card.Header><FontAwesomeIcon icon={faList}/> Buildings List</Card.Header>
                 <Card.Body>
                     <Table bordered hover striped variant="dark">
                         <thead>
                             <tr>
-                            {/* <th>ElementDomain</th> */}
-                            <th>ElementId</th>
-                            <th>Name</th>
+                            <th>Building Name</th>
+                            <th>Building Number</th>
                             <th>Type</th>
-                            <th>Active</th>
-                            <th>Date Created</th>
-                            <th>CreatedBy</th>
-                            <th>Location</th>
-                            <th>Element Attributes</th>
-                            <th>Edit</th>
-
+                            <th>Number of Floors</th>
+                            <th>Parking Lot</th>
+                            <th>Last Tama Date</th>
+                            <th>intended For Tama Or PinoiBinoi</th>
+                            <th>Edit/Delete</th>
                             </tr>
                         </thead>
                         <tbody>
                             {
                                 elements.length === 0 ?
                                 <tr align="center">
-                                <td colSpan="10">No Elements Available.</td>
+                                <td colSpan="10">No Buildings Available.</td>
                                 </tr> :
-                                // this.state.elements.map((element) => (
                                     elements.map((element) => (
                                 <tr key={element.elementId.id}>
-                                    {/* <td> {element.elementId.domain}</td> */}
-                                    <td>{element.elementId.id} </td>
                                     <td>{element.name} </td>
+                                    <td>{element.elementAttributes.building_No} </td>
                                     <td>{element.type} </td>
-                                    {element.active ?
-                                    (<td>True</td>)
-                                    :
-                                    (<td>False</td>)
-                                    }
-                                    {/* <td>{element.active}</td> */}
-                                    <td>{element.createdTimestamp} </td>
-                                    <td>UserDomain: {element.createdBy.userId.domain} Email: {element.createdBy.userId.email} </td>
-                                    <td>Lat:{element.location.lat} Lng:  {element.location.lng} </td>
-                                    <td>{element.elementAttributes} </td>
+                                    <td>{element.elementAttributes.num_Of_Floors} </td>
+                                    <td>{element.elementAttributes.Parking_Lot} </td>
+                                    <td>{element.elementAttributes.last_Tama_Date} </td>
+                                    <td>{element.elementAttributes.intended_For_Tama_Or_PinoiBinoi} </td>
                                     <td>
                                             <ButtonGroup>
-                                                {/* <Link to={"edit/"+element.elementId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit} /></Link>{' '} */}
-                                                {/* <Link to={"edit/${element.elementId}"} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit} /></Link>{' '} */}
-                                                <Link to={"edit/"+element.elementId.domain +"/"+element.elementId.id} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit} /></Link>{' '}
-                                                <Button size="sm" variant="outline-danger" onClick={this.deleteAllElement.bind(this)}><FontAwesomeIcon icon={faTrash} /></Button>
+                                                <Link to={"edit/Building/"+element.elementId.domain +"/"+element.elementId.id} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit} /></Link>{' '}
+                                                <Button size="sm" variant="outline-danger" onClick={this.deleteBuilding.bind(this,element)}><FontAwesomeIcon icon={faTrash} /></Button>
                                             </ButtonGroup>
                                         </td>
                                 </tr>
@@ -203,10 +178,6 @@ export default class ElementList extends Component {
                                         onClick={this.nextPage}>
                                         <FontAwesomeIcon icon={faStepForward} /> Next
                                     </Button>
-                                    {/* <Button type="button" variant="outline-info" disabled={currentPage === totalPages ? true : false}
-                                        onClick={this.lastPage}>
-                                        <FontAwesomeIcon icon={faFastForward} /> Last
-                                    </Button> */}
                                 </InputGroup.Append>
                             </InputGroup>
                         </div>

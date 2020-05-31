@@ -4,7 +4,6 @@ import {Toast} from 'react-bootstrap';
 export default class MyToast extends Component {
 
     render(){
-
         const toastCss = {
             position: 'fixed',
             top: '10px',
