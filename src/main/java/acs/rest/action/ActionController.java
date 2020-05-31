@@ -22,6 +22,7 @@ public class ActionController {
 	private final int DEFAULT_PAGE_SIZE = 10;
 	private final int DEFAULT_PAGE_NUM = 0;
 	private final String EXPECTED_SEARCH_FIELDS[] = {"type", "name"};
+	private final String ACTION_TYPES[] = {"searchElementsOfUser", "searchElementsByNameAndType", "deleteSpecific"};
 	private ActionService actionService;
 	private ExtendedElementService elementService;
 	
@@ -36,18 +37,20 @@ public class ActionController {
 	@RequestMapping(path = "/acs/actions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public Object invokeAnAction(@RequestBody ActionBoundary action) {
 		
-		if(action.getType().equals("searchElementsOfUser")) {
+		// Check if  'searchElementsOfUser' is invoked
+		if(action.getType().equals(ACTION_TYPES[0])) {
 			return this.elementService.searchAllElementsOfUser(action.getInvokedBy().getUserId(), DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE);
 		}
 		
-		if(action.getType().equals("searchElementsByNameAndType")) {
+		// check if 'searchElementsByNameAndType' is invoked
+		if(action.getType().equals(ACTION_TYPES[1])) {
 			String type = "", name = "";
 			
 			for(Entry<String, Object> es : action.getActionAttributes().entrySet()) {
-				if(es.getKey().equals(EXPECTED_SEARCH_FIELDS[0])) {
+				if(es.getKey().equals(EXPECTED_SEARCH_FIELDS[0])) { // search for 'type' key
 					type = (String) es.getValue();
 				}
-				if(es.getKey().equals(EXPECTED_SEARCH_FIELDS[1])) {
+				if(es.getKey().equals(EXPECTED_SEARCH_FIELDS[1])) { // search for 'name' key
 					name = (String) es.getValue();
 				}
 			}
@@ -59,7 +62,8 @@ public class ActionController {
 					DEFAULT_PAGE_SIZE);
 		}
 		
-		if(action.getType().equals("deleteSpecific")) {
+		// Check if 'deleteSpecific' is invoked
+		if(action.getType().equals(ACTION_TYPES[2])) {
 			this.elementService.deleteSpecificElement(action.getInvokedBy().getUserId(), action.getElement().getElementId());
 			return null;
 		}
