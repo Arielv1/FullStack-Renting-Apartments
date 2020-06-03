@@ -1,8 +1,6 @@
 package acs.logic.element;
 
-import java.util.*;
 import org.springframework.stereotype.Component;
-
 import acs.data.elements.ElementEntity;
 import acs.data.elements.LocationEntity;
 import acs.data.utils.ElementIdEntity;
@@ -16,26 +14,7 @@ import acs.rest.utils.UserIdBoundary;
 
 @Component
 public class ElementConverter {
-   /* "elementId": {
-    	"domain" : "2020B.Ofir.Cohen"
-        "ID": 1
-    },
-    "type": "demoType",
-    "name": "demoName",
-    "active": false,
-    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
-    "createdBy": {
-    	"userid":{
-    		"domain:"2020b.ofir.cohen",
-        	"email": "ofir.cohen@gmail.com"
-        	}
-    },
-    "location": {
-        "lat": "00.00"
-    },
-    "elementAttribues": {
-        "demoAttribute": "demoValue"
-    }*/
+
 	public ElementBoundary fromEntity (ElementEntity entity) {
 		
 		IdBoundary elementIdBoundary = new IdBoundary();
@@ -143,7 +122,7 @@ public class ElementConverter {
 			entity.setLocation(locationEntity);
 		} 
 		else {
-			//TODO default location - subject to change
+			
 			entity.setLocation(new LocationEntity(0, 0));
 		}
 		

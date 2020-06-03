@@ -1,6 +1,5 @@
 package acs.logic.element;
 
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,14 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
-
-import acs.data.*;
 import acs.data.elements.CreatedByEntity;
 import acs.data.elements.ElementEntity;
 import acs.data.elements.LocationEntity;

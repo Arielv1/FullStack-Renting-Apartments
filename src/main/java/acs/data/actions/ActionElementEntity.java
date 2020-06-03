@@ -2,9 +2,7 @@ package acs.data.actions;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
-
 import acs.data.utils.ElementIdEntity;
-import acs.rest.utils.IdBoundary;
 
 @Embeddable
 public class ActionElementEntity  {

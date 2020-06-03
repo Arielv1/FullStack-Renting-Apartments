@@ -90,11 +90,6 @@ public class ElementTests {
 		
 		
 	}
-
-	@BeforeEach
-	public void setUsers() {
-		
-	}
 	
 	@LocalServerPort
 	public void setPort(int port) {

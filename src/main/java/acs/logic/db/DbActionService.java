@@ -1,24 +1,17 @@
 package acs.logic.db;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import acs.dal.ActionDao;
 import acs.dal.ElementDao;
 import acs.dal.UserDao;
@@ -62,12 +55,6 @@ public class DbActionService implements ExtendedActionService {
 	@Value("${spring.application.name:ofir.cohen}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
-	}
-
-	@PostConstruct
-	public void init() {
-		// initialize object after injection
-		System.err.println("project name: " + this.projectName);
 	}
 
 	private UserEntity retrieveUserInfoFromDb(String domain, String email) {

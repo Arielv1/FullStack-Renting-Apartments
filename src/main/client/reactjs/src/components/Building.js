@@ -132,7 +132,7 @@ export default class Building extends Component {
                 <Card.Body>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridName">
-                            <Form.Label>Building Name</Form.Label>
+                            <Form.Label>Street Name</Form.Label>
                             <Form.Control required
                                 type="text" name="building_name"
                                 value={building_name}

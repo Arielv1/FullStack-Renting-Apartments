@@ -2,7 +2,6 @@ package acs.data.actions;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
-
 import acs.data.utils.UserIdEntity;
 
 

@@ -102,7 +102,7 @@ export default class Register extends React.Component {
                             <option value="ADMIN">Admin</option>
                             <option value="MANAGER">Manager</option>
                             <option value="PLAYER">Player</option>
-                            </select>צ
+                            </select>
                         </Form.Group>
                         <Form.Group as={Col} controlId="formGridAvatar">
                             <Form.Label>Avatar</Form.Label>
