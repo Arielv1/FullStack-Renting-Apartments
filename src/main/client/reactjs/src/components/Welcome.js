@@ -15,6 +15,10 @@ export default class Welcome extends Component {
                     <h2> Welcome {username}</h2>
 
                 }
+                {
+                    <img src="roundMe.jpg" alt=""/>
+
+                }
              </div>
 
         );
