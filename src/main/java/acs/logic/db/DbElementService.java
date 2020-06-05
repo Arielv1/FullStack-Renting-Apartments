@@ -31,7 +31,6 @@ import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.element.boundaries.ElementBoundary;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
-import acs.rest.utils.ValidEmail;
 
 @Service
 public class DbElementService implements ExtendedElementService {
@@ -53,13 +52,6 @@ public class DbElementService implements ExtendedElementService {
 		this.converter = converter;
 		this.elementDao = elementDao;
 		this.userDao = userDao;
-		
-	}
-	
-	@PostConstruct
-	public void init() {
-		// initialize object after injection
-		System.err.println("Project : " + this.projectName + " initialized DbElementService");
 		
 	}
 	
@@ -454,6 +446,10 @@ public class DbElementService implements ExtendedElementService {
 			throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
 		}
 		
+		if(results.size() == 0) {
+			throw new PageNotFound("No results found for " + userId.getEmail());
+		}
+		
 		return results.stream()
 				.map(this.converter::fromEntity)
 				.collect(Collectors.toList());
@@ -478,6 +474,10 @@ public class DbElementService implements ExtendedElementService {
 		}
 		else {
 			throw new ForbiddenActionException("User Doesn't Have Permission To Get Elements");
+		}
+		
+		if(results.size() == 0) {
+			throw new PageNotFound("No results found for " + type + " : " + name);
 		}
 		
 		return results.stream()

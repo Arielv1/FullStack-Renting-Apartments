@@ -118,13 +118,13 @@ export default class BuildingsList extends Component {
                     <Table bordered hover striped variant="dark">
                         <thead>
                             <tr>
-                            <th>Building Name</th>
+                            <th>Street Name</th>
                             <th>Building Number</th>
                             <th>Type</th>
                             <th>Number of Floors</th>
                             <th>Parking Lot</th>
                             <th>Last Tama Date</th>
-                            <th>intended For Tama Or PinoiBinoi</th>
+                            <th>Intended For Tama Or PinoiBinoi</th>
                             <th>Edit/Delete</th>
                             </tr>
                         </thead>

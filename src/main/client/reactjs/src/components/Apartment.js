@@ -132,7 +132,7 @@ export default class Apartment extends Component {
                 <Card.Body>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridName">
-                            <Form.Label>Name</Form.Label>
+                            <Form.Label>Name (*)</Form.Label>
                             <Form.Control required
                                 type="text" name="apartment_name"
                                 value={apartment_name}
@@ -141,7 +141,7 @@ export default class Apartment extends Component {
                                 placeholder="Enter Apartment Name" />
                         </Form.Group>
                         <Form.Group as={Col} controlId="formGridType">
-                            <Form.Label>Apartment Number</Form.Label>
+                            <Form.Label>Apartment Number (*)</Form.Label>
                             <Form.Control required
                                 type="number" name="apartment_No"
                                 pattern="[0-9]*"
@@ -153,7 +153,7 @@ export default class Apartment extends Component {
                     </Form.Row>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridCreatedBy">
-                            <Form.Label>Floor</Form.Label>
+                            <Form.Label>Floor (*)</Form.Label>
                             <Form.Control required
                                 type="number" name="floor"
                                 pattern="[0-9]*"
@@ -163,18 +163,18 @@ export default class Apartment extends Component {
                                 placeholder="Enter Apartment Floor" />
                         </Form.Group>
                         <Form.Group as={Col} controlId="formGridActive">
-                            <Form.Label>Last_Renovation_Date</Form.Label>
+                            <Form.Label>Last Renovation Date (*)</Form.Label>
                             <Form.Control required
                                 type="date" name="last_Renovation_Date"
                                 value={last_Renovation_Date}
                                 onChange={this.elementChange}
                                 className={"bg-dark text-white"}
-                                placeholder="Enter Apartment Last Renvation Date" />
+                                placeholder="Enter Apartment Last Renvotion Date" />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
                         <Form.Group as={Col} controlId="formGridLocation">
-                            <Form.Label>Owner</Form.Label>
+                            <Form.Label>Owner (*)</Form.Label>
                             <Form.Control required
                                 type="text" name="owner"
                                 value={owner}
@@ -183,7 +183,7 @@ export default class Apartment extends Component {
                                 placeholder="Enter Owner of the Apartment" />
                         </Form.Group>
                         <Form.Group as={Col} controlId="formGridAttributes">
-                            <Form.Label>number_Of_Rooms</Form.Label>
+                            <Form.Label>Number of Rooms</Form.Label>
                             <Form.Control
                                 type="number" name="number_Of_Rooms"
                                 pattern="[0-9]*"

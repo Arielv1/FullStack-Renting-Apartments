@@ -128,7 +128,7 @@ export default class ApartmentsList extends Component {
                             <th>Apartment No</th>
                             <th>Floor</th>
                             <th>Number of Rooms</th>
-                            <th>Last_Renovation_Date</th>
+                            <th>Last Renovation Date</th>
                             <th>Edit/Delete</th>
                             </tr>
                         </thead>

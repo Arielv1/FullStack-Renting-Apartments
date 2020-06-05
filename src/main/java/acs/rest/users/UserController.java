@@ -1,8 +1,5 @@
 package acs.rest.users;
 
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,14 +51,4 @@ public class UserController {
 			this.userService.updateUser(userDomain, userEmail, update);
 
 		}
-		
-		 // DUMMY DELETE METHOD - COPY TO ADMINCONTROLLER OR DELETE IF NEEDED
-		 // Delete (DELETE) all users
-		@RequestMapping(path = "/acs/users/admin/{adminDomain}/{adminEmail}",
-				method = RequestMethod.DELETE)
-		public void deleteAllUsers(@PathVariable("adminDomain") String adminDomain,
-				 					  @PathVariable("adminEmail") String adminEmail) {
-			this.userService.deleteAllUsers(adminDomain, adminEmail);	
-		}
-
 }

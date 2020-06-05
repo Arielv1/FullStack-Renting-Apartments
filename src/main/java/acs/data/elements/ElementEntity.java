@@ -20,29 +20,6 @@ import acs.dal.MapToJsonConverter;
 import acs.data.utils.ElementIdEntity;
 import acs.rest.element.*;
 import acs.rest.element.boundaries.CreatedByBoundary;
-/*
-    "elementId": {
-    	"domain" : "2020B.Ofir.Cohen"
-        "ID": 1
-    },
-    "type": "demoType",
-    "name": "demoName",
-    "active": false,
-    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
-    "createdBy": {
-    	"userid":{
-    		"domain:"2020b.ofir.cohen",
-        	"email": "ofir.cohen@gmail.com"
-        	}
-    },
-    "location": {
-        "lat": "00.00"
-    },
-    "elementAttributes": {
-        "demoAttribute": "demoValue"
-    }
- */
-
 
 @Entity 
 @Table(name = "ELEMENTS")

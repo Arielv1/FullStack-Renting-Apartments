@@ -28,11 +28,16 @@ public class UserTests {
 	private RestTemplate restTemplate;
 	private String url;
 	private String domain;
-
-	private final static String GET = "/login/{userDomain}/{userEmail}";
-	private final static String PUT = "/{userDomain}/{userEmail}";
-	private final static String DELETE_ALL_USERS = "/admin/TestAdminDomain/TestAdminEmail/";
 	
+	
+	private final static String GET = "users/login/{userDomain}/{userEmail}";
+	private final static String PUT = "users/{userDomain}/{userEmail}";
+	private final static String POST = "users";
+	private final static String DELETE_ALL_USERS = "/admin/users/{adminDomain}/{adminEmail}";
+	
+	private UserBoundary player;
+	private UserBoundary manager;
+	private UserBoundary admin;
 
 	@LocalServerPort
 	public void setPort(int port) {
@@ -41,14 +46,27 @@ public class UserTests {
 
 	@PostConstruct
 	public void init() {
-		this.url = "http://localhost:" + this.port + "/acs/users";
+		this.url = "http://localhost:" + this.port + "/acs/";
 		this.restTemplate = new RestTemplate();
 		this.domain = "2020b.ofir.cohen";
+		
+		this.player = this.restTemplate.postForObject(this.url + POST ,
+				 new UserNewDetails("p@gmail.com", UserRole.PLAYER, "player", ":_"),
+	  			UserBoundary.class);
+	
+	
+		this.manager = this.restTemplate.postForObject(this.url + POST,  
+				new UserNewDetails("m@gmail.com", UserRole.MANAGER, "manager", ":/"),
+		  			UserBoundary.class);
+		
+		this.admin =  this.restTemplate.postForObject(this.url + POST,  
+				new UserNewDetails("a@gmail.com",  UserRole.ADMIN, "admin", ":*"),
+	 			UserBoundary.class);
 	}
 
 	@AfterEach
 	public void tearDown() {
-		this.restTemplate.delete(this.url + DELETE_ALL_USERS);
+		this.restTemplate.delete(this.url + DELETE_ALL_USERS ,this.admin.getUserId().getDomain() , this.admin.getUserId().getEmail());
 	}
 
 	public String userIdToURL(UserIdBoundary userId) {
@@ -67,7 +85,7 @@ public class UserTests {
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails("tomer32@gmail.com", UserRole.ADMIN, "tomer test", ";[");
 
-		UserBoundary output = this.restTemplate.postForObject(this.url, input, UserBoundary.class);
+		UserBoundary output = this.restTemplate.postForObject(this.url+ POST , input, UserBoundary.class);
 
 		// THEN the server returns status 2xx
 		// AND retrieves a user with non null id
@@ -83,7 +101,7 @@ public class UserTests {
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails("tomer32@gmail.com", UserRole.ADMIN, "tomer test", ";[");
 
-		UserBoundary output = this.restTemplate.postForObject(this.url, input, UserBoundary.class);
+		UserBoundary output = this.restTemplate.postForObject(this.url + POST , input, UserBoundary.class);
 
 		// THEN the server returns status 2xx,
 		// AND retrieves a user with same email as sent to server
@@ -99,7 +117,7 @@ public class UserTests {
 		// WHEN I POST /users AND send a user boundary
 		UserNewDetails input = new UserNewDetails("tomer32@gmail.com", UserRole.ADMIN, "tomer test", ";[");
 
-		UserBoundary userPost = this.restTemplate.postForObject(this.url, input, UserBoundary.class);
+		UserBoundary userPost = this.restTemplate.postForObject(this.url + POST , input, UserBoundary.class);
 
 		// THEN server contains a single user in the database
 		// AND it's user details is similar input's
@@ -118,7 +136,7 @@ public class UserTests {
 		// WHEN I POST /samples AND send a user boundary
 		UserNewDetails input = new UserNewDetails("test23@gmail.com", UserRole.MANAGER, "testy test", ";=}");
 
-		UserBoundary userPost = this.restTemplate.postForObject(this.url, input, UserBoundary.class);
+		UserBoundary userPost = this.restTemplate.postForObject(this.url + POST , input, UserBoundary.class);
 
 		// THEN server contains user with generated role
 		UserBoundary output = this.restTemplate.getForObject(this.url + GET, UserBoundary.class, this.domain,
@@ -135,7 +153,7 @@ public class UserTests {
 
 		UserNewDetails input = new UserNewDetails("test23@gmail.com", UserRole.MANAGER, "testy test", ";=}");
 
-		UserBoundary inputUser = this.restTemplate.postForObject(this.url, input, UserBoundary.class);
+		UserBoundary inputUser = this.restTemplate.postForObject(this.url + POST , input, UserBoundary.class);
 
 		// WHEN I update details to be different avatar
 		inputUser.setAvatar(";]");
@@ -155,7 +173,7 @@ public class UserTests {
 
 		Object targetObject = Collections.singletonMap("x", "y");
 		try {
-			this.restTemplate.postForObject(this.url,
+			this.restTemplate.postForObject(this.url + POST ,
 
 					targetObject, UserBoundary.class);
 

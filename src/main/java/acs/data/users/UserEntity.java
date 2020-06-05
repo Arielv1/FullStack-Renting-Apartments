@@ -1,31 +1,18 @@
 package acs.data.users;
 
 
-import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import javax.persistence.Table;
-
 import acs.data.utils.UserIdEntity;
 import acs.data.utils.UserRole;
 
 
-/*
- {
- 	"userId": { 
- 		"domain" : "2020.b@demo",
- 		"email" : "tomerarnon@gma"il.com"
- 	},
- 	"role" : "PLAYER",
- 	"userName" : "demo user",
- 	"avatar" : ";-)"
- } 
- * 
- */
 
-@javax.persistence.Entity
+
+@Entity
 @Table(name = "USERS")
 public class UserEntity {
 	

@@ -4,29 +4,6 @@ import java.util.*;
 
 import acs.rest.utils.IdBoundary;
 
-
-/*
-    "elementId": {
-    	"domain" : "2020B.Ofir.Cohen"
-        "ID": 1
-    },
-    "type": "demoType",
-    "name": "demoName",
-    "active": false,
-    "createdTimestamp": "2020-04-01T08:10:44.284+0000",
-    "createdBy": {
-    	"userid":{
-    		"domain:"2020b.ofir.cohen",
-        	"email": "ofir.cohen@gmail.com"
-        	}
-    },
-    "location": {
-        "lat": "00.00"
-    },
-    "elementAttributes": {
-        "demoAttribute": "demoValue"
-    }
- */
 public class ElementBoundary {
 	private IdBoundary elementId;
 	private String type;

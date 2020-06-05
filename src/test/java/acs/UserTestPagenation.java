@@ -25,23 +25,34 @@ public class UserTestPagenation {
 	private int port;
 	private RestTemplate restTemplate;
 	private String url;
-
+	
+	private UserBoundary admin;
+	
 	@PostConstruct
 	public void init() {
-		this.url = "http://localhost:" + this.port + "/acs/";
+		this.url = "http://localhost:" + this.port + "/acs";
 		this.restTemplate = new RestTemplate();
+		
+		this.admin =  this.restTemplate.postForObject(this.url + "/users",  
+				new UserNewDetails("a@gmail.com",  UserRole.ADMIN, "admin", ":*"),
+	 			UserBoundary.class);
 	}
 
 	@LocalServerPort
 	public void setPort(int port) {
 		this.port = port;
 	}
-
-	@BeforeEach
+	
 	@AfterEach
 	public void setUp() {
+		
+		
 		UserBoundary admin = this.restTemplate.postForObject(this.url + "/users",
 				new UserNewDetails("adminx@gmail.com", UserRole.PLAYER, "x test", ";["), UserBoundary.class);
+	}
+	
+	@AfterEach
+	public void tearUp() {
 		this.restTemplate.delete(this.url + "/admin/users/{domain}/{email}", admin.getUserId().getDomain(),
 				admin.getUserId().getEmail());
 	}
@@ -56,14 +67,15 @@ public class UserTestPagenation {
 		for (int i = 0; i < 20; i++) {
 			users.add(this.restTemplate.postForObject(this.url + "/users",
 					new UserNewDetails("x" + i + "@gmail.com", UserRole.PLAYER, "x test " + i, ";["),
-					UserBoundary.class));
+					UserBoundary.class, 
+					admin.getUserId().getDomain(), admin.getUserId().getEmail()));
 			
 			
 			
 		}
 		// THEN the data base retrieve 10 users in the second page
 		UserBoundary[] getUsers = this.restTemplate.getForObject(this.url + "/admin/users/{domain}/{email}"
-		+"?size={size}&page={page}", UserBoundary[].class, "domain.test", "tomer40@gmail.com", 10,1);
+		+"?size={size}&page={page}", UserBoundary[].class, admin.getUserId().getDomain(), admin.getUserId().getEmail(), 10,1);
 		
 		assertThat(getUsers).hasSize(10);
 		

@@ -7,35 +7,6 @@ import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.utils.IdBoundary;
 
-/*
- {
- 	"actionId":{
- 		"domain":"2020b.demo",
- 		"id":"971"
- 	},
- 	"type":"actionType",
- 	"element":{
- 		"elementId":{
- 			"domain":"2020b.demo",
- 			"id":"54"
- 			}
- 	},
- 	"createdTimestamp":"2020-03-01T15:03:55.121+0000",
- 	"invokedBy":{
- 		"userId":{
- 			"domain":"2020b.demo",
- 			"email":"player@de.mo"
- 		}
- 	},
- 	"actionAttributes":{
- 		"key1":"can be set to any value you wish",
- 		"key2":44.5,
- 		"booleanValue":false,
- 		"lastKey":"it can contain anything you wish"
- 	}
- }
- */
-
 public class ActionBoundary {
 	private IdBoundary actionId;
 	private String type;

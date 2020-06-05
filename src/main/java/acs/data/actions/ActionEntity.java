@@ -2,22 +2,16 @@ package acs.data.actions;
 
 import java.util.Date;
 import java.util.Map;
-
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
 import acs.dal.MapToJsonConverter;
 import acs.data.utils.ActionIdEntity;
-import acs.rest.action.boundaries.ActionElementBoundary;
-import acs.rest.action.boundaries.InvokedByBoundary;
-import acs.rest.utils.IdBoundary;
 
 @Entity
 @Table(name = "ACTIONS")

@@ -7,16 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import acs.logic.action.ActionService;
 import acs.logic.action.ExtendedActionService;
 import acs.logic.element.ElementService;
 import acs.logic.user.ExtentedUserService;
 import acs.rest.action.ActionBoundary;
 import acs.rest.users.UserBoundary;
 
-//consumes =  type of input
-//produces =  type of output
 
 @RestController
 public class AdminController {
@@ -24,10 +20,8 @@ public class AdminController {
 	private final String DEFAULT_PAGE_SIZE = "10";
 	private final String DEFAULT_PAGE_NUM = "0";
 	
-	// ask if should i change to extended Element service
 	private ExtentedUserService dbUserService;
 	private ElementService dbElementeService;
-//	private ActionService actionService;
 	private ExtendedActionService actionService;
 
 	@Autowired

@@ -4,19 +4,17 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 
 @Embeddable
-public class ElementIdEntity implements Serializable {
+public class ElementIdEntity  implements Serializable {
+	
+	
 	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = -5130710627011039756L;
 	private String domain;
 	private String id;
 	

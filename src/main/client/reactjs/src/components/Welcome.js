@@ -10,9 +10,13 @@ export default class Welcome extends Component {
             <div>
                 {
                     user === null ?
-                    <h2> Welcome Guys</h2>
+                    <h2 style={{fontSize: 60,color: "grey",textAlign: 'center'}}> Welcome to roundMe</h2>
                     :
-                    <h2> Welcome To {username}</h2>
+                    <h2> Welcome {username}</h2>
+
+                }
+                {
+                    <img src="roundMe.jpg" alt=""/>
 
                 }
              </div>

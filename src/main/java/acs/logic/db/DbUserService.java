@@ -49,13 +49,6 @@ public class DbUserService implements ExtentedUserService {
 
 	}
 
-	@PostConstruct
-	public void init() {
-		// initialize object after injection
-		System.err.println("Project : " + this.projectName);
-
-	}
-
 	@Override
 	@Transactional
 	public UserBoundary createUser(UserBoundary user) {

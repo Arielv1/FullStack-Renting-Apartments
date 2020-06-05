@@ -4,18 +4,6 @@ package acs.rest.users;
 import acs.data.utils.UserRole;
 import acs.rest.utils.UserIdBoundary;
 
-/*
- {
- 	"userId": { 
- 		"domain" : "2020.b@demo",
- 		"email" : "tomerarnon@gmail.com"
- 	},
- 	"userName" : "demo user",
- 	"role" : "PLAYER",
- 	"avatar" : ";-)"
- } 
- * 
- */
 
 public class UserBoundary {
 	private UserIdBoundary userId;

@@ -1,21 +1,6 @@
 package acs.rest.users;
 
-
-
 import acs.data.utils.UserRole;
-
-
-/*
- * {
- * 
- * "email": "tmoer32@gmail.com",
- *  "username": "tomer arnon", 
-	"role" : "PLAYER",
-	"avatar": ";-)"
-	
-	}
- 
- */
 
 public class UserNewDetails {
 
