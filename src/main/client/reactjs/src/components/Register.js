@@ -62,7 +62,7 @@ export default class Register extends React.Component {
             <div>
             <Card className={"border border-dark bg-dark text-white"}>
             <Card.Header>
-                <FontAwesomeIcon icon={faPlusSquare} /> Login
+                <FontAwesomeIcon icon={faPlusSquare} /> Register
             </Card.Header>
             <Form onSubmit={this.handleSubmit}>
                 <Card.Body>

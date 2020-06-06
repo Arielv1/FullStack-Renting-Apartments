@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Card, Table, InputGroup, FormControl,ButtonGroup, Button} from 'react-bootstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faList, faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
-import {faStepBackward, faFastBackward, faStepForward} from '@fortawesome/free-solid-svg-icons';
+import {faStepBackward, faFastBackward, faStepForward, faSearch, faTimes} from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import MyToast from './MyToast';
 import {Link} from 'react-router-dom';
@@ -36,10 +36,14 @@ export default class ApartmentsList extends Component {
 
     changePage = event => {
         let targetPage = parseInt(event.target.value);
-        this.findAllApartments(targetPage);
-        this.setState({
-            [event.target.name]: targetPage
-        });
+        if(this.state.search){
+            this.searchData(targetPage)
+        }else{
+            this.findAllBuildings(targetPage);
+        }
+        // this.setState({
+        //     [event.target.name]: targetPage
+        // });
     };
 
     firstPage = () => {
@@ -52,18 +56,23 @@ export default class ApartmentsList extends Component {
 
     prevPage = () => {
         if(this.state.currentPage > 0) {
-            this.findAllApartments(this.state.currentPage -1);
-            this.setState({
-                currentPage: this.state.currentPage -1
-            });
+            if(this.state.search){
+                this.searchData( this.state.currentPage -1)
+            }else{
+                this.findAllBuildings( this.state.currentPage -1);
+            }
+            
+                
         }
     };
 
     nextPage = () => {
-        this.setState({
-            currentPage: this.state.currentPage +1
-        });
-        this.findAllApartments(this.state.currentPage + 1);
+        if(this.state.search){
+            this.searchData(this.state.currentPage + 1)
+        }else{
+            this.findAllBuildings(this.state.currentPage + 1);
+        }
+        
     };
 
     deleteApartment = (element) => {
@@ -100,8 +109,30 @@ export default class ApartmentsList extends Component {
             });
     };
 
+    searchChange = event => {
+        this.setState({
+            [event.target.name] : event.target.value
+        });
+    };
+
+    cancelChange = () => {
+        this.setState({"search" : ''});
+        this.findAllApartments(this.state.currentPage);
+    };
+
+    searchData = (currentPage) => {
+        axios.get("/acs/elements/2020b.ofir.cohen/m@gmail.com/search/byType/Apartment?page="+currentPage+"&size="+this.state.elementsPerPage)
+            .then(response => response.data)
+            .then((data) => {
+                console.log(data);
+                this.setState({
+                    elements: data
+                });
+            });
+    }
+
     render(){
-        const {elements, currentPage} = this.state;
+        const {elements, currentPage, search} = this.state;
         const pageNumCss = {
             width: "45px",
             border: "1px solid #17A2B8",
@@ -116,7 +147,27 @@ export default class ApartmentsList extends Component {
                 <MyToast show = {this.state.show} message = {"Apartment Deleted Successfully."} type = {"danger"}/>
                 </div>
                 <Card className={"border border-dark bg-dark text-white"}>
-                <Card.Header><FontAwesomeIcon icon={faList}/> Apartment List</Card.Header>
+                <Card.Header>
+                <div style={{"float":"left"}}> 
+                    <FontAwesomeIcon icon={faList}/> Apartments List
+                    </div>
+                    <div style={{"float":"right"}}>
+                        <InputGroup  size="sm">
+                            <FormControl placeholder="search" name="search" value={search} 
+                            className={" info-border bg-dark text-white"}  onChange={this.searchChange} />
+                           
+                            <InputGroup.Append>
+                                <Button size="sm" variant="outline-info" type="button" onClick={this.searchData}>
+                                <FontAwesomeIcon icon={faSearch}/> 
+                                </Button>
+                                <Button size="sm" variant="outline-info" type="button" onClick={this.cancelChange}>
+                                <FontAwesomeIcon icon={faTimes}/> 
+                                </Button>
+                            </InputGroup.Append>
+                        </InputGroup>
+
+                    </div>
+                </Card.Header>
                 <Card.Body>
                     <Table bordered hover striped variant="dark">
                         <thead>
