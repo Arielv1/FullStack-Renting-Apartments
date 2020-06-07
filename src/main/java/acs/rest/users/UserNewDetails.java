@@ -1,6 +1,9 @@
 package acs.rest.users;
 
 import acs.data.utils.UserRole;
+/*
+ 
+ */
 
 public class UserNewDetails {
 
