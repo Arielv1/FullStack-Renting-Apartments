@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -113,14 +112,14 @@ public class DbElementService implements ExtendedElementService {
 			entity.setType(update.getType()); 
 		}
 		else {
-			throw new RuntimeException("ElementEntity invalid type");
+			throw new RuntimeException("Invalid type , please try again");
 		}
 		
 		if(update.getName() != null && !update.getName().trim().isEmpty()) {
 			entity.setName(update.getName()); 
 		}
 		else {
-			throw new RuntimeException("ElementEntity invalid name");
+			throw new RuntimeException("Invalid name , please try again");
 		}
 		
 		if (update.getActive() != null) {
@@ -499,8 +498,11 @@ public class DbElementService implements ExtendedElementService {
 		// Check if element exists
 		ElementEntity entity = retrieveElementFromDb(element.getDomain(), element.getId());
 		
+		// Performs delete by setting 'active' to false
+		entity.setActive(false);
+		
 		// Deletes the element
-		this.elementDao.delete(entity);
+		this.elementDao.save(entity);
 	}
 	
 }

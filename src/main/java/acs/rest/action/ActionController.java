@@ -1,6 +1,5 @@
 package acs.rest.action;
 
-import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,17 +37,11 @@ public class ActionController {
 		
 		// check if 'searchElementsByNameAndType' is invoked
 		if(action.getType().equals(ACTION_TYPES[1])) {
-			String type = "", name = "";
+			String type , name;
 			
-			for(Entry<String, Object> es : action.getActionAttributes().entrySet()) {
-				if(es.getKey().equals(EXPECTED_SEARCH_FIELDS[0])) { // search for 'type' key
-					type = (String) es.getValue();
-				}
-				if(es.getKey().equals(EXPECTED_SEARCH_FIELDS[1])) { // search for 'name' key
-					name = (String) es.getValue();
-				}
-			}
-			
+			type = action.getActionAttributes().get(EXPECTED_SEARCH_FIELDS[0]).toString();
+			name = action.getActionAttributes().get(EXPECTED_SEARCH_FIELDS[1]).toString();
+						
 			return this.elementService.searchElementsByNameAndType(action.getInvokedBy().getUserId(), 
 					name, 
 					type, 

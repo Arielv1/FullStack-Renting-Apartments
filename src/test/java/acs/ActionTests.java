@@ -3,20 +3,15 @@ package acs;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import javax.annotation.PostConstruct;
-
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
-
 import acs.data.utils.UserRole;
 import acs.rest.action.ActionBoundary;
 import acs.rest.action.boundaries.ActionElementBoundary;
@@ -27,11 +22,8 @@ import acs.rest.users.UserBoundary;
 import acs.rest.users.UserNewDetails;
 import acs.rest.utils.IdBoundary;
 import acs.rest.utils.UserIdBoundary;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ActionTests {

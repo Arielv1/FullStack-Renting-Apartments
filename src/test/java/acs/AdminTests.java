@@ -1,23 +1,17 @@
 package acs;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import javax.annotation.PostConstruct;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
-
-import acs.data.utils.UserIdEntity;
 import acs.data.utils.UserRole;
 import acs.rest.action.ActionBoundary;
 import acs.rest.action.boundaries.ActionElementBoundary;
@@ -208,7 +202,9 @@ public class AdminTests {
 				.getForObject(this.url + GET_ALL_ELEMENTS_OF_USER, 
 						ElementBoundary[].class, 
 						manager.getUserId().getDomain(), manager.getUserId().getEmail()))
-			.hasSize(4);
+			.hasSize(5);
+		
+		assertThat(dbContent[0].getActive() == false);
 	}
 	
 	@Test
