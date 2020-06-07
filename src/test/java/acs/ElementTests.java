@@ -4,35 +4,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
 import javax.annotation.PostConstruct;
-
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import acs.data.elements.ElementEntity;
-import acs.data.utils.ElementIdEntity;
 import acs.data.utils.UserRole;
-import acs.logic.exceptions.PageNotFound;
-import acs.logic.exceptions.ForbiddenActionException;
 import acs.rest.action.ActionBoundary;
-import acs.rest.action.boundaries.ActionElementBoundary;
 import acs.rest.action.boundaries.InvokedByBoundary;
 import acs.rest.element.boundaries.CreatedByBoundary;
 import acs.rest.element.boundaries.ElementBoundary;

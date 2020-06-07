@@ -4,18 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-
-import acs.aop.LogThisMethod;
-import acs.aop.PerformanceElapsedMonitor;
 import acs.dal.UserDao;
 import acs.data.users.UserEntity;
 import acs.data.utils.UserIdEntity;
@@ -83,8 +77,6 @@ public class DbUserService implements ExtentedUserService {
 
 	@Override
 	@Transactional
-	@LogThisMethod
-	@PerformanceElapsedMonitor
 	public UserBoundary login(String userDomain, String userEmail) {
 
 		if (!(valid.isEmailVaild(userEmail))) {
