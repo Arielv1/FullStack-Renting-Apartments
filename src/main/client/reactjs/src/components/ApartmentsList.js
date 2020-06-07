@@ -120,15 +120,34 @@ export default class ApartmentsList extends Component {
         this.findAllApartments(this.state.currentPage);
     };
 
-    searchData = (currentPage) => {
-        axios.get("/acs/elements/2020b.ofir.cohen/m@gmail.com/search/byType/Apartment?page="+currentPage+"&size="+this.state.elementsPerPage)
-            .then(response => response.data)
-            .then((data) => {
-                console.log(data);
+    searchData = () => {
+        console.log(this.state.search)
+        const action = 
+        {
+            type:"searchElementsByNameAndType",
+    
+            invokedBy: { "userId":{
+                "domain": "2020b.ofir.cohen",
+                "email": "m@gmail.com"
+            }},
+            actionAttributes:{
+                "type" : "Apartment",
+                "name" : this.state.search
+                
+            }
+        }
+        axios.post("acs/actions",action)
+        .then(response => {
+            if(response.data != null) {
+                console.log(response.data)
                 this.setState({
-                    elements: data
+                    elements: response.data
+                    
                 });
-            });
+            } else {
+                this.setState({"show":false});
+            }
+        });
     }
 
     render(){
