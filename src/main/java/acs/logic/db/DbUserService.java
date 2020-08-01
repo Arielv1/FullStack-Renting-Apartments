@@ -30,7 +30,7 @@ public class DbUserService implements ExtentedUserService {
 	private UserConvertor convertor;
 	private ValidEmail valid;
 
-	@Value("${spring.application.name:ofir.cohen}")
+	@Value("${spring.application.name:roundMe}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}

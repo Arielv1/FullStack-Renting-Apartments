@@ -48,7 +48,7 @@ public class UserTests {
 	public void init() {
 		this.url = "http://localhost:" + this.port + "/acs/";
 		this.restTemplate = new RestTemplate();
-		this.domain = "2020b.ofir.cohen";
+		this.domain = "roundMe";
 		
 		this.player = this.restTemplate.postForObject(this.url + POST ,
 				 new UserNewDetails("p@gmail.com", UserRole.PLAYER, "player", ":_"),

@@ -52,7 +52,7 @@ public class DbActionService implements ExtendedActionService {
 	}
 
 	// inject value from configuration or use default value
-	@Value("${spring.application.name:ofir.cohen}")
+	@Value("${spring.application.name:roundMe}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}

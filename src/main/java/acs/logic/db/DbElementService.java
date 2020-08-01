@@ -41,7 +41,7 @@ public class DbElementService implements ExtendedElementService {
 	
 	private ElementConverter converter;
 		
-	@Value("${spring.application.name:ofir.cohen}")
+	@Value("${spring.application.name:roundMe}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
