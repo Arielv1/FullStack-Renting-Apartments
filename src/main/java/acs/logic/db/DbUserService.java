@@ -29,7 +29,8 @@ public class DbUserService implements ExtentedUserService {
 	private UserDao userDao;
 	private UserConvertor convertor;
 	private ValidEmail valid;
-
+	
+	// If there's no project name if properties file, inject with default name
 	@Value("${spring.application.name:roundMe}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
@@ -48,14 +49,14 @@ public class DbUserService implements ExtentedUserService {
 	public UserBoundary createUser(UserBoundary user) {
 
 		if (!valid.isEmailVaild(user.getUserId().getEmail())) {
-			throw new RuntimeException("Email invalid!!");
+			throw new RuntimeException("Invalid Email");
 		}
 
 		if (user.getAvatar() == null && user.getAvatar().trim().isEmpty()) {
-			throw new RuntimeException("Avatar invalid!!");
+			throw new RuntimeException("Invalid Avatar");
 		}
 		if (user.getUsername() == null) {
-			throw new RuntimeException("User Name invalid!!");
+			throw new RuntimeException("Invalid Username");
 		}
 
 		user.setUserId(new UserIdBoundary(this.projectName, user.getUserId().getEmail()));
@@ -63,14 +64,14 @@ public class DbUserService implements ExtentedUserService {
 
 		Optional<UserEntity> entityOptional = this.userDao.findById(userId);
 		if (entityOptional.isPresent()) {
-			throw new RuntimeException("the User alreay exsite in the data base!!");
+			throw new RuntimeException("the User alreay exists in the data base!!");
 		} else {
 			if (user.getRole() != null) {
 				UserEntity entity = this.convertor.toEntity(user);
 				this.userDao.save(entity);
 				return this.convertor.fromEntity(entity);
 			} else {
-				throw new RuntimeException("the role is not from UserRole type");
+				throw new RuntimeException("There's no such role - must be PLAYER/MANAGER/ADMIN");
 			}
 		}
 	}
@@ -80,7 +81,7 @@ public class DbUserService implements ExtentedUserService {
 	public UserBoundary login(String userDomain, String userEmail) {
 
 		if (!(valid.isEmailVaild(userEmail))) {
-			throw new RuntimeException("Email invalid!!");
+			throw new RuntimeException("Invalid Email!");
 		}
 
 		UserIdEntity userId = new UserIdEntity(userDomain, userEmail);
@@ -101,14 +102,14 @@ public class DbUserService implements ExtentedUserService {
 	public UserBoundary updateUser(String userDomain, String userEmail, UserBoundary update) {
 
 		if (!valid.isEmailVaild(userEmail)) {
-			throw new RuntimeException("Email invalid!!");
+			throw new RuntimeException("Invalid Email!");
 		}
 
 		if (update.getAvatar() == null && update.getAvatar().trim().isEmpty()) {
-			throw new RuntimeException("Avatar invalid!!");
+			throw new RuntimeException("Invalid Avatar!");
 		}
 		if (update.getUsername() == null) {
-			throw new RuntimeException("User Name invalid!!");
+			throw new RuntimeException("Invalid Username!");
 		}
 
 		UserIdEntity userId = new UserIdEntity(userDomain, userEmail);
@@ -128,7 +129,7 @@ public class DbUserService implements ExtentedUserService {
 	@Transactional
 	public List<UserBoundary> getAllUsers(String adminDomain, String adminEmail) {
 		if (!valid.isEmailVaild(adminEmail)) {
-			throw new RuntimeException("Email invalid");
+			throw new RuntimeException("Invalid Email!");
 		}
 
 		return StreamSupport.stream(this.userDao.findAll().spliterator(), false).map(this.convertor::fromEntity)
@@ -148,7 +149,7 @@ public class DbUserService implements ExtentedUserService {
 		}
 
 		if (!valid.isEmailVaild(adminEmail)) {
-			throw new RuntimeException("Email invalid");
+			throw new RuntimeException("Invalid Email!");
 		}
 		return this.userDao.findAll(
 				// use pagination base on size & page and sort by ID in

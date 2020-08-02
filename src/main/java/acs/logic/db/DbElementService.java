@@ -40,7 +40,8 @@ public class DbElementService implements ExtendedElementService {
 	private UserDao userDao;
 	
 	private ElementConverter converter;
-		
+	
+	// If there's no project name if properties file, inject with default name
 	@Value("${spring.application.name:roundMe}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
@@ -203,8 +204,7 @@ public class DbElementService implements ExtendedElementService {
 		
 		if(user.getRole().equals(UserRole.MANAGER) || (user.getRole().equals(UserRole.PLAYER) && element.getActive())) {
 			// manager has access to all elements , player can only get 'active is true' elements
-			
-			System.err.println("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL\n" + this.converter.fromEntity(element));
+
 			
 			return this.converter.fromEntity(element);		
 		}

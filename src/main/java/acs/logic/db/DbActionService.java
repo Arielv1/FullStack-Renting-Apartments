@@ -51,7 +51,7 @@ public class DbActionService implements ExtendedActionService {
 		this.valid = valid;
 	}
 
-	// inject value from configuration or use default value
+	// If there's no project name if properties file, inject with default name
 	@Value("${spring.application.name:roundMe}")
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
